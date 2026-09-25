@@ -47,7 +47,7 @@ export function appNode(): Node {
     browserRequirements: "JavaScript 필요",
     isAccessibleForFree: true,
     offers: { "@type": "Offer", price: "0", priceCurrency: "KRW" },
-    featureList: ["다섯 가지 질문으로 조건 입력", "공고별 신청 가능·확인 필요·해당 없음 판정", "예상 순위 계산", "민영주택 가점 84점 계산"],
+    featureList: ["여섯 가지 질문으로 조건 입력", "공고별 신청 가능·확인 필요·해당 없음 판정", "예상 순위 계산", "민영주택 가점 84점 계산"],
     inLanguage: "ko-KR",
     publisher: { "@id": ORG_ID },
   };

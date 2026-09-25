@@ -130,7 +130,14 @@ export interface Announcement {
 
 /* ───────────────────────── 사용자 프로필 ───────────────────────── */
 
-export type Marital = "single" | "engaged" | "newlywed" | "married";
+/**
+ * 혼인 상태.
+ *   single   미혼(결혼한 적 없음)
+ *   engaged  결혼 예정(예비부부)
+ *   newlywed 결혼 7년 이내 / married 결혼 7년 넘음 — 혼인신고 연도(marriedYear)가 있으면 그 값으로 다시 따진다
+ *   solo     혼자(이혼·사별 등) — 지금 혼인 중이 아님. 배우자 없이 가구를 센다
+ */
+export type Marital = "single" | "engaged" | "newlywed" | "married" | "solo";
 export type HomeStatus = "none" | "own" | "familyOwn";
 export type SpecialStatus = "recipient" | "nearPoor" | "singleParent" | "disabled" | "veteran";
 
@@ -142,30 +149,41 @@ export interface Profile {
   birthYear?: number;
   sido?: Sido;
   sigungu?: string;
-  /** 지금 사는 시·도에 산 기간(년, 대략) */
+  /** 지금 사는 시·도에 산 기간(년, 정확한 연수) */
   residenceYears?: number;
   marital?: Marital;
+  /** 혼인신고 연도. 있으면 「7년 이내」·신혼 배점 혼인 기간·가점 무주택 기간 시작을 이 값으로 계산한다 */
+  marriedYear?: number;
   /** 자녀 수(미성년, 태아 포함). 3은 「3명 이상」 */
   children?: number;
-  /** 2세 미만 아기가 있거나 임신 중 */
+  /** 2세 미만 아기가 있거나 임신 중. 자녀가 0명이면 묻지 않고 false로 본다(derive) */
   infant?: boolean;
+  /**
+   * 만 6세 이하 자녀 수(0~3, 3은 「3명 이상」). 매입·전세임대·행복주택 신혼 계층의 「6세 이하 자녀 가구」,
+   * 한부모 조건, 다자녀 배점 「영유아 자녀」에 쓴다. 자녀가 0명이면 묻지 않고 0으로 본다(derive).
+   */
+  youngChildren?: number;
   home?: HomeStatus;
   /** 세대원 모두 집을 가져 본 적이 없다(생애최초) */
   neverOwned?: boolean;
-  /** 무주택이 된 지(년). 쭉 무주택이면 99 */
+  /** 무주택이 된 지(년, 정확한 연수). 쭉 무주택이면 99 */
   homelessYears?: number;
   /** 세전 월소득(가구 합산, 만원) 구간. 모르면 undefined */
   income?: Band;
   dualIncome?: boolean;
   hasAccount?: boolean;
-  /** 청약통장 가입 기간(개월) 구간 */
+  /** 청약통장 가입 기간(개월) 구간. 정확한 연수 y는 {min: y*12, max: y*12+11} */
   accountMonths?: Band;
+  /** 배우자 청약통장 가입 기간(개월) 구간 — 가점 통장 항목에 점수의 50%(최대 3점)를 더한다 */
+  spouseAccountMonths?: Band;
   /** 납입 인정 횟수 구간 */
   payments?: Band;
   /** 예치금·납입 총액(만원) 구간 */
   deposit?: Band;
   /** 총자산(만원) 구간 — 부동산·금융·자동차 합, 부채 차감 */
   assets?: Band;
+  /** 부동산(토지·건물, 만원) 구간. 없으면 {0,0}. 공공분양·민영 특공의 부동산 기준에 먼저 쓴다 */
+  property?: Band;
   /** 자동차가액(만원) 구간. 차 없으면 {0,0} */
   car?: Band;
   householdHead?: boolean;
@@ -179,7 +197,7 @@ export interface Profile {
   taxFiveYears?: boolean;
 }
 
-/** 금액 구간(만원). max=null이면 「이상」 */
+/** 금액 구간(만원). max=null이면 「이상」, min===max면 정확한 금액 */
 export interface Band {
   min: number;
   max: number | null;

@@ -1,4 +1,7 @@
-import type { Band, HomeStatus, Marital, Profile, SpecialStatus } from "./domain";
+import type { Band, HomeStatus, Marital, Profile, ProfileKey, SpecialStatus } from "./domain";
+import { placeText } from "./place";
+import { bandText, incomeText, manwon, monthsBandText } from "./rules/core";
+import { standardsFor } from "./rules/standards";
 
 /** 선택지 하나. value는 프로필에 그대로 들어간다 */
 export interface Option<T> {
@@ -12,6 +15,7 @@ export const MARITAL: Option<Marital>[] = [
   { label: "결혼 예정", value: "engaged", sub: "예비부부" },
   { label: "결혼 7년 이내", value: "newlywed" },
   { label: "결혼 7년 넘음", value: "married" },
+  { label: "혼자예요", value: "solo", sub: "이혼·사별 등" },
 ];
 
 export const CHILDREN: Option<number>[] = [
@@ -21,23 +25,45 @@ export const CHILDREN: Option<number>[] = [
   { label: "3명 이상", value: 3 },
 ];
 
+/**
+ * 만 6세 이하 자녀 수 — 자녀가 1명 이상일 때만 묻는다(0명이면 판정 엔진이 0으로 본다).
+ * 매입·전세임대·행복주택 신혼 계층의 「6세 이하 자녀 가구」·한부모 조건, 다자녀 배점 「영유아」에 쓴다.
+ */
+export const YOUNG_CHILDREN_LABEL = "만 6세 이하 자녀";
+export const YOUNG_CHILDREN_HELP = "모집공고일 기준 만 나이로 세요.";
+
+export const YOUNG_CHILDREN: Option<number>[] = [
+  { label: "없음", value: 0 },
+  { label: "1명", value: 1 },
+  { label: "2명", value: 2 },
+  { label: "3명 이상", value: 3 },
+];
+
+/** 자녀 수보다 많은 선택지는 가린다 — 자녀 2명이면 「없음·1명·2명」 */
+export function youngChildrenOptions(children: number | undefined): Option<number>[] {
+  if (children === undefined || children >= 3) return YOUNG_CHILDREN;
+  return YOUNG_CHILDREN.filter((o) => o.value <= children);
+}
+
 export const HOME: Option<HomeStatus>[] = [
-  { label: "우리 세대 모두 집이 없어요", value: "none", sub: "같은 주민등록에 올라 있는 가족 모두" },
-  { label: "제 명의로 된 집이 있어요", value: "own", sub: "분양권·입주권 포함" },
-  { label: "가족 중에 집 가진 사람이 있어요", value: "familyOwn", sub: "배우자·부모님 등 같은 세대원" },
+  {
+    label: "주민등록등본에 같이 올라 있는 가족은 아무도 집이 없어요",
+    value: "none",
+    sub: "분양권·입주권도 집으로 쳐요",
+  },
+  { label: "제 이름으로 된 집이 있어요", value: "own", sub: "분양권·입주권도 집으로 쳐요" },
+  { label: "같이 올라 있는 가족 중에 집 가진 사람이 있어요", value: "familyOwn", sub: "배우자·부모님 등" },
 ];
 
 const b = (min: number, max: number | null): Band => ({ min, max });
 
-/** 세전 월소득(가구 합산, 만원) */
+/** 정확한 금액·횟수 하나를 구간으로 — 직접 입력한 값은 {min: x, max: x} */
+export const exactBand = (x: number): Band => b(x, x);
+
+/** 세전 월소득(가구 합산, 만원). 경계가 겹치지 않게 [300, 399] = 「300만 원대」 */
 export const INCOME: Option<Band>[] = [
-  { label: "200만 원 미만", value: b(0, 200) },
-  { label: "200~300만 원", value: b(200, 300) },
-  { label: "300~400만 원", value: b(300, 400) },
-  { label: "400~500만 원", value: b(400, 500) },
-  { label: "500~600만 원", value: b(500, 600) },
-  { label: "600~800만 원", value: b(600, 800) },
-  { label: "800~1,000만 원", value: b(800, 1000) },
+  { label: "200만 원 미만", value: b(0, 199) },
+  ...[200, 300, 400, 500, 600, 700, 800, 900].map((m) => ({ label: `${m}만 원대`, value: b(m, m + 99) })),
   { label: "1,000만 원 이상", value: b(1000, null) },
 ];
 
@@ -51,6 +77,28 @@ export const ACCOUNT_MONTHS: Option<Band>[] = [
   { label: "10~15년", value: b(120, 179) },
   { label: "15년 이상", value: b(180, null) },
 ];
+
+/**
+ * 통장 가입 기간 스테퍼 값 → 구간.
+ *   0 → 6개월 미만 [0,5] · 0.5 → 6개월~1년 [6,11] · 정수 y(1 이상) → y년 [y*12, y*12+11]
+ */
+export function accountBandFromYears(y: number): Band {
+  if (y < 0.5) return b(0, 5);
+  if (y < 1) return b(6, 11);
+  const n = Math.floor(y);
+  return b(n * 12, n * 12 + 11);
+}
+
+/** 구간 → 스테퍼 값(accountBandFromYears의 반대). 옛 선택지 구간이면 아래 끝 기준 */
+export function accountYearsFromBand(v: Band | undefined): number | undefined {
+  if (!v) return undefined;
+  if (v.min < 6) return 0;
+  if (v.min < 12) return 0.5;
+  return Math.floor(v.min / 12);
+}
+
+/** 스테퍼 값 글자: 0 → 「6개월 미만」, 0.5 → 「6개월~1년」, 5 → 「5년」 */
+export const accountYearsText = (y: number) => monthsBandText(accountBandFromYears(y));
 
 export const PAYMENTS: Option<Band>[] = [
   { label: "6회 미만", value: b(0, 5) },
@@ -74,22 +122,49 @@ export const DEPOSIT: Option<Band>[] = [
   { label: "1,500만 원 이상", value: b(1500, null) },
 ];
 
-/** 총자산(만원) — 부동산·금융자산·자동차 합에서 부채를 뺀 값 */
-export const ASSETS: Option<Band>[] = [
-  { label: "1억 원 미만", value: b(0, 9999) },
-  { label: "1억~2억", value: b(10000, 19999) },
-  { label: "2억~2억 5천", value: b(20000, 24999) },
-  { label: "2억 5천~3억 3천", value: b(25000, 32999) },
-  { label: "3억 3천~3억 5천", value: b(33000, 34999) },
-  { label: "3억 5천~5억", value: b(35000, 49999) },
-  { label: "5억 원 이상", value: b(50000, null) },
-];
+/* ── 자산·부동산·자동차: 경계를 기준표(standards.ts) 값에서 만든다 — 구간이 기준선에 걸치지 않게 ── */
 
+const STD_ASSETS = standardsFor().assets;
+
+/** 경계값 목록 → 선택지. 앞 구간은 「○ 이하」, 가운데는 「○ ~ ○」, 끝은 「○ 넘음」. 아래 끝은 「경계 + 1」 */
+function bandsFrom(cuts: { at: number; sub: string }[], zero?: Option<Band>): Option<Band>[] {
+  const sorted = [...cuts].sort((x, y) => x.at - y.at);
+  const out: Option<Band>[] = zero ? [zero] : [];
+  let lo = zero ? 1 : 0;
+  for (const c of sorted) {
+    const v = b(lo, c.at);
+    out.push({ label: bandText(v), value: v, sub: c.sub });
+    lo = c.at + 1;
+  }
+  out.push({ label: `${manwon(lo - 1)} 넘음`, value: b(lo, null) });
+  return out;
+}
+
+/** 총자산(만원) — 부동산·예금·자동차 등을 합치고 빚을 뺀 금액 */
+export const ASSETS: Option<Band>[] = bandsFrom([
+  { at: STD_ASSETS.happyStudent, sub: "행복주택 대학생 기준까지" },
+  { at: STD_ASSETS.publicSaleSmall, sub: "공공분양 부동산 기준까지" },
+  { at: STD_ASSETS.permanent, sub: "영구·매입임대 기준까지" },
+  { at: STD_ASSETS.happyYouth, sub: "행복주택 청년 기준까지" },
+  { at: STD_ASSETS.special29, sub: "민영 특공 부동산 기준까지" },
+  { at: STD_ASSETS.rentGeneral, sub: "국민·통합공공임대 기준까지" },
+  { at: STD_ASSETS.newhome, sub: "뉴홈 나눔형 기준까지" },
+]);
+
+/** 부동산(토지·건물, 만원) — 공공분양·민영 특공 추첨분이 보는 값 */
+export const PROPERTY: Option<Band>[] = bandsFrom(
+  [
+    { at: STD_ASSETS.publicSaleSmall, sub: "공공분양 기준까지" },
+    { at: STD_ASSETS.special29, sub: "민영 특공 추첨분 기준까지" },
+  ],
+  { label: "없어요", value: b(0, 0), sub: "월세·전세만 살아요" },
+);
+
+/** 자동차가액(만원, 가장 비싼 차) — 기준 하나(standards.ts car)만 가른다 */
 export const CAR: Option<Band>[] = [
   { label: "차 없음", value: b(0, 0) },
-  { label: "2,000만 원 미만", value: b(1, 1999) },
-  { label: "2,000~4,500만", value: b(2000, 4499) },
-  { label: "4,500만 원 이상", value: b(4500, null) },
+  { label: `${manwon(STD_ASSETS.car)} 이하`, value: b(1, STD_ASSETS.car) },
+  { label: `${manwon(STD_ASSETS.car)} 넘음`, value: b(STD_ASSETS.car + 1, null) },
 ];
 
 export const RESIDENCE_YEARS: Option<number>[] = [
@@ -117,6 +192,68 @@ export const SPECIAL: Option<SpecialStatus>[] = [
   { label: "국가유공자", value: "veteran" },
 ];
 
+/**
+ * 예/아니요 질문 — 모두 긍정형으로 묻고, options[0]이 늘 긍정(「있어요」·「네」)이다.
+ * 버튼은 options 순서대로 왼쪽부터 그리면 「긍정이 왼쪽」으로 통일된다.
+ * 「집을 가져 본 적이 없나요?」 같은 이중부정은 쓰지 않는다 — 값이 반대인 칸(neverOwned)은 value로 뒤집는다.
+ */
+export interface YesNoQuestion {
+  key: ProfileKey;
+  label: string;
+  help?: string;
+  options: [Option<boolean>, Option<boolean>];
+}
+
+const YES: Option<boolean> = { label: "네", value: true };
+const NO: Option<boolean> = { label: "아니요", value: false };
+
+export const YES_NO = {
+  hasAccount: {
+    key: "hasAccount",
+    label: "청약통장이 있나요?",
+    help: "주택청약종합저축(또는 청약저축·예금·부금)",
+    options: [{ label: "있어요", value: true }, { label: "없어요", value: false }],
+  },
+  dualIncome: { key: "dualIncome", label: "맞벌이인가요?", options: [{ label: "네, 맞벌이예요", value: true }, NO] },
+  infant: {
+    key: "infant",
+    label: "2세 미만 아기가 있거나 임신 중인가요?",
+    options: [{ label: "있어요", value: true }, { label: "없어요", value: false }],
+  },
+  householdHead: {
+    key: "householdHead",
+    label: "세대주인가요?",
+    help: "주민등록등본 맨 위에 이름이 있으면 세대주예요",
+    options: [{ label: "네, 세대주예요", value: true }, NO],
+  },
+  livesWithParents: {
+    key: "livesWithParents",
+    label: "만 65세 이상 부모님을 3년 넘게 모시고 있나요?",
+    help: "같은 주민등록등본에 올라 있어야 해요",
+    options: [YES, NO],
+  },
+  neverOwned: {
+    key: "neverOwned",
+    label: "우리 세대에 집을 가졌던 적이 있는 사람이 있나요?",
+    help: "지금은 없어도, 예전에 가졌다가 판 적이 있으면 「있어요」예요",
+    // 값이 반대: 「있어요」 = neverOwned false
+    options: [{ label: "있어요", value: false }, { label: "없어요", value: true }],
+  },
+  wonRecently: {
+    key: "wonRecently",
+    label: "최근 5년 안에 청약에 당첨된 적이 있나요?",
+    help: "세대원 누구든 당첨됐으면 「있어요」예요",
+    options: [{ label: "있어요", value: true }, { label: "없어요", value: false }],
+  },
+  student: { key: "student", label: "대학생인가요?", help: "재학·입학 예정·졸업 2년 이내", options: [YES, NO] },
+  taxFiveYears: {
+    key: "taxFiveYears",
+    label: "근로·사업소득세를 5년 이상 냈나요?",
+    help: "생애최초 특별공급 조건이에요",
+    options: [YES, NO],
+  },
+} as const satisfies Record<string, YesNoQuestion>;
+
 const sameBand = (x?: Band, y?: Band) => !!x && !!y && x.min === y.min && x.max === y.max;
 
 export function optionLabel<T>(opts: Option<T>[], v: T | undefined): string | undefined {
@@ -131,15 +268,18 @@ export function optionLabel<T>(opts: Option<T>[], v: T | undefined): string | un
 export function profileChips(p: Profile): string[] {
   const out: string[] = [];
   if (p.birthYear) out.push(`${String(p.birthYear).slice(2)}년생`);
-  if (p.sido) out.push(p.sigungu ? `${p.sido} ${p.sigungu}` : p.sido);
-  const m = optionLabel(MARITAL, p.marital);
-  if (m) out.push(m);
+  if (p.sido) out.push(placeText({ sido: p.sido, sigungu: p.sigungu }));
+  if (p.marital === "solo") out.push("혼자(이혼·사별)");
+  else if ((p.marital === "newlywed" || p.marital === "married") && p.marriedYear) out.push(`${p.marriedYear}년 결혼`);
+  else {
+    const m = optionLabel(MARITAL, p.marital);
+    if (m) out.push(m);
+  }
   if (p.children !== undefined) out.push(p.children ? `자녀 ${p.children >= 3 ? "3명+" : `${p.children}명`}` : "자녀 없음");
-  if (p.home) out.push({ none: "무주택", own: "주택 소유", familyOwn: "세대원 주택 소유" }[p.home]);
-  const inc = optionLabel(INCOME, p.income);
-  if (inc) out.push(`월 ${inc.replace(" 원", "")}`);
+  if (p.children && p.youngChildren) out.push(`6세 이하 ${p.youngChildren >= 3 ? "3명+" : `${p.youngChildren}명`}`);
+  if (p.home) out.push({ none: "무주택", own: "집 있음", familyOwn: "가족 집 있음" }[p.home]);
+  if (p.income) out.push(incomeText(p.income));
   if (p.hasAccount === false) out.push("통장 없음");
-  const acc = optionLabel(ACCOUNT_MONTHS, p.accountMonths);
-  if (acc) out.push(`통장 ${acc}`);
+  else if (p.accountMonths) out.push(`통장 ${monthsBandText(p.accountMonths)}`);
   return out;
 }

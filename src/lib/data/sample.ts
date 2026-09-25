@@ -1,4 +1,25 @@
-import type { Announcement } from "@/lib/domain";
+import type { Announcement, Profile } from "@/lib/domain";
+
+/**
+ * 홈 데모용 예시 프로필 — 실제 사람이 아니다.
+ * 1997년생 · 서울 강동구 · 미혼 · 자녀 없음 · 무주택 · 월 300만 원대 · 총자산 1억 800만 원 이하 · 차 없음
+ * · 청약통장 없음 · 해당 계층 없음.
+ * 구간 값은 questions.ts 선택지와 같은 모양이다(소득 [300, 399], 자산 [0, 10800]).
+ * 예시 공고 16건으로 돌리면 신청 가능 5 · 확인 필요 2 · 해당 없음 8 · 마감 1(2026-09 기준).
+ */
+export const EXAMPLE_PROFILE: Readonly<Profile> = Object.freeze({
+  birthYear: 1997,
+  sido: "서울",
+  sigungu: "강동구",
+  marital: "single",
+  children: 0,
+  home: "none",
+  income: { min: 300, max: 399 },
+  assets: { min: 0, max: 10800 },
+  car: { min: 0, max: 0 },
+  hasAccount: false,
+  special: [],
+});
 
 /**
  * 예시 공고. 실제 공고가 아니다 — 판정 엔진과 화면을 보여주기 위한 데이터다(단지명은 가상).
@@ -38,9 +59,9 @@ export function sampleAnnouncements(today = new Date()): Announcement[] {
         { name: "전용 36㎡", area: 36, units: 40, deposit: 6300, rent: 28 },
       ],
       groups: [
-        { id: "youth", label: "청년 계층", units: 150, basis: "notice" },
+        { id: "youth", label: "청년 계층", units: 132, basis: "notice" },
         { id: "newlywed", label: "신혼부부·한부모 계층", units: 60, basis: "notice" },
-        { id: "elderly", label: "고령자 계층", units: 30, basis: "notice" },
+        { id: "elderly", label: "고령자 계층", units: 48, basis: "notice" },
       ],
       summary: ["임대료는 주변 시세의 60~80% 수준이에요.", "청년은 최장 6년, 신혼부부는 자녀가 있으면 최장 10년 살 수 있어요."],
     },
@@ -110,12 +131,12 @@ export function sampleAnnouncements(today = new Date()): Announcement[] {
         { name: "84A", area: 84, units: 210, price: 118000 },
       ],
       groups: [
-        { id: "gen1", label: "일반공급", units: 150, basis: "notice" },
+        { id: "gen1", label: "일반공급", units: 164, basis: "notice" },
         { id: "spNewlywed", label: "신혼부부 특별공급", units: 44, basis: "notice" },
         { id: "spFirst", label: "생애최초 특별공급", units: 20, basis: "notice" },
         { id: "spNewborn", label: "신생아 특별공급", units: 29, basis: "notice" },
         { id: "spMultiChild", label: "다자녀 특별공급", units: 29, basis: "notice" },
-        { id: "spParents", label: "노부모부양 특별공급", units: 9, basis: "notice" },
+        { id: "spParents", label: "노부모부양 특별공급", units: 8, basis: "notice" },
       ],
       summary: ["투기과열지구·조정대상지역이라 1순위 요건이 더 까다로워요.", "당첨되면 10년간 다른 청약 당첨이 제한돼요."],
     },
@@ -193,7 +214,7 @@ export function sampleAnnouncements(today = new Date()): Announcement[] {
         { name: "59A", area: 59, units: 260, price: 44500 },
       ],
       groups: [
-        { id: "gen1", label: "일반공급", units: 110, basis: "notice" },
+        { id: "gen1", label: "일반공급", units: 176, basis: "notice" },
         { id: "spNewborn", label: "신생아 특별공급", units: 88, basis: "notice" },
         { id: "spNewlywed", label: "신혼부부 특별공급", units: 44, basis: "notice" },
         { id: "spFirst", label: "생애최초 특별공급", units: 66, basis: "notice" },
@@ -251,7 +272,7 @@ export function sampleAnnouncements(today = new Date()): Announcement[] {
         { name: "101A", area: 101, units: 60, price: 64000 },
       ],
       groups: [
-        { id: "gen1", label: "일반공급", units: 220, basis: "notice" },
+        { id: "gen1", label: "일반공급", units: 264, basis: "notice" },
         { id: "spNewlywed", label: "신혼부부 특별공급", units: 45, basis: "notice" },
         { id: "spFirst", label: "생애최초 특별공급", units: 21, basis: "notice" },
         { id: "spMultiChild", label: "다자녀 특별공급", units: 30, basis: "notice" },
@@ -289,11 +310,10 @@ export function sampleAnnouncements(today = new Date()): Announcement[] {
         { name: "전용 36㎡", area: 36, units: 50, deposit: 3300, rent: 17 },
       ],
       groups: [
-        { id: "student", label: "대학생 계층", units: 30, basis: "notice" },
-        { id: "youth", label: "청년 계층", units: 70, basis: "notice" },
-        { id: "newlywed", label: "신혼부부 계층", units: 40, basis: "notice" },
+        { id: "newlywed", label: "신혼부부·한부모 계층", units: 112, basis: "notice" },
+        { id: "elderly", label: "고령자 계층", units: 28, basis: "notice" },
       ],
-      summary: ["오늘 17시에 접수가 마감돼요.", "대학생 계층은 자동차가 있으면 신청할 수 없어요."],
+      summary: ["오늘 17시에 접수가 마감돼요.", "이번 공고는 신혼부부·한부모와 고령자 계층만 모집해요."],
     },
     {
       id: "apt-songpa",
@@ -322,12 +342,12 @@ export function sampleAnnouncements(today = new Date()): Announcement[] {
         { name: "114A", area: 114, units: 30, price: 231000 },
       ],
       groups: [
-        { id: "gen1", label: "일반공급", units: 100, basis: "notice" },
+        { id: "gen1", label: "일반공급", units: 119, basis: "notice" },
         { id: "spNewlywed", label: "신혼부부 특별공급", units: 24, basis: "notice" },
         { id: "spFirst", label: "생애최초 특별공급", units: 11, basis: "notice" },
         { id: "spNewborn", label: "신생아 특별공급", units: 16, basis: "notice" },
         { id: "spMultiChild", label: "다자녀 특별공급", units: 16, basis: "notice" },
-        { id: "spParents", label: "노부모부양 특별공급", units: 5, basis: "notice" },
+        { id: "spParents", label: "노부모부양 특별공급", units: 4, basis: "notice" },
       ],
       summary: ["분양가상한제 단지라 거주의무·전매제한이 있어요.", "서울 거주 2년 이상이어야 해당지역 우선이에요."],
     },
@@ -377,10 +397,11 @@ export function sampleAnnouncements(today = new Date()): Announcement[] {
       schedule: { announced: r(-20), applyStart: r(-12), applyEnd: r(-3), winners: r(20) },
       units: [{ name: "전용 26㎡", area: 26, units: 80, deposit: 2100, rent: 11 }],
       groups: [
-        { id: "youth", label: "청년 계층", units: 50, basis: "notice" },
+        { id: "student", label: "대학생 계층", units: 20, basis: "notice" },
+        { id: "youth", label: "청년 계층", units: 30, basis: "notice" },
         { id: "newlywed", label: "신혼부부 계층", units: 30, basis: "notice" },
       ],
-      summary: ["접수가 끝났어요. 당첨자 발표를 기다리는 중이에요."],
+      summary: ["접수가 끝났어요. 당첨자 발표를 기다리는 중이에요.", "대학생 계층은 자동차가 있으면 신청할 수 없어요."],
     },
   ];
   return list.map((a) => ({ ...a, sample: true }));

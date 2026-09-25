@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { ResultsView } from "@/components/results/ResultsView";
 import { pageMeta } from "@/lib/seo";
 
@@ -10,5 +11,9 @@ export const metadata: Metadata = pageMeta({
 });
 
 export default function ResultsPage() {
-  return <ResultsView />;
+  return (
+    <Suspense>
+      <ResultsView />
+    </Suspense>
+  );
 }

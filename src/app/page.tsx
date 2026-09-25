@@ -1,16 +1,12 @@
 import type { Metadata } from "next";
-import { AudienceTiles } from "@/components/landing/AudienceTiles";
-import { Faq } from "@/components/landing/Faq";
-import { FinalCta } from "@/components/landing/FinalCta";
-import { GuideLinks } from "@/components/landing/GuideLinks";
+import { DeadlineBoard } from "@/components/landing/DeadlineBoard";
 import { Hero } from "@/components/landing/Hero";
-import { HowItWorks } from "@/components/landing/HowItWorks";
-import { Problem } from "@/components/landing/Problem";
+import { NoticeReader } from "@/components/landing/NoticeReader";
 import { ScoreLab } from "@/components/landing/ScoreLab";
 import { SiteFooter } from "@/components/landing/SiteFooter";
 import { SiteNav } from "@/components/landing/SiteNav";
-import { SourceMarquee } from "@/components/landing/SourceMarquee";
-import { VerdictTrio } from "@/components/landing/VerdictTrio";
+import { Standards } from "@/components/landing/Standards";
+import { WhoWhat } from "@/components/landing/WhoWhat";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { HOME_FAQ } from "@/lib/faq";
 import { appNode, faqNode, graph } from "@/lib/jsonld";
@@ -49,15 +45,11 @@ export default function Home() {
       />
       <main>
         <Hero />
-        <SourceMarquee />
-        <Problem />
-        <HowItWorks />
-        <AudienceTiles />
-        <VerdictTrio />
+        <DeadlineBoard />
+        <NoticeReader />
+        <WhoWhat />
         <ScoreLab />
-        <GuideLinks />
-        <Faq />
-        <FinalCta />
+        <Standards />
       </main>
       <SiteFooter />
     </>

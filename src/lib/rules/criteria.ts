@@ -36,6 +36,59 @@ export const INCOME = {
 
 export type IncomeKey = keyof typeof INCOME;
 
+/**
+ * 분양 특별공급 소득 풀 — 물량을 소득 구간별로 나눠 먼저 뽑는 순서.
+ * 비율(pct)은 분양 계열 소득 100%(3인 이하 가구당, 4인 이상은 가구원수별) 대비, 가산 없음.
+ * 출처: 가이드 「신혼부부·생애최초·신생아 특별공급」 표(선정 행)와 같은 값 — 여기를 바꾸면 poolLine 문구가 따라 바뀐다.
+ *   pctDual이 없으면 그 구간의 맞벌이 기준이 가이드에 없다는 뜻이다(외벌이 기준으로만 단정한다).
+ *   last=true인 구간은 신청 자격 상한까지의 나머지 물량(추첨). 민영은 소득을 넘어도 부동산 기준으로 들어갈 수 있다.
+ */
+export interface IncomePool {
+  /** 「우선공급」·「그다음 물량」·「추첨 물량」 */
+  name: string;
+  /** 물량 비율(%) */
+  share: number;
+  /** 소득 상한(%). last 구간은 신청 자격 상한 */
+  pct: number;
+  pctDual?: number;
+  last?: boolean;
+}
+
+export const POOLS = {
+  publicNewlywed: [
+    { name: "우선공급", share: 70, pct: 100, pctDual: 120 },
+    { name: "그다음 물량", share: 20, pct: 130 },
+    { name: "추첨 물량", share: 10, pct: INCOME.publicNewlywed.pct, pctDual: INCOME.publicNewlywed.pctDual, last: true },
+  ],
+  publicFirst: [
+    { name: "우선공급", share: 70, pct: 100, pctDual: 120 },
+    { name: "그다음 물량", share: 20, pct: 130, pctDual: 140 },
+    { name: "추첨 물량", share: 10, pct: INCOME.publicFirst.pct, pctDual: INCOME.publicFirst.pctDual, last: true },
+  ],
+  publicNewborn: [
+    { name: "우선공급", share: 70, pct: 100, pctDual: 120 },
+    { name: "그다음 물량", share: 20, pct: 140, pctDual: 150 },
+    { name: "추첨 물량", share: 10, pct: INCOME.publicNewborn.pct, pctDual: INCOME.publicNewborn.pctDual, last: true },
+  ],
+  privateNewlywed: [
+    { name: "우선공급", share: 50, pct: 100, pctDual: 120 },
+    { name: "그다음 물량", share: 20, pct: 140, pctDual: 160 },
+    { name: "추첨 물량", share: 30, pct: INCOME.privateNewlywed.pct, pctDual: INCOME.privateNewlywed.pctDual, last: true },
+  ],
+  privateFirst: [
+    { name: "우선공급", share: 50, pct: 130 },
+    { name: "그다음 물량", share: 20, pct: 160 },
+    { name: "추첨 물량", share: 30, pct: INCOME.privateFirst.pct, last: true },
+  ],
+  privateNewborn: [
+    { name: "우선공급", share: 50, pct: 130 },
+    { name: "그다음 물량", share: 20, pct: 160 },
+    { name: "추첨 물량", share: 30, pct: INCOME.privateNewborn.pct, last: true },
+  ],
+} as const satisfies Partial<Record<IncomeKey, readonly IncomePool[]>>;
+
+export type PoolKey = keyof typeof POOLS;
+
 /** 나이 기준 */
 export const AGE = {
   youth: [19, 39],

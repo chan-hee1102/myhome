@@ -25,7 +25,7 @@ export type Block =
 
 export interface Section {
   id: string;
-  /** 검색어와 같은 질문형 제목 */
+  /** 본문 소제목 — 명사형·서술형과 질문형을 섞는다(전부 질문형이면 기계가 쓴 글처럼 읽힌다). FAQ의 q는 질문형 그대로 */
   h2: string;
   blocks: Block[];
 }
@@ -57,7 +57,7 @@ export interface Guide {
   published: string;
   updated: string;
   program?: ProgramId;
-  /** 확인이 끝나지 않은 값이 있을 때 본문 위에 띄우는 안내 */
+  /** 확인이 끝나지 않은 값이 있을 때 본문 위에 띄우는 안내 — 사용자에게 하는 말(해요체)로. 표 칸에는 ※ + PENDING_NOTE */
   pending?: string;
   /** Dataset JSON-LD(확인이 끝난 표만) */
   dataset?: { name: string; description: string; anchor: string; variables: string[] };

@@ -1,44 +1,45 @@
 "use client";
 
-import { LineReveal, Reveal } from "@/components/motion/Reveal";
+import Link from "next/link";
 import { GajeomCalc } from "@/components/guide/GajeomCalc";
-import { ButtonLink } from "@/components/ui/Button";
-import { br } from "@/lib/text";
 
-/** 가점 84점을 슬라이더로 직접 계산해 보는 구역 */
+/** 가점 84칸 — 민영 아파트 일반공급 점수를 직접 맞춰 보는 구역 */
 export function ScoreLab() {
   return (
-    <section id="score" aria-labelledby="score-title" className="scroll-mt-16 bg-tint-blue py-20 md:py-28">
-      <div className="wrap grid items-center gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
-        <div>
-          <p className="eyebrow">가점 계산기</p>
-          <h2 id="score-title" className="t-display-l mt-3">
-            <LineReveal lines={[br("청약 가점,"), br("바로 계산해 보세요")]} />
-          </h2>
-          <p className="t-body-l mt-5 max-w-[28em] text-sub">
-            {br("민영 아파트는 | 무주택 기간·부양가족·통장 가입 기간, | 세 가지로 점수를 매겨요. | 84점이 만점이에요.")}
-          </p>
-          <ul className="mt-6 space-y-2.5">
-            {["무주택 기간은 만 30세부터 세요", "그 전에 결혼했다면 혼인신고일부터예요", "부양가족에 본인은 빠져요"].map((t) => (
-              <li key={t} className="t-body flex items-center gap-2.5 text-body">
-                <span className="grid size-5 shrink-0 place-items-center rounded-full bg-brand text-white" aria-hidden>
-                  <svg viewBox="0 0 16 16" className="size-3" fill="none" stroke="currentColor" strokeWidth="2.4">
-                    <path d="M3.5 8.5l3 3 6-7" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-                {t}
-              </li>
-            ))}
-          </ul>
-          <div className="mt-8">
-            <ButtonLink href="/guide/gajeom" variant="outline" arrow>
+    <section id="score" aria-labelledby="score-title" className="scroll-mt-20 border-t border-line bg-wash py-14 md:py-20">
+      <div className="wrap">
+        <div className="section-head">
+          <span>가점 계산기</span>
+          <span className="text-muted">민영 아파트 일반공급 · 84점 만점</span>
+        </div>
+        <div className="mt-6 grid gap-10 md:mt-8 lg:grid-cols-12 lg:gap-8">
+          <div className="lg:col-span-4">
+            <h2 id="score-title" className="t-h2">
+              84칸 중에
+              <br />
+              몇 칸이 켜질까요
+            </h2>
+            <p className="t-body mt-5 text-sub">1점이 1칸이에요. 무주택 기간 32칸, 부양가족 35칸, 통장 가입 기간 17칸을 합쳐 84칸이에요.</p>
+            <dl className="mt-6 divide-y divide-line border-y border-line text-[15px]">
+              {[
+                ["무주택 기간", "1년 미만 2점, 1년마다 2점씩 더해 15년 이상 32점"],
+                ["부양가족", "0명이어도 5점, 1명마다 5점씩 더해 6명 이상 35점"],
+                ["통장 가입 기간", "6개월 미만 1점, 1년마다 1점씩 더해 15년 이상 17점"],
+              ].map(([k, v]) => (
+                <div key={k} className="grid grid-cols-[7.5em_minmax(0,1fr)] gap-3 py-3">
+                  <dt className="font-semibold text-ink">{k}</dt>
+                  <dd className="text-sub">{v}</dd>
+                </div>
+              ))}
+            </dl>
+            <Link href="/guide/gajeom" className="t-small mt-6 inline-block font-semibold text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
               가점 점수표 전체 보기
-            </ButtonLink>
+            </Link>
+          </div>
+          <div className="lg:col-span-7 lg:col-start-6">
+            <GajeomCalc />
           </div>
         </div>
-        <Reveal>
-          <GajeomCalc />
-        </Reveal>
       </div>
     </section>
   );
