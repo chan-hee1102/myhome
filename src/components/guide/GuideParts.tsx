@@ -59,12 +59,15 @@ export function TableView({ table }: { table: GuideTable }) {
   const wide = table.head.length > 3;
   return (
     <figure className="my-6">
+      <p aria-hidden className="text-[16px] font-bold text-ink">
+        {table.caption}
+      </p>
       {wide && (
-        <p className={`mb-2 text-[14px] font-medium text-muted md:text-[15px] ${table.head.length > 5 ? "" : "md:hidden"}`}>표가 넓어요. 옆으로 밀면 나머지 칸이 보여요 →</p>
+        <p className={`mt-0.5 text-[14px] font-medium text-muted md:text-[15px] ${table.head.length > 5 ? "" : "md:hidden"}`}>옆으로 밀면 나머지 칸이 보여요 →</p>
       )}
-      <div className="overflow-x-auto" tabIndex={0} aria-label={table.caption}>
+      <div className="mt-2.5 overflow-x-auto rounded-[12px] border border-line" tabIndex={0} aria-label={table.caption}>
         <table id={table.id} className={`guide-table ${table.wrap ? "wrap-cells" : ""}`}>
-          <caption className="pt-3">{table.caption}</caption>
+          <caption className="sr-only">{table.caption}</caption>
           <thead>
             <tr>
               {table.head.map((h) => (
@@ -159,7 +162,7 @@ export function RelatedGuides({ slugs }: { slugs: string[] }) {
 
 export function CheckCta({ compact = false }: { compact?: boolean }) {
   return (
-    <div className={`border-t border-line-strong ${compact ? "pt-4" : "pt-6"}`}>
+    <div className={`card ${compact ? "p-5" : "p-6"}`}>
       <p className="t-h3">내 자격 바로 확인</p>
       <p className="t-small mt-1.5 text-sub">질문 6개에 답하면 공고별 신청 가능 여부와 예상 순위를 보여 드려요.</p>
       <div className="mt-4">

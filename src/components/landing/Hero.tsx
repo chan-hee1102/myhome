@@ -51,7 +51,6 @@ function BirthStart() {
   };
   return (
     <form
-      className="mt-8 md:mt-10"
       onSubmit={(e) => {
         e.preventDefault();
         go();
@@ -106,7 +105,7 @@ function HeroFacade() {
   const mine = hydrated && !isEmptyProfile(profile);
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.4 });
+  const inView = useInView(ref, { amount: 0.4 });
   const [step, setStep] = useState(-1);
   const [active, setActive] = useState<string | null>(null);
 
@@ -119,10 +118,14 @@ function HeroFacade() {
     return evaluateAll(list, demoProfiles[step]);
   }, [hydrated, mine, list, profile, step, demoProfiles]);
 
-  // 예시 재생: 화면에 들어오면 0.95초마다 조건 한 칸
+  // 예시 재생: 화면에 있는 동안 0.95초마다 조건 한 칸. 끝나면 4초 쉬고 처음부터(동작 줄이기면 결과만)
   useEffect(() => {
     if (mine || !inView || !hydrated) return;
-    if (step >= DEMO.length - 1) return;
+    if (step >= DEMO.length - 1) {
+      if (reduce) return;
+      const t = setTimeout(() => setStep(-1), 4000);
+      return () => clearTimeout(t);
+    }
     const t = setTimeout(() => setStep((s) => (reduce ? DEMO.length - 1 : s + 1)), step < 0 ? 500 : 950);
     return () => clearTimeout(t);
   }, [mine, inView, hydrated, reduce, step]);
@@ -141,7 +144,7 @@ function HeroFacade() {
 
   return (
     <div ref={ref} className="relative">
-      <div className="flex items-baseline justify-between gap-4 border-t border-line-strong pt-3.5 text-[14px] md:text-[15px] font-semibold text-sub">
+      <div className="flex items-baseline justify-between gap-4 text-[14px] font-semibold text-sub md:text-[15px]">
         <span>{mine ? "내 조건으로 본 공고" : "예시 조건으로 본 공고"}</span>
         <span className="text-muted">{SITE.sampleData ? `예시 공고 ${items.length}건` : `공고 ${items.length}건`}</span>
       </div>
@@ -159,7 +162,7 @@ function HeroFacade() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.32, ease: EASE.out }}
-                className="inline-flex h-7 items-center rounded-[4px] bg-page px-2.5 text-[14px] md:text-[15px] font-medium text-body ring-1 ring-inset ring-line-strong"
+                className="inline-flex h-8 items-center rounded-full bg-tint px-3 text-[14px] font-semibold text-brand-ink md:text-[15px]"
               >
                 {d.chip}
               </motion.span>
@@ -210,31 +213,80 @@ function HeroFacade() {
   );
 }
 
+/**
+ * 히어로 뒤 배경 — 옅은 창 격자에서 불이 하나둘 켜졌다 꺼진다(밤의 아파트). 장식이라 스크린리더는 건너뛴다.
+ * 0.9초마다 창 두어 개만 바뀐다. 동작 줄이기 설정이면 멈춘 그림.
+ */
+function HeroSky() {
+  const reduce = useReducedMotion();
+  const COLS = 14;
+  const ROWS = 12;
+  const [lit, setLit] = useState<boolean[]>(() => Array.from({ length: COLS * ROWS }, (_, i) => (i * 37) % 11 === 0));
+  useEffect(() => {
+    if (reduce) return;
+    const t = setInterval(() => {
+      setLit((l) => {
+        const n = [...l];
+        for (let k = 0; k < 3; k++) {
+          const i = Math.floor(Math.random() * n.length);
+          n[i] = !n[i];
+        }
+        return n;
+      });
+    }, 900);
+    return () => clearInterval(t);
+  }, [reduce]);
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-y-0 right-0 hidden w-[62%] overflow-hidden md:block"
+      style={{ maskImage: "linear-gradient(90deg, transparent, #000 45%)", WebkitMaskImage: "linear-gradient(90deg, transparent, #000 45%)" }}
+    >
+      <div className="grid gap-x-[1.6%] gap-y-3 overflow-hidden p-6" style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))` }}>
+        {lit.map((on, i) => (
+          <span
+            key={i}
+            className={`block aspect-[5/7] rounded-[3px] ring-1 ring-inset transition-colors duration-700 ${on ? "bg-brand/30 ring-brand/35" : "bg-white/50 ring-brand/10"}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function Hero() {
   return (
-    <section className="overflow-x-clip pt-16">
-      <div className="wrap grid gap-12 pb-10 pt-10 md:pb-24 md:pt-16 lg:grid-cols-12 lg:items-center lg:gap-8 lg:pt-20">
+    <section className="relative overflow-x-clip bg-tint pt-16">
+      <HeroSky />
+      <div className="wrap relative grid gap-10 pb-16 pt-10 md:pb-28 md:pt-16 lg:grid-cols-12 lg:items-center lg:gap-8 lg:pt-20">
         <div className="lg:col-span-6">
           <h1 className="t-h1">
             청약 공고 중
             <br />
-            내가 넣을 수 있는 것만
+            <span className="text-brand">내가 넣을 수 있는 것만</span>
           </h1>
           <p className="t-body-l mt-5 text-sub md:mt-6">
             <span className="block">{br("질문 6개에 답하면 | 공고마다 신청할 수 있는지 알려 드려요.")}</span>
             <span className="block">{br("로그인 없이 쓰고, | 입력한 내용은 이 기기에만 남아요.")}</span>
           </p>
-          <BirthStart />
+          <div className="card mt-8 max-w-[480px] p-5 md:mt-10 md:p-6">
+            <BirthStart />
+          </div>
           {SITE.sampleData && (
-            <p className="mt-8 max-w-[34em] border-t border-line pt-3 text-[15px] leading-relaxed text-sub">
+            <p className="mt-5 max-w-[34em] text-[15px] leading-relaxed text-sub">
               <span className="mr-1.5 font-semibold text-ink">예시 공고</span>
               지금 공고는 예시예요. 자격 기준은 2026년 법령 그대로예요.
             </p>
           )}
         </div>
-        <div className="lg:col-span-5 lg:col-start-8">
+        <motion.div
+          className="card p-5 md:p-7 lg:col-span-5 lg:col-start-8"
+          initial={{ opacity: 0, y: 24, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.64, ease: EASE.out, delay: 0.15 }}
+        >
           <HeroFacade />
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -5,6 +5,7 @@ import { NoticeReader } from "@/components/landing/NoticeReader";
 import { ScoreLab } from "@/components/landing/ScoreLab";
 import { SiteFooter } from "@/components/landing/SiteFooter";
 import { SiteNav } from "@/components/landing/SiteNav";
+import { StatStrip } from "@/components/landing/StatStrip";
 import { Standards } from "@/components/landing/Standards";
 import { WhoWhat } from "@/components/landing/WhoWhat";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -45,6 +46,7 @@ export default function Home() {
       />
       <main>
         <Hero />
+        <StatStrip />
         <DeadlineBoard />
         <NoticeReader />
         <WhoWhat />

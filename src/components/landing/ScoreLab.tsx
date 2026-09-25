@@ -7,7 +7,7 @@ import { GajeomCalc } from "@/components/guide/GajeomCalc";
 /** 가점 84칸 — 민영 아파트 일반공급 점수를 직접 맞춰 보는 구역 */
 export function ScoreLab() {
   return (
-    <section id="score" aria-labelledby="score-title" className="scroll-mt-20 border-t border-line bg-wash py-12 md:py-20">
+    <section id="score" aria-labelledby="score-title" className="scroll-mt-20 py-10 md:py-16">
       <div className="wrap">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-4">

@@ -57,11 +57,11 @@ function Row({ r, index, far }: { r: NoticeResult; index: number; far: boolean }
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, transition: { duration: 0.12 } }}
       transition={{ ...SPRING.land, delay: Math.min(index, 6) * 0.04 }}
-      className="border-b border-line last:border-b-0"
+      className="card card-hover overflow-hidden"
     >
       <Link
         href={`/notice/${r.a.id}`}
-        className={`group grid grid-cols-1 gap-y-1.5 px-4 py-5 transition-colors hover:bg-wash md:grid-cols-[96px_minmax(0,1fr)_176px] md:gap-x-6 md:gap-y-0 md:px-6 ${far ? "bg-wash/50" : ""}`}
+        className={`group grid grid-cols-1 gap-y-1.5 px-4 py-5 md:grid-cols-[96px_minmax(0,1fr)_176px] md:gap-x-6 md:gap-y-0 md:px-6 ${far ? "bg-[#f8fafc]" : ""}`}
       >
         {/* D-day */}
         <div className="flex min-w-0 items-baseline gap-2 md:block">
@@ -200,7 +200,7 @@ export function ResultsView() {
         <SampleNotice />
 
         {/* 요약 */}
-        <section className="mt-8 grid gap-8 lg:grid-cols-12 lg:gap-8">
+        <section className="card mt-6 grid gap-8 p-5 md:p-8 lg:grid-cols-12 lg:gap-8">
           <div className="min-w-0 lg:col-span-8">
             <div className="section-head">
               <span>
@@ -254,7 +254,7 @@ export function ResultsView() {
                 <ul className="no-scrollbar mask-fade-r -mx-5 mt-6 flex gap-1.5 overflow-x-auto px-5 md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:[mask-image:none]" aria-label="내 조건(누르면 고칠 수 있어요)">
                   {chips.map((c) => (
                     <li key={c}>
-                      <Link href="/check?edit=1" className="inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-[4px] bg-page px-2.5 text-[15px] font-medium text-body ring-1 ring-inset ring-line-strong hover:ring-ink">
+                      <Link href="/check?edit=1" className="inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-full bg-tint px-3.5 text-[15px] font-semibold text-brand-ink transition-colors hover:bg-brand-soft-hover">
                         {c}
                       </Link>
                     </li>
@@ -273,7 +273,7 @@ export function ResultsView() {
 
         {/* 더 정확해지려면 */}
         {hydrated && !empty && top && (
-          <section className="mt-8 rounded-[4px] bg-page px-5 py-4 ring-1 ring-inset ring-line-strong md:px-6">
+          <section className="mt-8 card px-5 py-4 md:px-6">
             <p className="t-h3">{askLine(top)}</p>
             <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
               <ButtonLink href={`/check?topic=${top.topic}`} size="sm" arrow>
@@ -343,10 +343,10 @@ export function ResultsView() {
         </div>
 
         {/* 목록 */}
-        <ul className="mt-2 overflow-hidden rounded-[4px] bg-page ring-1 ring-inset ring-line-strong">
+        <ul className="mt-2 space-y-2.5">
           {!hydrated &&
             Array.from({ length: 4 }).map((_, k) => (
-              <li key={k} className="border-b border-line px-6 py-5 last:border-b-0">
+              <li key={k} className="card px-6 py-5">
                 <div className="h-[72px] animate-pulse rounded-[4px] bg-well" />
               </li>
             ))}
@@ -355,9 +355,9 @@ export function ResultsView() {
               <Row key={r.a.id} r={r} index={k} far={false} />
             ))}
           </AnimatePresence>
-          {hydrated && near.length === 0 && far.length === 0 && <li className="t-body px-6 py-10 text-center text-sub">이 구분에 맞는 공고가 없어요. 다른 탭을 눌러 보세요.</li>}
+          {hydrated && near.length === 0 && far.length === 0 && <li className="card t-body px-6 py-10 text-center text-sub">이 구분에 맞는 공고가 없어요. 다른 탭을 눌러 보세요.</li>}
           {hydrated && near.length === 0 && far.length > 0 && (
-            <li className="t-body px-6 py-6 text-sub">{profile.sido} 근처에는 이 구분의 공고가 없어요. 아래는 다른 지역 공고예요.</li>
+            <li className="card t-body px-6 py-6 text-sub">{profile.sido} 근처에는 이 구분의 공고가 없어요. 아래는 다른 지역 공고예요.</li>
           )}
         </ul>
         {far.length > 0 && (
@@ -366,7 +366,7 @@ export function ResultsView() {
               다른 지역 공고 {far.length}건
               <span className="mt-0.5 block font-medium text-muted">그 지역 주민이 먼저 뽑혀요.</span>
             </p>
-            <ul className="mt-2 overflow-hidden rounded-[4px] bg-page ring-1 ring-inset ring-line-strong">
+            <ul className="mt-2 space-y-2.5">
               {far.map((r, k) => (
                 <Row key={r.a.id} r={r} index={k} far />
               ))}

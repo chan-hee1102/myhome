@@ -85,7 +85,7 @@ function CheckRow({ c, i }: { c: Check; i: number }) {
 function ScoreCard({ g }: { g: GroupResult }) {
   const s = g.score!;
   return (
-    <div className="rounded-[4px] bg-page p-5 ring-1 ring-inset ring-line-strong md:p-6">
+    <div className="card p-5 md:p-6">
       <p className="text-[14px] md:text-[15px] font-semibold text-sub">{s.title}</p>
       <p className="mt-1 text-ink">
         <span className="t-num-l text-ink">{s.total}</span>
@@ -157,7 +157,7 @@ function DayCard({ r }: { r: NoticeResult }) {
   const day = dayText(r);
   const hot = isUrgent(r);
   return (
-    <div className="rounded-[4px] bg-page p-5 ring-1 ring-inset ring-line-strong md:p-6">
+    <div className="card p-5 md:p-6">
       <p className={`t-num-l ${hot ? "text-hot-ink" : "text-ink"}`}>{day.big}</p>
       <p className="mt-1 text-[14px] md:text-[15px] font-semibold text-sub">{day.small}</p>
       <DayBar r={r} />
@@ -369,6 +369,7 @@ export function NoticeView({ id }: { id: string }) {
         <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-10">
           <div className="min-w-0">
             {/* 제목 */}
+            <div className="card p-5 md:p-7">
             <p className="text-[14px] md:text-[15px] font-semibold text-sub">
               {a.agency} · {prog.name} · {placeText(a)}
             </p>
@@ -402,7 +403,7 @@ export function NoticeView({ id }: { id: string }) {
                 </li>
               ))}
             </ul>
-
+            </div>
 
             {/* 내 자격 */}
             <section className="mt-12 md:mt-14" aria-labelledby="verdict-title">
@@ -445,7 +446,7 @@ export function NoticeView({ id }: { id: string }) {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: DUR.fast }}
-                  className="mt-5 rounded-[4px] bg-page px-5 py-5 ring-1 ring-inset ring-line-strong md:px-7 md:py-6"
+                  className="mt-5 card px-5 py-5 md:px-7 md:py-6"
                 >
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <StatusBadge status={r.phase === "closed" ? "closed" : g.verdict}>{v.label}</StatusBadge>
@@ -520,7 +521,7 @@ export function NoticeView({ id }: { id: string }) {
               <div className="section-head">
                 <span id="schedule-title">일정</span>
               </div>
-              <div className="mt-5 rounded-[4px] bg-page p-5 ring-1 ring-inset ring-line-strong md:p-7">
+              <div className="mt-5 card p-5 md:p-7">
                 <Timeline r={r} />
               </div>
             </section>
@@ -529,7 +530,7 @@ export function NoticeView({ id }: { id: string }) {
               <div className="section-head">
                 <span id="units-title">주택형</span>
               </div>
-              <div className="mt-3 rounded-[4px] bg-page px-5 py-2 ring-1 ring-inset ring-line-strong md:px-7">
+              <div className="mt-3 card px-5 py-2 md:px-7">
                 <Units a={a} />
               </div>
             </section>

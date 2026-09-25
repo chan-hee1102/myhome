@@ -35,7 +35,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
         <Breadcrumbs items={[{ name: "홈", href: "/" }, { name: "청약 가이드", href: GUIDE_HUB.path }, { name: g.short }]} />
 
         <div className="mt-8 lg:grid lg:grid-cols-12 lg:gap-8">
-          <article className="min-w-0 lg:col-span-8">
+          <article className="card min-w-0 p-5 md:p-10 lg:col-span-8">
             <header>
               <h1 className="t-h1">{br(g.h1.replace(" (", " | ("))}</h1>
               <p id="answer" className="t-body-l mt-5 max-w-[38em] text-body">
@@ -104,7 +104,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
           <aside className="hidden lg:col-span-3 lg:col-start-10 lg:block">
             <div className="sticky top-24 space-y-4">
-              <nav aria-label="목차" className="border-t border-line-strong pt-4">
+              <nav aria-label="목차" className="card p-5">
                 <p className="t-caption font-semibold text-muted">이 페이지에서</p>
                 <ol className="mt-3 space-y-2">
                   {g.sections.map((s) => (

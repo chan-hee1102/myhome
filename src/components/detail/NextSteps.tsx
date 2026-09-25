@@ -133,7 +133,7 @@ export function NextSteps({ r, g }: { r: NoticeResult; g: GroupResult }) {
       <div className="section-head">
         <span id="next-title">지금 할 일</span>
       </div>
-      <ol className="mt-3 rounded-[4px] bg-page px-5 ring-1 ring-inset ring-line-strong md:px-7">
+      <ol className="mt-3 card px-5 md:px-7">
         {steps.map((s, i) => (
           <li key={s.title} className="grid grid-cols-[28px_minmax(0,1fr)] gap-x-3 border-b border-line py-4 last:border-b-0">
             <span className="num text-[20px] leading-6 text-ink">{i + 1}</span>

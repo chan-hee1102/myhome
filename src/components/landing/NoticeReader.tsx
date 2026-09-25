@@ -58,16 +58,16 @@ export function NoticeReader() {
   const v = data?.g.verdict;
 
   return (
-    <section aria-labelledby="reader-title" className="border-t border-line py-12 md:py-20">
+    <section aria-labelledby="reader-title" className="py-10 md:py-16">
       <div className="wrap">
         <h2 id="reader-title" className="t-h2">
           {br("공고문 속 자격 조건을 | 내 상황과 한 줄씩 맞춰 봐요")}
         </h2>
         <p className="t-body-l mt-3 max-w-[40em] text-sub">97년생, 서울 강동구, 미혼, 무주택, 월 소득 300만 원대인 예시예요.</p>
 
-        <div ref={ref} className="mt-10 grid items-start gap-6 md:mt-12 lg:grid-cols-12 lg:gap-8">
+        <div ref={ref} className="card mt-8 grid items-start gap-6 p-4 md:mt-10 md:p-7 lg:grid-cols-12 lg:gap-8">
           {/* 공고문 */}
-          <figure className="self-start rounded-[4px] bg-page p-5 ring-1 ring-inset ring-line-strong md:p-7 lg:col-span-5">
+          <figure className="self-start rounded-[14px] border border-line bg-[#f8fafc] p-5 md:p-6 lg:col-span-5">
             <figcaption className="border-b border-line-strong pb-3">
               <span className="block text-[14px] md:text-[15px] font-semibold text-muted">{data ? `${data.a.agency} · ${placeText(data.a)} · 예시 공고` : " "}</span>
               <span className="mt-1 block text-[17px] font-bold tracking-[-0.03em] text-ink">

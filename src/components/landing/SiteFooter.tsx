@@ -29,7 +29,7 @@ const COLS: { title: string; links: [string, string][] }[] = [
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-line">
+    <footer className="border-t border-line bg-page">
       <div className="wrap pb-12 pt-10 md:pb-16 md:pt-12">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-4">

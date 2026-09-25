@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FaqList } from "@/components/guide/GuideParts";
+import { Reveal } from "@/components/motion/Reveal";
 import { HOME_FAQ } from "@/lib/faq";
 import { manwon } from "@/lib/rules/core";
 import { depositFor, income100, standardsFor } from "@/lib/rules/standards";
@@ -17,22 +18,27 @@ const FIGURES = [
 /** 2026 기준 숫자 + 자주 묻는 질문 + 가이드 목록 */
 export function Standards() {
   return (
-    <section id="faq" aria-labelledby="std-title" className="scroll-mt-20 border-t border-line py-12 md:py-20">
+    <section id="faq" aria-labelledby="std-title" className="scroll-mt-20 py-10 md:py-16">
       <div className="wrap">
         <h2 id="std-title" className="t-h2">
           {STD.year}년 기준 숫자
         </h2>
         <p className="t-body-l mt-3 text-sub">법령과 고시에 나온 값이에요. 누르면 근거를 볼 수 있어요.</p>
 
-        <dl className="mt-8 grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
-          {FIGURES.map((f) => (
-            <Link key={f.k} href={f.href} className="group block border-l border-line pl-4">
-              <dt className="text-[14px] md:text-[15px] font-semibold text-sub">{f.k}</dt>
-              <dd className="num mt-1.5 whitespace-nowrap text-[20px] leading-tight text-ink group-hover:underline md:text-[30px]">{f.v}</dd>
-              <dd className="mt-1 text-[14px] md:text-[15px] text-muted">{f.note}</dd>
-            </Link>
+        <ul className="mt-8 grid grid-cols-2 gap-2.5 md:mt-10 md:grid-cols-4 md:gap-4">
+          {FIGURES.map((f, i) => (
+            <li key={f.k}>
+              <Reveal delay={i * 0.07} className="h-full">
+                <Link href={f.href} className="card card-hover group block h-full p-4 md:p-5">
+                  <span className="block text-[14px] font-semibold text-sub md:text-[15px]">{f.k}</span>
+                  <span className="num mt-1.5 block whitespace-nowrap text-[20px] leading-tight text-ink md:text-[28px]">{f.v}</span>
+                  <span className="mt-1 block text-[14px] text-muted md:text-[15px]">{f.note}</span>
+                  <span className="mt-3 block text-[14px] font-semibold text-brand-ink group-hover:underline md:text-[15px]">근거 보기 →</span>
+                </Link>
+              </Reveal>
+            </li>
           ))}
-        </dl>
+        </ul>
 
         <div className="mt-16 grid gap-10 md:mt-20 lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-4">
@@ -42,9 +48,9 @@ export function Standards() {
               청약 가이드 전체 보기
             </Link>
           </div>
-          <div className="lg:col-span-7 lg:col-start-6">
+          <Reveal className="card px-5 py-1 md:px-7 lg:col-span-7 lg:col-start-6 [&>div]:border-t-0">
             <FaqList items={HOME_FAQ} />
-          </div>
+          </Reveal>
         </div>
       </div>
     </section>

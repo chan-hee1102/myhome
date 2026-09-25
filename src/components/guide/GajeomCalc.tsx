@@ -136,7 +136,7 @@ export function GajeomCalc() {
   };
 
   return (
-    <div className="rounded-[4px] bg-page p-5 ring-1 ring-inset ring-line-strong md:p-8">
+    <div className="card p-5 md:p-8">
       <div className="flex items-start justify-between gap-4 border-b border-line-strong pb-5">
         <div>
           <p className="text-[14px] md:text-[15px] font-semibold text-sub">{explain ? "내 조건으로 계산한 가점" : "청약 가점"}</p>

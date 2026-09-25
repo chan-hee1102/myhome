@@ -50,7 +50,7 @@ export function DeadlineBoard() {
       .map((a) => ({ a, s: Math.round((parseDay(a.schedule.applyStart) - start) / DAY), e: Math.round((parseDay(a.schedule.applyEnd) - start) / DAY) }))
       .filter((r) => r.e >= BEFORE && r.s < SPAN)
       .sort((x, y) => x.e - y.e)
-      .slice(0, 7);
+      .slice(0, 6);
     return { rows, start };
   }, [hydrated]);
 
@@ -73,7 +73,7 @@ export function DeadlineBoard() {
   const openNow = rows.filter((r) => r.s <= BEFORE && BEFORE <= r.e).length;
 
   return (
-    <section aria-labelledby="board-title" className="py-12 md:py-20">
+    <section aria-labelledby="board-title" className="py-10 md:py-16">
       <div className="wrap">
         <div className="grid gap-3 lg:grid-cols-12 lg:items-end">
           <h2 id="board-title" className="t-h2 lg:col-span-6">
@@ -84,7 +84,7 @@ export function DeadlineBoard() {
           </p>
         </div>
 
-        <div ref={ref} className="mt-10 md:mt-12">
+        <div ref={ref} className="card mt-8 px-4 pb-4 pt-5 md:mt-10 md:px-7 md:pb-6 md:pt-7">
           {/* 데스크탑: 날짜 눈금 + 막대 */}
           <div className="hidden md:block">
             <div className="grid grid-cols-[260px_minmax(0,1fr)]">
@@ -108,10 +108,10 @@ export function DeadlineBoard() {
               <div aria-hidden className="pointer-events-none absolute inset-y-0 left-[260px] right-0">
                 <motion.div className="absolute inset-y-0 w-[1.5px] -translate-x-1/2 bg-ink" style={{ left }} />
               </div>
-              <ul className="relative border-t border-ink">
+              <ul className="relative border-t border-line-strong">
                 {(hydrated ? rows : Array.from({ length: 6 }, () => null)).map((r, i) => (
-                  <li key={r ? r.a.id : i} className="border-b border-line">
-                    {r ? <BarRow r={r} /> : <div className="h-[64px]" />}
+                  <li key={r ? r.a.id : i} className="border-b border-line last:border-b-0">
+                    {r ? <BarRow r={r} i={i} play={inView || !!reduce} /> : <div className="h-[56px]" />}
                   </li>
                 ))}
               </ul>
@@ -119,15 +119,15 @@ export function DeadlineBoard() {
           </div>
 
           {/* 모바일: D-day 목록 */}
-          <ul className="border-t border-line-strong md:hidden">
+          <ul className="md:hidden">
             {(hydrated ? rows : Array.from({ length: 5 }, () => null)).map((r, i) => (
-              <li key={r ? r.a.id : i} className="border-b border-line">
+              <li key={r ? r.a.id : i} className="border-b border-line last:border-b-0">
                 {r ? <ListRow r={r} /> : <div className="h-[68px]" />}
               </li>
             ))}
           </ul>
 
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
             <p className="t-small text-sub">
               {hydrated && (
                 <>
@@ -154,31 +154,39 @@ function dayOf(r: Row) {
   return { ...dday("open", 0, left, dates), tone: left <= 3 ? "text-hot-ink" : "text-ink" };
 }
 
-function BarRow({ r }: { r: Row }) {
+/** 막대는 화면에 들어오면 왼쪽부터 순서대로 자란다(줄마다 0.06초 늦게) */
+function BarRow({ r, i, play }: { r: Row; i: number; play: boolean }) {
+  const reduce = useReducedMotion();
   const s = Math.max(0, r.s);
   const e = Math.min(SPAN - 1, r.e);
   const open = r.s <= BEFORE && BEFORE <= r.e;
   const hot = open && r.e - BEFORE <= 3;
   const d = dayOf(r);
   return (
-    <Link href={`/notice/${r.a.id}`} className="group grid grid-cols-[260px_minmax(0,1fr)] items-center">
-      <span className="min-w-0 py-3 pr-4">
+    <Link href={`/notice/${r.a.id}`} className="group grid grid-cols-[260px_minmax(0,1fr)] items-center rounded-[10px] transition-colors hover:bg-wash">
+      <span className="min-w-0 py-2.5 pl-2 pr-4">
         <span className="block truncate text-[16px] font-semibold text-ink group-hover:underline">{r.a.complex}</span>
         <span className="block truncate text-[14px] md:text-[15px] text-muted">
           {r.a.agency} · {PROGRAMS[r.a.program].name} · {r.a.sido}
         </span>
       </span>
-      <span className="relative block h-[64px]">
-        <span
-          className={`absolute top-1/2 h-2.5 -translate-y-1/2 rounded-[2px] ${hot ? "bg-hot" : open ? "bg-bar" : "bg-page ring-[1.5px] ring-inset ring-bar"}`}
+      <span className="relative block h-[56px]">
+        <motion.span
+          className={`absolute top-1/2 h-2.5 -translate-y-1/2 origin-left rounded-full ${hot ? "bg-hot" : open ? "bg-bar" : "bg-page ring-[1.5px] ring-inset ring-bar"}`}
           style={{ left: `${(s / SPAN) * 100}%`, width: `${((e - s + 1) / SPAN) * 100}%` }}
+          initial={reduce ? false : { scaleX: 0 }}
+          animate={play ? { scaleX: 1 } : undefined}
+          transition={{ duration: 0.6, ease: EASE.out, delay: 0.25 + i * 0.06 }}
         />
-        <span
+        <motion.span
+          initial={reduce ? false : { opacity: 0 }}
+          animate={play ? { opacity: 1 } : undefined}
+          transition={{ duration: 0.3, delay: 0.7 + i * 0.06 }}
           className={`data absolute top-1/2 -translate-y-1/2 whitespace-nowrap pl-2 text-[15px] ${d.tone}`}
           style={{ left: `min(${((e + 1) / SPAN) * 100}%, calc(100% - 116px))` }}
         >
           {BEFORE < r.s ? d.line : BEFORE > r.e ? "마감" : r.e === BEFORE ? "오늘 마감" : d.big}
-        </span>
+        </motion.span>
       </span>
     </Link>
   );

@@ -605,7 +605,7 @@ function LivePanel({ results }: { results: NoticeResult[] }) {
   const counts = countVerdicts(results);
   const items: FacadeItem[] = results.map((r) => ({ id: r.a.id, state: winOf(r), label: `${r.a.complex} — ${WIN_LABEL[winOf(r)]}` }));
   return (
-    <div>
+    <div className="card p-5 md:p-6">
       <div className="section-head">
         <span>지금 조건으로</span>
         <span className="text-muted">{SITE.sampleData ? "예시 공고" : "공고"} {results.length}건</span>
@@ -724,14 +724,14 @@ function DoneView({ results, profile }: { results: NoticeResult[]; profile: Prof
           )}
         </div>
         {top.length > 0 && (
-          <ul className="mt-10 border-t border-line-strong">
+          <ul className="card mt-8 px-5 md:px-6">
             {top.map((r, k) => (
               <motion.li
                 key={r.a.id}
                 initial={reduce ? false : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ ...SPRING.land, delay: 0.6 + k * 0.04 }}
-                className="border-b border-line"
+                className="border-b border-line last:border-b-0"
               >
                 <Link href={`/notice/${r.a.id}`} className="group grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 py-4">
                   <span className="min-w-0">
@@ -755,7 +755,7 @@ function DoneView({ results, profile }: { results: NoticeResult[]; profile: Prof
         )}
         <p className="t-small mt-6 text-muted">참고용 결과예요. 최종 자격과 순위는 공급기관 심사로 정해져요.</p>
       </div>
-      <div className="lg:col-span-4 lg:col-start-9">
+      <div className="card self-start p-5 md:p-6 lg:col-span-4 lg:col-start-9">
         <div className="section-head">
           <span>전체 공고 {results.length}건</span>
         </div>
@@ -783,9 +783,9 @@ function SummaryView({ profile }: { profile: Profile }) {
     <div className="max-w-[640px]">
       <h1 className="t-h1">조건 고치기</h1>
       <p className="t-body mt-3 text-sub">고칠 항목만 눌러 바꾸면 결과에 바로 반영돼요.</p>
-      <ul className="mt-8 border-t border-line-strong">
+      <ul className="card mt-8 px-5 md:px-6">
         {rows.map((r) => (
-          <li key={r.step} className="border-b border-line">
+          <li key={r.step} className="border-b border-line last:border-b-0">
             <Link href={`/check?step=${r.step}&edit=1`} className="group grid grid-cols-[6em_minmax(0,1fr)_auto] items-center gap-4 py-4">
               <span className="text-[16px] font-semibold text-ink">{r.label}</span>
               <span className={`truncate text-[16px] ${r.value ? "text-body" : "text-muted"}`}>{r.value || "입력 전"}</span>
