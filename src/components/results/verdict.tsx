@@ -2,6 +2,7 @@ import type { ProfileKey } from "@/lib/domain";
 import { withJosa } from "@/lib/josa";
 import { placeText } from "@/lib/place";
 import { topicOf, type NoticeResult, type Verdict } from "@/lib/rules/evaluate";
+import type { RankInfo } from "@/lib/rules/templates";
 import { PROGRAMS } from "@/lib/rules/programs";
 
 export const VERDICT: Record<Verdict | "closed", { label: string; dot: string; text: string; headline: string }> = {
@@ -21,25 +22,39 @@ export function verdictKey(r: NoticeResult): Verdict | "closed" {
 }
 
 /**
- * D-day 두 줄. 접수 시작 전과 마감 D-day가 헷갈리지 않게, 시작 전은 「D-」를 쓰지 않는다.
- * 큰 글자는 좁은 칸에서도 한 줄에 들어가게 짧게(최대 4자) — 「10일 뒤」는 두 줄로 꺾여서 「10일」 + 「접수 시작까지」로 나눈다.
- *   접수 예정 「10일 / 접수 시작까지」 · 「내일 / 접수 시작」
- *   접수 중   「D-6 / 마감까지」 · 「오늘 / 마감」
+ * D-day — 이 사이트의 모든 날짜 문구는 여기서만 만든다(목록·상세·완료 화면·홈 접수 일정).
+ * 접수 시작 전과 마감 D-day가 헷갈리지 않게, 시작 전은 「D-」를 쓰지 않는다.
+ *   접수 예정 「3일 뒤 / 접수 시작」 · 「내일 / 접수 시작」
+ *   접수 중   「D-6 / 마감」 · 「오늘 / 마감」
  *   마감      「마감 / 접수 끝」
  */
-export function dayText(r: NoticeResult): { big: string; small: string } {
-  if (r.phase === "closed") return { big: "마감", small: "접수 끝" };
-  if (r.phase === "upcoming") return r.daysToStart === 1 ? { big: "내일", small: "접수 시작" } : { big: `${r.daysToStart}일`, small: "접수 시작까지" };
-  if (r.daysLeft === 0) return { big: "오늘", small: "마감" };
-  return { big: `D-${r.daysLeft}`, small: "마감까지" };
+export function dday(phase: NoticeResult["phase"], daysToStart: number, daysLeft: number): { big: string; small: string; line: string } {
+  if (phase === "closed") return { big: "마감", small: "접수 끝", line: "접수 끝" };
+  if (phase === "upcoming") {
+    const big = daysToStart === 1 ? "내일" : `${daysToStart}일 뒤`;
+    return { big, small: "접수 시작", line: `${big} 접수 시작` };
+  }
+  const big = daysLeft === 0 ? "오늘" : `D-${daysLeft}`;
+  return { big, small: "마감", line: `${big} 마감` };
 }
 
-/** D-day 한 줄: 「2일 뒤 접수 시작」, 「D-6 마감」, 「오늘 마감」, 「접수 끝」 */
-export function dayLine(r: NoticeResult): string {
-  if (r.phase === "closed") return "접수 끝";
-  if (r.phase === "upcoming") return `${r.daysToStart === 1 ? "내일" : `${r.daysToStart}일 뒤`} 접수 시작`;
-  if (r.daysLeft === 0) return "오늘 마감";
-  return `D-${r.daysLeft} 마감`;
+export function dayText(r: NoticeResult) {
+  return dday(r.phase, r.daysToStart, r.daysLeft);
+}
+
+/** 마감 3일 이내면 빨강 — 목록·완료 화면·홈이 같은 기준 */
+export function isUrgent(r: Pick<NoticeResult, "phase" | "daysLeft">) {
+  return r.phase === "open" && r.daysLeft <= 3;
+}
+
+/** 예상 순위 글자색: 군청은 「신청 가능」에만. 확인 필요이거나 순위가 아직 안 정해졌으면 주황 */
+export function rankTone(verdict: Verdict, rank: RankInfo) {
+  return verdict === "ok" && rank.tri !== "unknown" ? "text-brand-ink" : "text-maybe-ink";
+}
+
+/** 점수 한 줄: 「가점 12점 / 84점」, 모르는 항목이 있으면 「가점 12점 이상 / 84점」 */
+export function scoreLine(s: { title: string; total: number; max: number; partial?: boolean }) {
+  return `${s.title} ${s.total}점${s.partial ? " 이상" : ""} / ${s.max}점`;
 }
 
 export function shortDate(s?: string) {

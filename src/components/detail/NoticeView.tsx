@@ -5,11 +5,12 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useMemo, useState } from "react";
 import { DUR, EASE, SPRING } from "@/components/motion/tokens";
 import { WinMark } from "@/components/motion/WinMark";
-import { badgeStatus, dayText, shortDate, topicFor, VERDICT } from "@/components/results/verdict";
+import { badgeStatus, dayText, isUrgent, rankTone, shortDate, topicFor, VERDICT } from "@/components/results/verdict";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { StatusBadge } from "@/components/ui/Badge";
 import { ButtonLink, buttonClass } from "@/components/ui/Button";
 import { SampleNotice } from "@/components/ui/SampleNotice";
+import { WinGlyph } from "@/components/ui/Window";
 import type { Announcement } from "@/lib/domain";
 import { sampleAnnouncements } from "@/lib/data/sample";
 import { SOURCES } from "@/lib/data/sources";
@@ -113,27 +114,35 @@ function ScoreCard({ g }: { g: GroupResult }) {
           </li>
         ))}
       </ul>
+      <p className="t-caption mt-5 border-t border-line pt-3 text-muted">답한 조건으로 계산한 참고용 점수예요. 공고문의 배점표가 우선이에요.</p>
     </div>
   );
 }
 
-/** 접수 기간 띠 — 전체 기간 중 지난 몫은 회색, 남은 몫은 군청(3일 이하면 빨강). 지난 몫이 왼쪽부터 차오른다 */
+/**
+ * 접수 기간 띠 — 전체 기간 중 지난 몫은 회색, 남은 몫은 군청(3일 이하면 빨강). 지난 몫이 왼쪽부터 차오른다.
+ * 접수 전은 홈의 접수 일정 띠와 같이 테두리만 그린다(아직 켜지지 않은 기간).
+ */
 function DayBar({ r }: { r: NoticeResult }) {
   const reduce = useReducedMotion();
   const s = new Date(r.a.schedule.applyStart).getTime();
   const e = new Date(r.a.schedule.applyEnd).getTime();
   const total = Math.max(1, Math.round((e - s) / 86_400_000) + 1);
   const left = r.phase === "open" ? Math.max(0, Math.min(total, r.daysLeft + 1)) : r.phase === "upcoming" ? total : 0;
-  const hot = r.phase === "open" && r.daysLeft <= 3;
+  const hot = isUrgent(r);
   return (
     <div className="mt-4" aria-hidden>
-      <div className={`relative h-2 overflow-hidden rounded-[2px] ${r.phase === "closed" ? "bg-well" : hot ? "bg-hot" : "bg-brand"}`}>
-        <motion.div
-          className="absolute inset-y-0 left-0 w-full origin-left bg-line-strong"
-          initial={reduce ? false : { scaleX: 0 }}
-          animate={{ scaleX: 1 - left / total }}
-          transition={{ duration: DUR.slow, ease: EASE.out, delay: 0.2 }}
-        />
+      <div
+        className={`relative h-2 overflow-hidden rounded-[2px] ${r.phase === "closed" ? "bg-well" : r.phase === "upcoming" ? "bg-page ring-[1.5px] ring-inset ring-brand/60" : hot ? "bg-hot" : "bg-brand"}`}
+      >
+        {r.phase === "open" && (
+          <motion.div
+            className="absolute inset-y-0 left-0 w-full origin-left bg-line-strong"
+            initial={reduce ? false : { scaleX: 0 }}
+            animate={{ scaleX: 1 - left / total }}
+            transition={{ duration: DUR.slow, ease: EASE.out, delay: 0.2 }}
+          />
+        )}
       </div>
       <div className="mt-1.5 flex justify-between text-[12px] font-medium text-muted tabular">
         <span>{shortDate(r.a.schedule.applyStart)}</span>
@@ -146,11 +155,11 @@ function DayBar({ r }: { r: NoticeResult }) {
 function DayCard({ r }: { r: NoticeResult }) {
   const a = r.a;
   const day = dayText(r);
-  const hot = r.phase === "open" && r.daysLeft <= 3;
+  const hot = isUrgent(r);
   return (
     <div className="rounded-[4px] bg-page p-5 ring-1 ring-inset ring-line md:p-6">
-      <p className="text-[13px] font-semibold text-sub">{day.small}</p>
-      <p className={`num mt-1 text-[40px] leading-none ${hot ? "text-hot-ink" : "text-ink"}`}>{day.big}</p>
+      <p className={`t-num-l ${hot ? "text-hot-ink" : "text-ink"}`}>{day.big}</p>
+      <p className="mt-1 text-[13px] font-semibold text-sub">{day.small}</p>
       <DayBar r={r} />
       <dl className="mt-5 space-y-2 border-t border-line pt-4 text-[14px]">
         <div className="flex justify-between gap-4">
@@ -365,6 +374,15 @@ export function NoticeView({ id }: { id: string }) {
             </p>
             <h1 className="t-h1 mt-2">{a.complex}</h1>
             <p className="t-body mt-2 text-sub">{a.title}</p>
+            {!empty && (
+              <a href="#verdict-title" className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 border-y border-line py-3 lg:hidden">
+                <StatusBadge status={badgeStatus(r)}>{VERDICT[badgeStatus(r)].label}</StatusBadge>
+                {r.best.rank && r.verdict !== "no" && r.phase !== "closed" && (
+                  <span className={`text-[15px] font-bold ${rankTone(r.verdict, r.best.rank)}`}>{r.best.rank.label}</span>
+                )}
+                <span className={`ml-auto text-[14px] font-semibold tabular ${isUrgent(r) ? "text-hot-ink" : "text-sub"}`}>{dayText(r).line}</span>
+              </a>
+            )}
 
             {/* 핵심 수치 */}
             <dl className="mt-6 grid grid-cols-3 border-y border-ink">
@@ -390,13 +408,9 @@ export function NoticeView({ id }: { id: string }) {
             <section className="mt-12 md:mt-14" aria-labelledby="verdict-title">
               <div className="section-head">
                 <span id="verdict-title">나도 신청할 수 있을까?</span>
-                {empty ? (
+                {empty && (
                   <Link href="/check" className="text-ink underline decoration-line-strong underline-offset-4">
                     조건 넣고 확인하기
-                  </Link>
-                ) : (
-                  <Link href="/check?edit=1" className="text-ink underline decoration-line-strong underline-offset-4">
-                    조건 고치기
                   </Link>
                 )}
               </div>
@@ -415,7 +429,7 @@ export function NoticeView({ id }: { id: string }) {
                         onClick={() => setPick(x.group.id)}
                         className={`relative inline-flex shrink-0 items-center gap-1.5 pb-3 pt-1 text-[15px] font-semibold ${on ? "text-ink" : "text-muted hover:text-ink"}`}
                       >
-                        <span aria-hidden className={`inline-block h-3 w-2.5 rounded-[2px] ${xs === "ok" ? "bg-brand" : xs === "maybe" ? "bg-maybe" : "ring-[1.5px] ring-inset ring-no"}`} />
+                        <WinGlyph state={xs} />
                         {x.group.label}
                         {on && <motion.span layoutId="group-line" className="absolute inset-x-0 -bottom-px h-[2px] bg-ink" transition={SPRING.ui} />}
                       </button>
@@ -440,7 +454,7 @@ export function NoticeView({ id }: { id: string }) {
                   <p className="t-h2 mt-2">{v.headline}</p>
                   {g.rank && g.verdict !== "no" && (
                     <div className="mt-4">
-                      <p className="t-num-m text-brand-ink">{g.rank.label}</p>
+                      <p className={`t-num-m ${rankTone(g.verdict, g.rank)}`}>{g.rank.label}</p>
                       {g.rank.detail && <p className="t-small mt-1 text-sub">{g.rank.detail}</p>}
                     </div>
                   )}
@@ -530,12 +544,6 @@ export function NoticeView({ id }: { id: string }) {
             <div className="sticky top-24 space-y-4">
               <DayCard r={r} />
               {g.score && <ScoreCard g={g} />}
-              <p className="t-small px-1 text-sub">
-                {badgeStatus(r) === "closed" ? "접수가 끝난 공고예요. " : ""}조건이 바뀌었다면{" "}
-                <Link href="/check?edit=1" className="font-semibold text-ink underline decoration-line-strong underline-offset-4">
-                  조건 고치기
-                </Link>
-              </p>
             </div>
           </aside>
         </div>

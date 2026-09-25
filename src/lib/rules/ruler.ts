@@ -98,6 +98,18 @@ const ROWS_ELDERLY: RowDef[] = [
 /** 청년(만 19~39세)에게만 해당하는 행 — 확실히 40세 이상이면 뺀다 */
 const YOUTH_ONLY = new Set<IncomeKey>(["happyYouth", "youthSafe"]);
 
+/** 신혼 유형 — 혼인 7년이 확실히 지났고 만 6세 이하 자녀도 없으면 뺀다 */
+const NEWLYWED_ONLY = new Set<IncomeKey>(["happyNewlywed", "integratedNewlywed", "publicNewlywed", "privateNewlywed"]);
+
+/** 자녀가 2명 이상이면 더하는 행(민영 다자녀 특공은 소득 기준이 없어 표에 없다) */
+const ROWS_MULTI: RowDef[] = [{ key: "publicMultiChild", label: "공공분양 다자녀 특공" }];
+
+/** 2세 미만 아기(임신 포함)가 있으면 더하는 행 */
+const ROWS_NEWBORN: RowDef[] = [
+  { key: "publicNewborn", label: "공공분양 신생아 특공" },
+  { key: "privateNewborn", label: "민영 신생아 특공" },
+];
+
 /** 소득 구간이 상한의 몇 %인지. [300, 399]면 위 끝을 400으로 보고 [79, 105] */
 export function incomeShare(band: Band, limit: number): [number, number | null] {
   const lo = Math.round((band.min / limit) * 100);
@@ -147,6 +159,8 @@ function basesFor(std: Standards, size: number): RulerBase[] {
  * 가구원 수·맞벌이로 유형별 소득 상한을 계산한다. 가구원 수를 모르면(혼인·자녀 미입력) null.
  * 미혼·혼자면 청년 쪽, 혼인 중·예비부부면 신혼 쪽 유형을 보여준다.
  * 만 65세 이상일 수 있으면 영구임대 2순위·행복주택 고령자 행을 더하고, 확실히 만 40세 이상이면 청년 전용 행은 뺀다.
+ * 혼인 7년이 확실히 지났고 6세 이하 자녀가 없으면 신혼 행을 빼고, 자녀 2명 이상이면 다자녀, 아기가 있으면 신생아 행을 더한다
+ * — 해당하지 않는 유형의 상한을 보여 주면 「나는 어디까지 되지?」를 오히려 헷갈리게 한다.
  * 1인·2인 가산은 limitFor가 규칙대로(임대 계열만) 더한다.
  */
 export function incomeRuler(p: Profile, announced?: string, today = new Date()): IncomeRuler | null {
@@ -158,7 +172,16 @@ export function incomeRuler(p: Profile, announced?: string, today = new Date()):
   const dual = !!(d.married && p.dualIncome);
   let defs = couple ? ROWS_COUPLE : ROWS_SINGLE;
   if (d.age && d.age[0] >= 40) defs = defs.filter((r) => !YOUTH_ONLY.has(r.key));
-  if (d.age && d.age[1] >= 65) defs = [...defs, ...ROWS_ELDERLY.filter((e) => !defs.some((r) => r.key === e.key))];
+  if (couple && d.within7 === false && !d.engaged && !(d.youngChildren && d.youngChildren > 0)) {
+    // 신혼 행 대신 일반 통합공공임대 행(같은 중위소득 기준) — 부부도 일반 자격으로는 신청할 수 있다
+    defs = [...defs.filter((r) => !NEWLYWED_ONLY.has(r.key)), { key: "integrated", label: "통합공공임대" }];
+  }
+  const extra = [
+    ...(d.age && d.age[1] >= 65 ? ROWS_ELDERLY : []),
+    ...((p.children ?? 0) >= 2 ? ROWS_MULTI : []),
+    ...(d.infant ? ROWS_NEWBORN : []),
+  ];
+  defs = [...defs, ...extra.filter((e) => !defs.some((r) => r.key === e.key))];
   const rows = defs.map(({ key, label }) => {
     const rule = INCOME[key];
     const { pct, won } = limitFor(std, size, rule, dual);

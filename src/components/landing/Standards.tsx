@@ -21,9 +21,7 @@ export function Standards() {
       <div className="wrap">
         <div className="section-head">
           <span>{STD.year} 기준</span>
-          <Link href="/guide" className="text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
-            청약 가이드 전체
-          </Link>
+          <span className="text-muted">법령·고시 값</span>
         </div>
         <h2 id="std-title" className="sr-only">
           {STD.year}년 청약·공공임대 기준 숫자와 자주 묻는 질문

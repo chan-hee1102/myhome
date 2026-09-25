@@ -58,7 +58,7 @@ export function SiteFooter() {
           </nav>
         </div>
         <p className="t-caption mt-12 border-t border-line pt-5 text-muted">
-          © 2026 {SITE.name} · 공고 출처 청약홈·마이홈포털·LH·HUG(공공데이터포털)
+          © 2026 {SITE.name} · {SITE.sampleData ? "지금은 예시 공고예요. 공공데이터포털 연결 후 청약홈·마이홈포털·LH·HUG 공고로 바뀌어요" : "공고 출처 청약홈·마이홈포털·LH·HUG(공공데이터포털)"}
         </p>
       </div>
     </footer>

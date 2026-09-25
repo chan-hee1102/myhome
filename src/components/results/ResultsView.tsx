@@ -11,15 +11,14 @@ import { AppHeader } from "@/components/ui/AppHeader";
 import { StatusBadge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
 import { SampleNotice } from "@/components/ui/SampleNotice";
-import { WIN_LABEL, WinGlyph, type WinState } from "@/components/ui/Window";
+import { Pane, WIN_LABEL, WinGlyph, type WinState } from "@/components/ui/Window";
 import { sampleAnnouncements } from "@/lib/data/sample";
-import { withJosa } from "@/lib/josa";
 import { placeText } from "@/lib/place";
 import { isEmptyProfile, useHydrated, useProfile } from "@/lib/profile";
 import { profileChips } from "@/lib/questions";
-import { byRelevance, countVerdicts, evaluateAll, groupLines, regionScope, suggestAsks, type NoticeResult } from "@/lib/rules/evaluate";
+import { askLine, byRelevance, countVerdicts, evaluateAll, groupLines, manualCount, regionScope, suggestAsks, type NoticeResult } from "@/lib/rules/evaluate";
 import { PROGRAMS } from "@/lib/rules/programs";
-import { badgeStatus, dayText, reasonLine, shortDate, VERDICT, verdictKey } from "./verdict";
+import { badgeStatus, dayText, isUrgent, rankTone, reasonLine, scoreLine, shortDate, VERDICT, verdictKey } from "./verdict";
 
 type Tab = "all" | "ok" | "maybe" | "no" | "closed";
 type Kind = "all" | "rent" | "sale";
@@ -47,7 +46,7 @@ function Row({ r, index, far }: { r: NoticeResult; index: number; far: boolean }
   const day = dayText(r);
   const reason = reasonLine(r);
   const dim = r.verdict === "no" || r.phase === "closed";
-  const urgent = r.phase === "open" && r.daysLeft <= 3;
+  const urgent = isUrgent(r);
   const score = r.best.score;
   const groups = groupLines(r).slice(0, 6);
   return (
@@ -61,7 +60,7 @@ function Row({ r, index, far }: { r: NoticeResult; index: number; far: boolean }
     >
       <Link
         href={`/notice/${r.a.id}`}
-        className={`group grid grid-cols-[72px_minmax(0,1fr)] gap-x-4 px-4 py-5 transition-colors hover:bg-wash md:grid-cols-[96px_minmax(0,1fr)_176px] md:gap-x-6 md:px-6 ${far ? "bg-wash/50" : ""}`}
+        className={`group grid grid-cols-[80px_minmax(0,1fr)] gap-x-4 px-4 py-5 transition-colors hover:bg-wash md:grid-cols-[96px_minmax(0,1fr)_176px] md:gap-x-6 md:px-6 ${far ? "bg-wash/50" : ""}`}
       >
         {/* D-day */}
         <div className="min-w-0">
@@ -77,8 +76,9 @@ function Row({ r, index, far }: { r: NoticeResult; index: number; far: boolean }
             {r.a.sample && <span className="ml-1.5 font-semibold text-maybe-ink">예시</span>}
           </p>
           <h3 className={`mt-0.5 truncate text-[18px] font-bold tracking-[-0.03em] group-hover:underline md:text-[20px] ${dim ? "text-sub" : "text-ink"}`}>{r.a.complex}</h3>
-          <div className="mt-1.5 md:hidden">
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 md:hidden">
             <StatusBadge status={badgeStatus(r)}>{v.label}</StatusBadge>
+            {r.best.rank && r.verdict !== "no" && r.phase !== "closed" && <span className={`text-[15px] font-bold ${rankTone(r.verdict, r.best.rank)}`}>{r.best.rank.label}</span>}
           </div>
           {groups.length > 1 && (
             <ul className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1" aria-label="공급 대상별 결과">
@@ -99,13 +99,10 @@ function Row({ r, index, far }: { r: NoticeResult; index: number; far: boolean }
         {/* 상태(데스크탑) */}
         <div className="hidden flex-col items-end gap-1 text-right md:flex">
           <StatusBadge status={badgeStatus(r)}>{v.label}</StatusBadge>
-          {r.best.rank && r.verdict !== "no" && <span className="text-[14px] font-semibold text-ink">{r.best.rank.label}</span>}
-          {score && r.verdict !== "no" && (
-            <span className="data text-[14px] text-sub">
-              {score.title} {score.total}
-              {score.partial ? "+" : ""}/{score.max}
-            </span>
+          {r.best.rank && r.verdict !== "no" && r.phase !== "closed" && (
+            <span className={`mt-1 text-[19px] font-bold leading-tight tracking-[-0.02em] ${rankTone(r.verdict, r.best.rank)}`}>{r.best.rank.label}</span>
           )}
+          {score && r.verdict !== "no" && r.phase !== "closed" && <span className="data text-[13px] text-sub">{scoreLine(score)}</span>}
         </div>
       </Link>
     </motion.li>
@@ -113,7 +110,7 @@ function Row({ r, index, far }: { r: NoticeResult; index: number; far: boolean }
 }
 
 /** 답하기 전후 건수 비교 — 1분 더 답했는데 무엇이 바뀌었는지(또는 안 바뀌었는지) 한 줄로 */
-function ChangeNote({ counts }: { counts: ReturnType<typeof countVerdicts> }) {
+function ChangeNote({ counts, manual }: { counts: ReturnType<typeof countVerdicts>; manual: number }) {
   const [before, setBefore] = useState<{ ok: number; maybe: number; no: number } | null>(null);
   useEffect(() => {
     try {
@@ -133,7 +130,9 @@ function ChangeNote({ counts }: { counts: ReturnType<typeof countVerdicts> }) {
       : dOk !== 0
         ? `방금 답한 내용으로 신청 가능이 ${dOk > 0 ? `${dOk}건 늘었어요` : `${-dOk}건 줄었어요`}.`
         : counts.maybe > 0
-          ? `결과는 그대로예요. 남은 확인 필요 ${counts.maybe}건은 다른 정보가 더 필요해요.`
+          ? manual >= counts.maybe
+            ? `결과는 그대로예요. 남은 확인 필요 ${counts.maybe}건은 더 답할 것이 없고, 공고문에서 직접 확인할 조건(사는 곳 등)이 남았어요.`
+            : `결과는 그대로예요. 남은 확인 필요 ${counts.maybe}건은 다른 정보가 더 필요해요.`
           : "결과는 그대로예요.";
   return (
     <motion.p
@@ -225,7 +224,7 @@ export function ResultsView() {
                 <dl className="mt-6 flex flex-wrap items-end gap-x-10 gap-y-5">
                   <div>
                     <dt className="text-[14px] font-semibold text-sub">신청 가능</dt>
-                    <dd className={`t-num-xl mt-1 ${counts.ok ? "text-brand" : "text-ghost"}`}>
+                    <dd className={`t-num-xl mt-1 ${counts.ok ? "text-brand" : "text-muted"}`}>
                       <Odometer value={counts.ok} />
                       <span className="ml-1 text-[22px] text-ink">건</span>
                     </dd>
@@ -233,16 +232,24 @@ export function ResultsView() {
                   {(
                     [
                       ["확인 필요", counts.maybe, "text-maybe-ink"],
-                      ["해당 없음", counts.no, "text-sub"],
-                      ["마감", counts.closed, "text-sub"],
+                      ["해당 없음", counts.no, "text-ink"],
+                      ["마감", counts.closed, "text-ink"],
                     ] as const
                   ).map(([k, n, c]) => (
                     <div key={k}>
                       <dt className="text-[14px] font-semibold text-sub">{k}</dt>
-                      <dd className={`t-num-m mt-1 ${n ? c : "text-ghost"}`}>{n}</dd>
+                      <dd className={`t-num-m mt-1 ${n ? c : "text-muted"}`}>{n}</dd>
                     </div>
                   ))}
                 </dl>
+                <div className="mt-5 lg:hidden" aria-hidden>
+                  <span className="flex flex-wrap gap-1">
+                    {results.map((r) => (
+                      <Pane key={r.a.id} state={winOf(r)} size="md" />
+                    ))}
+                  </span>
+                  <p className="mt-2 text-[12px] font-medium text-muted">창 1칸이 공고 1건이에요</p>
+                </div>
                 <ul className="mt-6 flex flex-wrap gap-1.5" aria-label="내 조건(누르면 고칠 수 있어요)">
                   {chips.map((c) => (
                     <li key={c}>
@@ -252,7 +259,7 @@ export function ResultsView() {
                     </li>
                   ))}
                 </ul>
-                <ChangeNote counts={counts} />
+                <ChangeNote counts={counts} manual={manualCount(results, profile)} />
               </>
             )}
           </div>
@@ -266,16 +273,14 @@ export function ResultsView() {
         {/* 더 정확해지려면 */}
         {hydrated && !empty && top && (
           <section className="mt-8 rounded-[4px] bg-page px-5 py-4 ring-1 ring-inset ring-line md:px-6">
-            <p className="t-h3">
-              {withJosa(top.label, "을/를")} 알려주시면 공고 {top.count}건의 결과가 정해져요
-            </p>
+            <p className="t-h3">{askLine(top)}</p>
             <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
               <ButtonLink href={`/check?topic=${top.topic}`} size="sm" arrow>
                 {top.label} 답하기
               </ButtonLink>
               {asks.slice(1, 4).map((a) => (
                 <Link key={a.topic} href={`/check?topic=${a.topic}`} className="inline-flex h-9 items-center text-[15px] font-semibold text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
-                  {a.label} <span className="ml-1 tabular font-medium text-muted">{a.count}건</span>
+                  {a.label} <span className="ml-1 tabular font-medium text-muted">{a.settles || a.count}건</span>
                 </Link>
               ))}
             </div>

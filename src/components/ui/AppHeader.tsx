@@ -16,7 +16,7 @@ export function AppHeader() {
             결과
           </Link>
           <ButtonLink href="/check?edit=1" variant="outline" size="sm">
-            조건 수정
+            조건 고치기
           </ButtonLink>
         </div>
       </div>

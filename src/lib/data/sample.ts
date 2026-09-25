@@ -27,8 +27,18 @@ export const EXAMPLE_PROFILE: Readonly<Profile> = Object.freeze({
  * 공식 API 수집을 붙이면 이 파일 대신 DB에서 읽는다(docs/DESIGN.md 3장).
  */
 
+/**
+ * 오늘부터 평일로 n일 뒤(음수면 전). 예시 공고의 공고일·접수일·발표일이 주말에 걸리지 않게 —
+ * 실제 공고는 평일에 내고 평일에 접수한다. 0은 오늘(주말이면 다음 월요일)이고, 1 이상은 그 뒤 평일이다.
+ */
 function rel(today: Date, days: number): string {
-  const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + days);
+  const d = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  if (days >= 0) while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+  const step = days < 0 ? -1 : 1;
+  for (let left = Math.abs(days); left > 0; ) {
+    d.setDate(d.getDate() + step);
+    if (d.getDay() !== 0 && d.getDay() !== 6) left--;
+  }
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
   return `${d.getFullYear()}-${mm}-${dd}`;
@@ -118,7 +128,7 @@ export function sampleAnnouncements(today = new Date()): Announcement[] {
       schedule: {
         announced: r(-3),
         applyStart: r(4),
-        applyEnd: r(8),
+        applyEnd: r(6),
         special: r(4),
         rank1: r(5),
         rank2: r(6),
@@ -202,7 +212,7 @@ export function sampleAnnouncements(today = new Date()): Announcement[] {
       schedule: {
         announced: r(-1),
         applyStart: r(10),
-        applyEnd: r(15),
+        applyEnd: r(13),
         special: r(10),
         rank1: r(12),
         rank2: r(13),
@@ -260,7 +270,7 @@ export function sampleAnnouncements(today = new Date()): Announcement[] {
       schedule: {
         announced: r(-5),
         applyStart: r(2),
-        applyEnd: r(5),
+        applyEnd: r(4),
         special: r(2),
         rank1: r(3),
         rank2: r(4),
@@ -329,7 +339,7 @@ export function sampleAnnouncements(today = new Date()): Announcement[] {
       schedule: {
         announced: r(-1),
         applyStart: r(12),
-        applyEnd: r(16),
+        applyEnd: r(14),
         special: r(12),
         rank1: r(13),
         rank2: r(14),

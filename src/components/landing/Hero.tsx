@@ -158,7 +158,7 @@ function HeroFacade() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.32, ease: EASE.out }}
-                className="inline-flex h-7 items-center rounded-[4px] bg-ink px-2.5 text-[13px] font-semibold text-white"
+                className="inline-flex h-7 items-center rounded-[4px] bg-page px-2.5 text-[13px] font-medium text-body ring-1 ring-inset ring-line-strong"
               >
                 {d.chip}
               </motion.span>
@@ -168,12 +168,12 @@ function HeroFacade() {
       </div>
 
       <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-5 md:gap-8">
-        <Facade items={items} cols={4} onActive={setActive} className="max-w-[340px]" />
+        <Facade items={items} cols={4} onActive={setActive} className="max-w-[220px] sm:max-w-[340px]" />
         <div className="pb-2 text-right">
           <p className="text-[13px] font-semibold text-sub">신청 가능</p>
-          <p className={`t-num-xl ${results.length && counts.ok ? "text-brand" : "text-ghost"}`}>{results.length ? <Odometer value={counts.ok} /> : "–"}</p>
+          <p className={`t-num-xl ${!results.length ? "text-faint" : counts.ok ? "text-brand" : "text-muted"}`}>{results.length ? <Odometer value={counts.ok} /> : "–"}</p>
           <p className="mt-4 text-[13px] font-semibold text-sub">확인 필요</p>
-          <p className={`t-num-m ${results.length && counts.maybe ? "text-maybe-ink" : "text-ghost"}`}>{results.length ? <Odometer value={counts.maybe} /> : "–"}</p>
+          <p className={`t-num-m ${!results.length ? "text-faint" : counts.maybe ? "text-maybe-ink" : "text-muted"}`}>{results.length ? <Odometer value={counts.maybe} /> : "–"}</p>
         </div>
       </div>
 

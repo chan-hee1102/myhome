@@ -7,11 +7,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Facade, type FacadeItem } from "@/components/motion/Facade";
 import { Odometer } from "@/components/motion/Odometer";
 import { DUR, EASE, SPRING } from "@/components/motion/tokens";
-import { dayText, programLine } from "@/components/results/verdict";
+import { dayText, isUrgent, programLine, rankTone } from "@/components/results/verdict";
 import { StatusBadge } from "@/components/ui/Badge";
 import { Arrow, BackArrow, Button, ButtonLink, IconButton } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
-import { WIN_LABEL, WinLegend, type WinState } from "@/components/ui/Window";
+import { Pane, WIN_LABEL, WinLegend, type WinState } from "@/components/ui/Window";
 import { WinMark } from "@/components/motion/WinMark";
 import { BEFORE_KEY } from "@/components/results/ResultsView";
 import { SIDO, type Band, type Profile, type Sido } from "@/lib/domain";
@@ -42,7 +42,7 @@ import {
   youngChildrenOptions,
 } from "@/lib/questions";
 import { derive, manwon } from "@/lib/rules/core";
-import { countVerdicts, evaluateAll, suggestAsks, type AskTopicId, type NoticeResult } from "@/lib/rules/evaluate";
+import { byRelevance, countVerdicts, evaluateAll, settleCount, suggestAsks, type AskTopicId, type NoticeResult } from "@/lib/rules/evaluate";
 import { incomeRuler } from "@/lib/rules/ruler";
 import { SITE } from "@/lib/site";
 import { bandEq, Chip, ChipGroup, Stepper, YesNo } from "./Choice";
@@ -342,7 +342,7 @@ function IncomeStep({ profile, update, skip, setSkip }: StepProps) {
           <ul className="mt-3 border-t border-ink">
             {ruler.rows.map((r, i) => (
               <li key={r.key} className="grid grid-cols-[20px_minmax(0,1fr)_auto] items-center gap-x-3 border-b border-line py-2.5">
-                <WinMark key={`${r.key}-${r.tri}`} tri={r.tri} delay={reduce ? 0 : i * 0.02} />
+                <WinMark tri={r.tri} delay={reduce ? 0 : i * 0.02} />
                 <span className="min-w-0 text-[14px] text-body">
                   {r.label} <span className="text-muted">{r.basisShort} {r.pct}%</span>
                 </span>
@@ -496,13 +496,17 @@ function HouseholdStep({ profile, update }: StepProps) {
 
 function SpecialStep({ profile, update }: StepProps) {
   const cur = profile.special ?? [];
-  const age = derive(profile).age;
-  const young = !age || age[0] <= 39;
+  const d = derive(profile);
+  const age = d.age;
   const elder = age && age[1] >= 65;
-  // 만 40세 이상에게 「대학생인가요?」는 묻지 않는다(자동 아니요) — 대학생 계층이 계속 「확인 필요」로 남지 않게
+  // 「대학생인가요?」는 만 40세 이상이거나 혼인 중이면 묻지 않는다(자동 아니요) — 행복주택 대학생 계층은
+  // 만 39세 이하·혼인 중이 아닌 사람만이라, 묻지 않아도 계층이 계속 「확인 필요」로 남지 않게
+  const askStudent = (!age || age[0] <= 39) && !d.married;
   useEffect(() => {
-    if (!young && profile.student === undefined) update({ student: false });
-  }, [young, profile.student, update]);
+    if (!askStudent && profile.student === undefined) update({ student: false });
+  }, [askStudent, profile.student, update]);
+  // 소득세 5년 납부는 생애최초 특별공급(청약통장 필요)에만 쓰인다 — 통장이 없다고 답했으면 묻지 않는다
+  const askTax = profile.hasAccount !== false;
   return (
     <div className="space-y-8">
       {elder && (
@@ -522,8 +526,8 @@ function SpecialStep({ profile, update }: StepProps) {
           </Chip>
         </div>
       </fieldset>
-      {young && <YesNo q={YES_NO.student} value={profile.student} onChange={(v) => update({ student: v })} />}
-      <YesNo q={YES_NO.taxFiveYears} value={profile.taxFiveYears} onChange={(v) => update({ taxFiveYears: v })} />
+      {askStudent && <YesNo q={YES_NO.student} value={profile.student} onChange={(v) => update({ student: v })} />}
+      {askTax && <YesNo q={YES_NO.taxFiveYears} value={profile.taxFiveYears} onChange={(v) => update({ taxFiveYears: v })} />}
     </div>
   );
 }
@@ -610,14 +614,14 @@ function LivePanel({ results }: { results: NoticeResult[] }) {
       <dl className="mt-5 flex gap-8">
         <div>
           <dt className="text-[13px] font-semibold text-sub">신청 가능</dt>
-          <dd className="relative num mt-1 w-fit text-[40px] leading-none text-brand">
+          <dd className={`t-num-l relative mt-1 w-fit ${counts.ok ? "text-brand" : "text-muted"}`}>
             <Odometer value={counts.ok} />
             <Delta value={counts.ok} />
           </dd>
         </div>
         <div>
           <dt className="text-[13px] font-semibold text-sub">확인 필요</dt>
-          <dd className="num mt-1 text-[40px] leading-none text-maybe-ink">
+          <dd className={`t-num-l mt-1 ${counts.maybe ? "text-maybe-ink" : "text-muted"}`}>
             <Odometer value={counts.maybe} />
           </dd>
         </div>
@@ -659,18 +663,25 @@ function DoneView({ results, profile }: { results: NoticeResult[]; profile: Prof
     label: `${r.a.complex} — ${WIN_LABEL[winOf(r)]}`,
     href: `/notice/${r.a.id}`,
   }));
+  // 결과 화면이 처음 여는 탭(신청 가능, 없으면 확인 필요)과 같은 목록·같은 순서(잘 맞는 순)
+  const lead = counts.ok > 0 ? "ok" : "maybe";
   const top = results
-    .filter((r) => r.phase !== "closed" && r.verdict !== "no")
-    .sort((x, y) => (x.verdict === y.verdict ? (x.best.rank?.order ?? 5) - (y.best.rank?.order ?? 5) : x.verdict === "ok" ? -1 : 1))
+    .filter((r) => r.phase !== "closed" && r.verdict === lead)
+    .sort(byRelevance(profile))
     .slice(0, 3);
   const more = asks.length > 0;
   const moreFirst = more && counts.maybe > counts.ok;
   const moreLabels = asks.slice(0, 2).map((a) => a.label).join("·");
-  const moreCount = asks[0]?.count ?? 0;
+  // 두 묶음을 다 답했을 때 정해지는 공고만 센다 — 답했는데 그대로면 약속을 어긴 셈이라
+  const moreCount = settleCount(
+    results,
+    asks.slice(0, 2).map((a) => a.topic),
+    profile,
+  );
   const moreHref = more ? `/check?step=${TOPIC_STEP[asks[0].topic]}` : "/results";
   return (
-    <div className="grid gap-8 lg:grid-cols-12 lg:gap-8">
-      <div className="order-2 lg:order-1 lg:col-span-7">
+    <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
+      <div className="lg:col-span-7">
         <p className="text-[14px] font-semibold text-sub">입력 끝</p>
         <h1 className="t-h1 mt-2">
           신청할 수 있는 공고 <span className={counts.ok ? "text-brand" : "text-sub"}>{counts.ok}건</span>
@@ -679,7 +690,11 @@ function DoneView({ results, profile }: { results: NoticeResult[]; profile: Prof
           {counts.maybe > 0 ? (
             <>
               아직 모르는 공고가 <span className="font-semibold text-maybe-ink">{counts.maybe}건</span> 있어요.{" "}
-              {more ? `${withJosa(moreLabels, "을/를")} 답하면 ${moreCount}건이 더 정해져요.` : "공고 상세에서 무엇이 걸리는지 볼 수 있어요."}
+              {more
+                ? moreCount > 0
+                  ? `${withJosa(moreLabels, "을/를")} 답하면 ${moreCount}건이 더 정해져요.`
+                  : `${withJosa(moreLabels, "을/를")} 답하면 결과가 더 정확해져요.`
+                : "공고 상세에서 무엇이 걸리는지 볼 수 있어요."}
             </>
           ) : (
             "답한 조건으로 모든 공고의 결과가 정해졌어요."
@@ -724,11 +739,15 @@ function DoneView({ results, profile }: { results: NoticeResult[]; profile: Prof
                       {programLine(r)} · {placeText(r.a)}
                     </span>
                     <span className="block truncate text-[18px] font-bold tracking-[-0.03em] text-ink group-hover:underline">{r.a.complex}</span>
-                    <span className="mt-1 block">
+                    <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
                       <StatusBadge status={r.verdict === "ok" ? "ok" : "maybe"}>{r.verdict === "ok" ? "신청 가능" : "확인 필요"}</StatusBadge>
+                      {r.best.rank && <span className={`text-[15px] font-bold ${rankTone(r.verdict, r.best.rank)}`}>{r.best.rank.label}</span>}
                     </span>
                   </span>
-                  <span className="t-num-m text-ink">{dayText(r).big}</span>
+                  <span className="text-right">
+                    <span className={`t-num-m block ${isUrgent(r) ? "text-hot-ink" : "text-ink"}`}>{dayText(r).big}</span>
+                    <span className="block text-[13px] font-medium text-muted">{dayText(r).small}</span>
+                  </span>
                 </Link>
               </motion.li>
             ))}
@@ -736,18 +755,18 @@ function DoneView({ results, profile }: { results: NoticeResult[]; profile: Prof
         )}
         <p className="t-small mt-6 text-muted">결과는 참고용 예상이에요. 최종 자격과 순위는 공급기관이 서류로 심사해 정해요.</p>
       </div>
-      <div className="order-1 lg:order-2 lg:col-span-4 lg:col-start-9">
+      <div className="lg:col-span-4 lg:col-start-9">
         <div className="section-head">
           <span>불 켜진 창 = 신청 가능</span>
         </div>
-        <Facade items={items} cols={4} className="mt-5 max-w-[150px] lg:max-w-[300px]" />
+        <Facade items={items} cols={4} className="mt-5 max-w-[200px] lg:max-w-[300px]" />
         <WinLegend className="mt-4" states={["ok", "maybe", "no", "closed"]} />
       </div>
     </div>
   );
 }
 
-/** 「조건 수정」 — 답한 것을 한눈에 보고 항목별로 고친다 */
+/** 「조건 고치기」 — 답한 것을 한눈에 보고 항목별로 고친다 */
 function SummaryView({ profile }: { profile: Profile }) {
   const rows: { step: StepId; label: string; value: string }[] = [
     { step: "birth", label: "나이", value: profile.birthYear ? `${profile.birthYear}년생` : "" },
@@ -843,7 +862,7 @@ export function CheckFlow() {
                 <span className="text-ink">{railIndex + 1}</span> / {rail.length}
               </span>
             )}
-            <Link href="/results" className="text-[14px] font-semibold text-sub underline decoration-line-strong underline-offset-4 hover:text-ink">
+            <Link href="/results" className="-mr-2 inline-flex h-11 items-center px-2 text-[14px] font-semibold text-sub underline decoration-line-strong underline-offset-4 hover:text-ink">
               {done || EXTRA.includes(step) || single ? "결과로" : "나중에"}
             </Link>
           </div>
@@ -932,33 +951,22 @@ function MobileCounts({ results }: { results: NoticeResult[] }) {
   const c = countVerdicts(results);
   return (
     <Link href="/results" className="block lg:hidden" aria-label={`신청 가능 ${c.ok}건, 확인 필요 ${c.maybe}건 — 결과 보기`}>
-      <span className="flex gap-[3px]" aria-hidden>
-        {results.map((r) => {
-          const s = winOf(r);
-          return (
-            <span
-              key={r.a.id}
-              className={`relative h-4 flex-1 overflow-hidden rounded-[1.5px] ring-1 ring-inset ${s === "ok" ? "ring-brand" : s === "maybe" ? "ring-maybe" : "ring-line-strong"}`}
-            >
-              <span
-                className={`absolute inset-0 origin-bottom transition-transform duration-300 ${s === "maybe" ? "bg-maybe" : "bg-brand"}`}
-                style={{ transform: `scaleY(${s === "ok" ? 1 : s === "maybe" ? 0.5 : 0})` }}
-              />
-            </span>
-          );
-        })}
+      <span className="flex max-h-[31px] flex-wrap gap-[3px] overflow-hidden" aria-hidden>
+        {results.map((r) => (
+          <Pane key={r.a.id} state={winOf(r)} size="sm" />
+        ))}
       </span>
       <span className="mt-2 flex h-7 items-center gap-5">
         <span className="flex items-baseline gap-1.5 text-[14px] font-semibold text-sub">
           신청 가능
-          <span className="relative t-num-m leading-none text-brand">
+          <span className={`t-num-m relative leading-none ${c.ok ? "text-brand" : "text-muted"}`}>
             <Odometer value={c.ok} />
             <Delta value={c.ok} />
           </span>
         </span>
         <span className="flex items-baseline gap-1.5 text-[14px] font-semibold text-sub">
           확인 필요
-          <span className="t-num-m leading-none text-maybe-ink">{c.maybe}</span>
+          <span className={`t-num-m leading-none ${c.maybe ? "text-maybe-ink" : "text-muted"}`}>{c.maybe}</span>
         </span>
       </span>
     </Link>

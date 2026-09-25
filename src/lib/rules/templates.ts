@@ -281,6 +281,7 @@ function integratedScore(ctx: C.Ctx): ScoreInfo {
 function multiChildScore(ctx: C.Ctx): ScoreInfo {
   const { p, a, d } = ctx;
   const yc = d.youngChildren;
+  const capitalMove = !!p.sido && p.sido !== a.sido && CAPITAL_AREA.includes(p.sido) && CAPITAL_AREA.includes(a.sido);
   return sumScore("다자녀 배점", [
     { label: "미성년 자녀", points: tierPoints(p.children, [[4, 40], [3, 35], [2, 25]]), max: 40, note: "4명 이상 40 · 3명 35 · 2명 25" },
     {
@@ -302,11 +303,14 @@ function multiChildScore(ctx: C.Ctx): ScoreInfo {
     { label: "무주택 기간", points: tierPoints(p.homelessYears, [[10, 20], [5, 15], [1, 10]]), max: 20, note: "10년 이상 20 · 5~10년 15 · 1~5년 10" },
     {
       label: `해당 시·도(${a.sido}) 거주`,
-      points: p.sido && p.sido !== a.sido ? 0 : tierPoints(p.residenceYears, [[10, 15], [5, 10], [1, 5]]),
+      // 수도권 안에서 다른 시·도에 살면 단정하지 않는다 — 수도권 대규모 택지 등은 서울·인천·경기 거주를 함께 치는 공고가 있다
+      points: p.sido && p.sido !== a.sido ? (capitalMove ? null : 0) : tierPoints(p.residenceYears, [[10, 15], [5, 10], [1, 5]]),
       max: 15,
       note:
         p.sido && p.sido !== a.sido
-          ? `10년 이상 15 · 5~10년 10 · 1~5년 5 · ${a.sido} 밖에 살아서 0점`
+          ? capitalMove
+            ? `10년 이상 15 · 5~10년 10 · 1~5년 5 · ${p.sido} 거주도 치는지는 공고마다 달라요(대규모 택지 등). 공고문을 확인하세요`
+            : `10년 이상 15 · 5~10년 10 · 1~5년 5 · ${a.sido} 밖에 살아서 0점`
           : `10년 이상 15 · 5~10년 10 · 1~5년 5 · ${a.sido}에 산 기간만 쳐요`,
     },
     {

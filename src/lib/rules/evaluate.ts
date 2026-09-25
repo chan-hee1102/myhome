@@ -1,3 +1,4 @@
+import { withJosa } from "@/lib/josa";
 import type { Announcement, GroupId, Profile, ProfileKey, SupplyGroup } from "@/lib/domain";
 import { sameBloc } from "@/lib/place";
 import { all, derive, type Check, type Derived } from "./core";
@@ -268,14 +269,40 @@ export function topicOf(k: ProfileKey): AskTopicId | undefined {
 export interface AskSuggestion {
   topic: AskTopicId;
   label: string;
-  /** 이 묶음에 답하면 판정이 바뀔 수 있는 진행 중 공고 수 */
+  /** 이 묶음에 답하면 판정이 바뀔 수 있는 진행 중 공고 수(다른 정보도 필요한 공고 포함) */
   count: number;
+  /** 이 묶음 하나만 답하면 결과가 정해지는 공고 수 — 「N건이 정해져요」는 이 숫자로만 말한다 */
+  settles: number;
   /** 이 묶음에서 아직 답하지 않았고 판정에 필요한 칸 */
   keys: ProfileKey[];
 }
 
+/** 이 공고의 「확인 필요」 대상이 아직 모르는 칸(프로필에 이미 있는 칸은 뺀다) */
+function openAsks(r: NoticeResult, profile?: Profile): ProfileKey[][] {
+  return r.groups.filter((g) => g.verdict === "maybe").map((g) => g.asks.filter((k) => !(profile && profile[k] !== undefined)));
+}
+
 /**
- * 진행 중 공고의 「확인 필요」를 푸는 질문 묶음을 공고 수가 많은 순으로.
+ * 주어진 묶음들만 답하면 결과가 정해지는 진행 중 「확인 필요」 공고 수.
+ * 「확인 필요」인 대상마다, 모르는 칸이 전부 이 묶음 안에 있어야 한다(묶음 밖의 칸이 하나라도 남으면 답해도 그대로다).
+ * 모르는 칸이 없는데 확인 필요인 대상(공고문을 직접 봐야 하는 조건)이 있으면 정해지지 않는다.
+ */
+export function settleCount(rs: NoticeResult[], topics: AskTopicId[], profile?: Profile): number {
+  const keys = new Set(topics.flatMap((t) => TOPIC_KEYS[t]));
+  return rs.filter((r) => {
+    if (r.phase === "closed" || r.verdict !== "maybe") return false;
+    const per = openAsks(r, profile);
+    return per.length > 0 && per.every((ks) => ks.length > 0 && ks.every((k) => keys.has(k)));
+  }).length;
+}
+
+/** 답할 것이 남지 않았는데도 「확인 필요」인 진행 중 공고 수 — 공고문에서 직접 확인할 조건만 남은 경우 */
+export function manualCount(rs: NoticeResult[], profile?: Profile): number {
+  return rs.filter((r) => r.phase !== "closed" && r.verdict === "maybe" && openAsks(r, profile).every((ks) => ks.length === 0)).length;
+}
+
+/**
+ * 진행 중 공고의 「확인 필요」를 푸는 질문 묶음. 그 묶음만 답하면 정해지는 공고가 많은 순, 같으면 영향받는 공고가 많은 순.
  * GroupResult.asks에는 아직 답하지 않은 칸만 들어 있으므로, 다 답한 묶음은 추천되지 않는다.
  * profile을 넘기면 한 번 더 걸러낸다(evaluate 뒤에 프로필이 바뀐 경우 대비).
  */
@@ -297,11 +324,21 @@ export function suggestAsks(rs: NoticeResult[], profile?: Profile): AskSuggestio
     }
   }
   return ASK_TOPICS.filter((t) => counts.has(t.id))
-    .map((t) => ({ topic: t.id, label: t.label, count: counts.get(t.id)!.ids.size, keys: [...counts.get(t.id)!.keys] }))
-    .sort((x, y) => y.count - x.count);
+    .map((t) => ({
+      topic: t.id,
+      label: t.label,
+      count: counts.get(t.id)!.ids.size,
+      settles: settleCount(rs, [t.id], profile),
+      keys: [...counts.get(t.id)!.keys],
+    }))
+    .sort((x, y) => y.settles - x.settles || y.count - x.count);
 }
 
-/** 「세대 정보만 알려주시면 공고 3건의 결과가 확실해져요.」 */
-export function askLine(s: Pick<AskSuggestion, "label" | "count">): string {
-  return `${s.label} 정보만 알려주시면 공고 ${s.count}건의 결과가 확실해져요.`;
+/**
+ * 「청약통장을 알려주시면 공고 2건의 결과가 정해져요」 — 그 묶음만으로 정해지는 공고가 있을 때만 「정해져요」라고 말한다.
+ * 없으면(다른 정보도 함께 필요하면) 「더 정확해져요」.
+ */
+export function askLine(s: Pick<AskSuggestion, "label" | "count" | "settles">): string {
+  const what = withJosa(s.label, "을/를");
+  return s.settles > 0 ? `${what} 알려주시면 공고 ${s.settles}건의 결과가 정해져요` : `${what} 알려주시면 공고 ${s.count}건의 결과가 더 정확해져요`;
 }

@@ -30,7 +30,7 @@ src/
   app/                 라우트 + robots·sitemap·manifest·llms·rss·opengraph-image
   components/
     landing/ check/ results/ detail/ guide/   화면별
-    ui/                Button · Badge(StatusBadge=창 글리프) · Window(WinGlyph·WinLegend) · Mark · Logo · AppHeader
+    ui/                Button · Badge(StatusBadge=창 글리프) · Window(Pane=창 부품 하나·WinGlyph·WinLegend) · Logo · AppHeader
     motion/ seo/       모션 부품 · JsonLd
   lib/
     rules/             판정 엔진 — core(세 값)·checks·templates·evaluate·gajeom·standards(기준표)·criteria(소득 규칙 한 벌)
@@ -43,7 +43,9 @@ src/
 
 2026-09-25에 두 번 바뀌었다: 검은 배경·세리프(「어둡고 어렵다」) → 흰 바탕·토스풍(「AI 티가 난다」) → 지금. 전문가 3명·사용자 4명 테스트로 정했다.
 
-- **모티프는 창 하나.** 아파트 입면의 창 1칸 = 공고 1건(가점은 1점). 꽉 찬 창 = 신청 가능(군청) · 아래 절반 = 확인 필요(주황) · 선만 = 해당 없음 · 회색 면 = 마감. 색이 아니라 채움으로도 읽힌다. **데이터 없는 창은 그리지 않는다**(`components/ui/Window.tsx`, `components/motion/Facade.tsx`).
+- **모티프는 창 하나.** 아파트 입면의 창 1칸 = 공고 1건(가점은 1점). 꽉 찬 창 = 신청 가능(군청) · 아래 절반 = 확인 필요(주황) · 선만 = 해당 없음 · 회색 면 = 마감. 색이 아니라 채움으로도 읽힌다. **데이터 없는 창은 그리지 않는다.**
+  창은 **부품 하나(`Pane`, `components/ui/Window.tsx`)로만 그린다** — 입면(`Facade`)·조건 표시(`WinMark`)·뱃지·범례·하단 띠·탭 표시·공유 카드가 모두 같은 규격: 비율 5:7, 가운데(50%) 창살 하나(틀 안쪽에만), 꺼질 때도 마지막 색 유지. 3차 감사에서 창을 다섯 가지로 따로 그려 생긴 불일치(창살이 틀을 끊음·반 칸 선 두 줄·꺼질 때 파란 번쩍임·체크박스처럼 보임)를 이렇게 없앴다.
+- **군청은 「신청 가능」에만.** 0은 `muted`, 확인 필요 상태의 순위는 `maybe-ink`, 접수 전 기간은 테두리만. D-day 문구는 `results/verdict.tsx dday()` 하나에서만 만든다(「3일 뒤 / 접수 시작」·「D-6 / 마감」).
 - **문법은 「공고문 서식」.** 카드 그림자 대신 1px 괘선, 섹션 머리글은 위 잉크 괘선 + 회색 글자(`.section-head`). 왼쪽 정렬 12열, 가운데 정렬 제목·색 eyebrow·파스텔 타일·그라디언트·폰 목업은 쓰지 않는다.
 - **색:** 흰 82 · 잉크 12 · 군청(`brand` #2447D6) 5 · 상태색 1. 회색은 토스 값에서 벗어난 자체 값(`ink/body/sub/muted`). `faint`·`ghost`는 글자에 쓰지 않는다.
 - **글꼴:** Pretendard 한 벌. 페이지에서 가장 큰 것은 숫자(`t-num-xl`). 글자 크기는 `t-num-xl · t-h1 · t-h2 · t-h3 · t-body-l · t-body · t-small · t-caption`만.

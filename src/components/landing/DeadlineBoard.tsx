@@ -4,6 +4,7 @@ import Link from "next/link";
 import { animate, motion, useInView, useMotionValue, useReducedMotion, useTransform } from "motion/react";
 import { useEffect, useMemo, useRef } from "react";
 import { DUR, EASE } from "@/components/motion/tokens";
+import { dday } from "@/components/results/verdict";
 import type { Announcement } from "@/lib/domain";
 import { sampleAnnouncements } from "@/lib/data/sample";
 import { placeText } from "@/lib/place";
@@ -150,18 +151,19 @@ export function DeadlineBoard() {
   );
 }
 
-function dday(r: Row) {
-  if (BEFORE > r.e) return { text: "마감", tone: "text-muted" };
-  if (BEFORE < r.s) return { text: `${r.s - BEFORE}일 뒤 시작`, tone: "text-brand-ink" };
+/** 문구는 목록·상세와 같은 dday()로 만든다 */
+function dayOf(r: Row) {
+  if (BEFORE > r.e) return { ...dday("closed", 0, 0), tone: "text-muted" };
+  if (BEFORE < r.s) return { ...dday("upcoming", r.s - BEFORE, 0), tone: "text-sub" };
   const left = r.e - BEFORE;
-  return { text: left === 0 ? "오늘 마감" : `D-${left}`, tone: left <= 3 ? "text-hot-ink" : "text-ink" };
+  return { ...dday("open", 0, left), tone: left <= 3 ? "text-hot-ink" : "text-ink" };
 }
 
 function BarRow({ r }: { r: Row }) {
   const s = Math.max(0, r.s);
   const e = Math.min(SPAN - 1, r.e);
   const open = r.s <= BEFORE && BEFORE <= r.e;
-  const d = dday(r);
+  const d = dayOf(r);
   return (
     <Link href={`/notice/${r.a.id}`} className="group grid grid-cols-[260px_minmax(0,1fr)] items-center">
       <span className="min-w-0 py-3 pr-4">
@@ -177,9 +179,9 @@ function BarRow({ r }: { r: Row }) {
         />
         <span
           className={`data absolute top-1/2 -translate-y-1/2 whitespace-nowrap pl-2 text-[14px] ${d.tone}`}
-          style={{ left: `min(${((e + 1) / SPAN) * 100}%, calc(100% - 88px))` }}
+          style={{ left: `min(${((e + 1) / SPAN) * 100}%, calc(100% - 116px))` }}
         >
-          {d.text}
+          {d.line}
         </span>
       </span>
     </Link>
@@ -187,10 +189,13 @@ function BarRow({ r }: { r: Row }) {
 }
 
 function ListRow({ r }: { r: Row }) {
-  const d = dday(r);
+  const d = dayOf(r);
   return (
     <Link href={`/notice/${r.a.id}`} className="grid grid-cols-[76px_minmax(0,1fr)] items-center gap-3 py-3.5">
-      <span className={`num leading-tight ${d.text.length > 5 ? "text-[15px]" : "text-[20px]"} ${d.tone}`}>{d.text}</span>
+      <span className="min-w-0">
+        <span className={`num block whitespace-nowrap text-[20px] leading-tight ${d.tone}`}>{d.big}</span>
+        <span className="block text-[12px] font-medium text-muted">{d.small}</span>
+      </span>
       <span className="min-w-0">
         <span className="block truncate text-[16px] font-semibold text-ink">{r.a.complex}</span>
         <span className="block truncate text-[13px] text-muted">

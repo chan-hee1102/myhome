@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
 import { useState } from "react";
-import type { WinState } from "@/components/ui/Window";
-import { DUR, EASE, SPRING, STAGGER } from "./tokens";
+import { Pane, type WinState } from "@/components/ui/Window";
+import { STAGGER } from "./tokens";
 
 export interface FacadeItem {
   id: string;
@@ -14,36 +13,11 @@ export interface FacadeItem {
   href?: string;
 }
 
-const FILL: Record<WinState, number> = { ok: 1, maybe: 0.5, no: 0, closed: 0, off: 0 };
-
-const FRAME: Record<WinState, string> = {
-  ok: "ring-brand",
-  maybe: "ring-maybe",
-  no: "ring-line-strong",
-  closed: "ring-ghost bg-well",
-  off: "ring-ghost",
-};
-
 /**
- * 창 한 칸. 켜질 때는 아래에서 위로 불이 차오르고(스프링), 꺼질 때는 짧게 내려간다(0.16초).
- * 꺼지는 동안에도 마지막으로 켜졌던 색을 유지한다 — 주황 반 칸이 꺼지면서 파랗게 번쩍이지 않게.
- * 가로 창살 하나가 불 켜진 창의 표시다.
+ * 입면의 창 한 칸 — 그림은 Pane(창 부품) 그대로, 여기서는 링크·호버만 붙인다.
  */
 function Win({ it, delay, onActive }: { it: FacadeItem; delay: number; onActive?: (id: string | null) => void }) {
-  const reduce = useReducedMotion();
-  const fill = FILL[it.state];
-  const want = it.state === "ok" ? "bg-brand" : it.state === "maybe" ? "bg-maybe" : null;
-  const [color, setColor] = useState(want ?? "bg-brand");
-  if (want && want !== color) setColor(want);
-  const t = reduce ? { duration: 0 } : fill > 0 ? { ...SPRING.land, delay } : { duration: DUR.fast, ease: EASE.exit, delay: delay * 0.5 };
-  const body = (
-    <span
-      className={`relative block aspect-[5/7] overflow-hidden rounded-[2px] ring-[1.5px] ring-inset transition-[box-shadow,background-color] duration-300 ${FRAME[it.state]}`}
-    >
-      <motion.span className={`absolute inset-0 origin-bottom ${want ?? color}`} initial={false} animate={{ scaleY: fill }} transition={t} />
-      <span aria-hidden className="absolute inset-x-0 top-[34%] h-px bg-white/70" />
-    </span>
-  );
+  const body = <Pane state={it.state} delay={delay} />;
   const common = {
     onMouseEnter: () => onActive?.(it.id),
     onMouseLeave: () => onActive?.(null),

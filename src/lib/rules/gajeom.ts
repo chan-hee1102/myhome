@@ -157,9 +157,11 @@ export function homelessBasis(p: Profile, d: Derived = derive(p)): HomelessBasis
     : `${by}년생 → 만 30세(${turn30}년)부터 ${yrs(since)}`;
   // 혼인 중인데 신고 연도를 모르면 만 30세 기준(더 짧은 쪽)으로 센다
   const tail = d.married && my === undefined ? " (30세 전에 혼인신고했다면 더 길어요)" : "";
+  // 연도로만 세므로, 올해 생일(또는 신고일)이 아직이면 1년 짧다 — 점수가 한 칸 낮을 수 있음을 밝힌다
+  const edge = since >= 1 ? ` (올해 ${marriedBefore30 ? "신고일" : "생일"}이 아직이면 1년 짧아요)` : "";
   if (p.homelessYears === undefined)
     return { state: "counting", points: null, text: `${head} · 무주택이 된 지 알려주시면 짧은 쪽으로 세요${tail}`, ask: ["homelessYears"] };
-  if (p.homelessYears >= 99) return { state: "counting", years: since, points: homelessPoints(since), text: `${head} (쭉 무주택)${tail}` };
+  if (p.homelessYears >= 99) return { state: "counting", years: since, points: homelessPoints(since), text: `${head} (쭉 무주택)${tail || edge}` };
   const years = Math.min(since, p.homelessYears);
   return {
     state: "counting",
@@ -167,7 +169,7 @@ export function homelessBasis(p: Profile, d: Derived = derive(p)): HomelessBasis
     points: homelessPoints(years),
     text:
       (since === p.homelessYears ? `${head} · 무주택 ${yrs(p.homelessYears)}` : `${head} · 무주택 ${yrs(p.homelessYears)} 중 짧은 쪽 ${yrs(years)}`) +
-      (since < p.homelessYears ? tail : ""),
+      (since < p.homelessYears ? tail || edge : since === p.homelessYears ? edge : ""),
   };
 }
 
@@ -236,7 +238,12 @@ export function gajeomLinesFromProfile(p: Profile, d: Derived = derive(p)): Gaje
       label: "부양가족",
       points: deps === undefined ? null : dependentPoints(deps),
       max: 35,
-      note: deps === undefined ? "가족 정보를 알려주세요" : `${deps}명 · 배우자·자녀·3년 넘게 모신 부모님`,
+      note:
+        deps === undefined
+          ? "가족 정보를 알려주세요"
+          : deps === 0
+            ? "0명 · 배우자·자녀·3년 넘게 같이 산 부모님이 있으면 1명씩 늘어요"
+            : `${deps}명 · ${[d.married && "배우자", p.children ? `자녀 ${p.children}명` : "", p.livesWithParents && "부모님"].filter(Boolean).join(" · ")}`,
     },
     {
       label: "통장 가입 기간",
