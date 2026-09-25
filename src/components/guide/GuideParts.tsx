@@ -47,7 +47,7 @@ function linkify(text: string): ReactNode {
       out[out.length - 1] = prev.slice(0, -g.short.length);
     }
     out.push(
-      <Link key={i} href={path} className="font-medium text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
+      <Link key={i} href={path} className="whitespace-nowrap font-medium text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
         {name}
       </Link>,
     );
@@ -59,8 +59,10 @@ export function TableView({ table }: { table: GuideTable }) {
   const wide = table.head.length > 3;
   return (
     <figure className="my-6">
-      {wide && <p className="mb-2 text-[12px] font-medium text-muted md:hidden">표를 옆으로 밀면 나머지 칸이 보여요 →</p>}
-      <div className="no-scrollbar overflow-x-auto border-t border-ink" tabIndex={0} aria-label={table.caption}>
+      {wide && (
+        <p className={`mb-2 text-[14px] font-medium text-muted md:text-[15px] ${table.head.length > 5 ? "" : "md:hidden"}`}>표가 넓어요. 옆으로 밀면 나머지 칸이 보여요 →</p>
+      )}
+      <div className="overflow-x-auto" tabIndex={0} aria-label={table.caption}>
         <table id={table.id} className={`guide-table ${table.wrap ? "wrap-cells" : ""}`}>
           <caption className="pt-3">{table.caption}</caption>
           <thead>
@@ -120,7 +122,7 @@ export function BlockView({ b }: { b: Block }) {
 /** 네이티브 details — JS 없이도 답이 HTML에 있다(AEO). 괘선 아코디언 */
 export function FaqList({ items }: { items: { q: string; a: string }[] }) {
   return (
-    <div className="border-t border-ink">
+    <div className="border-t border-line-strong">
       {items.map((f) => (
         <details key={f.q} name="faq" className="group border-b border-line">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 [&::-webkit-details-marker]:hidden">
@@ -141,13 +143,13 @@ export function FaqList({ items }: { items: { q: string; a: string }[] }) {
 export function RelatedGuides({ slugs }: { slugs: string[] }) {
   const list = slugs.map((s) => GUIDES.find((g) => g.slug === s)).filter(Boolean) as Guide[];
   return (
-    <ul className="border-t border-ink">
+    <ul className="border-t border-line-strong">
       {list.map((g) => (
         <li key={g.slug} className="border-b border-line">
           <Link href={`/guide/${g.slug}`} className="group grid gap-1 py-4 md:grid-cols-[12em_minmax(0,1fr)_auto] md:items-baseline md:gap-6">
             <span className="text-[16px] font-semibold text-ink group-hover:underline">{g.short}</span>
             <span className="t-small text-sub">{g.facts.join(" · ")}</span>
-            <span className="hidden text-[13px] text-muted md:block">{g.category}</span>
+            <span className="hidden text-[14px] md:text-[15px] text-muted md:block">{g.category}</span>
           </Link>
         </li>
       ))}
@@ -157,12 +159,12 @@ export function RelatedGuides({ slugs }: { slugs: string[] }) {
 
 export function CheckCta({ compact = false }: { compact?: boolean }) {
   return (
-    <div className={`border-t border-ink ${compact ? "pt-4" : "pt-6"}`}>
-      <p className="t-h3">내 조건으로 바로 확인하기</p>
-      <p className="t-small mt-1.5 text-sub">여섯 가지를 눌러서 답하면 공고마다 신청할 수 있는지와 예상 순위를 볼 수 있어요.</p>
+    <div className={`border-t border-line-strong ${compact ? "pt-4" : "pt-6"}`}>
+      <p className="t-h3">내 자격 바로 확인</p>
+      <p className="t-small mt-1.5 text-sub">질문 6개에 답하면 공고별 신청 가능 여부와 예상 순위를 보여 드려요.</p>
       <div className="mt-4">
         <ButtonLink href="/check" arrow block={compact}>
-          내 조건 넣기
+          자격 확인하기
         </ButtonLink>
       </div>
     </div>

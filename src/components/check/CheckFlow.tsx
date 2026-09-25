@@ -68,12 +68,12 @@ const TOPIC_STEP: Record<AskTopicId, StepId> = {
 const META: Record<StepId, { tag: string; title: string; help?: string }> = {
   birth: { tag: "나이", title: "몇 년생이세요?", help: "청년·고령자 기준과 가점 계산에 써요." },
   region: { tag: "사는 곳", title: "지금 어디 사세요?", help: "주민등록상 주소예요. 공고 지역에 살면 순위에서 앞서요." },
-  family: { tag: "가족", title: "가족 상황을 알려주세요", help: "자녀에는 배 속 아이도 넣어 주세요." },
+  family: { tag: "가족", title: "결혼했나요? 자녀는요?", help: "임신 중이면 아이도 자녀로 세어 주세요." },
   home: { tag: "집", title: "집이 있나요?", help: "대부분의 공고가 무주택을 기본 조건으로 봐요." },
-  income: { tag: "소득", title: "한 달 소득은 얼마쯤이에요?", help: "월급·연금처럼 매달 들어오는 돈을 세금 떼기 전 기준으로(연봉 ÷ 12). 결혼했다면 배우자 소득도 더해 주세요." },
-  assets: { tag: "재산", title: "재산은 어느 정도예요?", help: "대략이면 충분해요. 모르면 건너뛰어도 돼요." },
-  account: { tag: "청약통장", title: "청약통장을 알려주세요", help: "분양 1순위와 가점, 국민임대 순위에 쓰여요." },
-  household: { tag: "세대", title: "세대 정보를 알려주세요", help: "모르는 건 비워 두셔도 돼요." },
+  income: { tag: "소득", title: "한 달 소득은 얼마쯤이에요?", help: "세금 떼기 전 월소득이에요. 연봉은 12로 나눠 주세요. 결혼했다면 배우자 소득도 더해요." },
+  assets: { tag: "재산", title: "재산은 어느 정도예요?", help: "대략 골라도 돼요." },
+  account: { tag: "청약통장", title: "청약통장이 있나요?", help: "분양 1순위와 가점, 국민임대 순위에 쓰여요." },
+  household: { tag: "세대", title: "함께 사는 가족과 무주택 기간", help: "모르는 건 비워 두셔도 돼요." },
   special: { tag: "해당 계층", title: "해당되는 게 있나요?", help: "영구·매입임대 순위와 일부 특별공급에 쓰여요." },
 };
 
@@ -117,7 +117,7 @@ function BirthStep({ profile, update, onNext }: StepProps) {
             if (v.length === 4 && y >= 1930 && y <= YEAR - 15) update({ birthYear: y });
           }}
           onKeyDown={(e) => e.key === "Enter" && valid && onNext()}
-          className="num h-16 w-[6.5em] rounded-[10px] bg-page px-4 text-[32px] text-ink ring-1 ring-inset ring-line-strong outline-none placeholder:text-[22px] placeholder:font-medium placeholder:text-faint focus:ring-2 focus:ring-brand"
+          className="num h-16 w-[6.5em] rounded-[10px] bg-page px-4 text-[32px] text-ink ring-1 ring-inset ring-faint outline-none placeholder:text-[22px] placeholder:font-medium placeholder:text-faint focus:ring-2 focus:ring-brand"
         />
         <span className="text-[20px] font-bold text-ink">년생</span>
       </div>
@@ -159,7 +159,7 @@ function RegionStep({ profile, update }: StepProps) {
           {sido && (
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: DUR.base, ease: EASE.out }}>
               <p className="text-[16px] font-semibold text-ink">
-                {sido} 어디예요? <span className="font-medium text-muted">(고르면 임대주택 순위가 정확해져요)</span>
+                시·군·구 <span className="font-medium text-muted">고르면 임대주택 순위까지 보여요</span>
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {SIGUNGU[sido].map((g) => (
@@ -184,7 +184,7 @@ function FamilyStep({ profile, update }: StepProps) {
   return (
     <div className="space-y-8">
       <ChipGroup
-        label="혼인"
+        label="결혼"
         options={MARITAL}
         value={profile.marital}
         onChange={(v) => update({ marital: v, ...(v === "newlywed" || v === "married" ? {} : { marriedYear: undefined, dualIncome: undefined }) })}
@@ -195,7 +195,7 @@ function FamilyStep({ profile, update }: StepProps) {
           <label htmlFor="married-year" className="text-[16px] font-semibold text-ink">
             혼인신고한 해 <span className="font-medium text-muted">(선택)</span>
           </label>
-          <p className="mt-0.5 text-[14px] text-muted">알려주시면 「7년 이내」와 신혼 배점을 정확히 계산해요.</p>
+          <p className="mt-0.5 text-[15px] text-muted">적으면 신혼부부 기간과 배점을 정확히 계산해요.</p>
           <input
             id="married-year"
             value={my}
@@ -209,12 +209,12 @@ function FamilyStep({ profile, update }: StepProps) {
               if (v.length === 4 && y >= 1950 && y <= YEAR) update({ marriedYear: y, marital: YEAR - y <= 7 ? "newlywed" : "married" });
               else if (!v) update({ marriedYear: undefined });
             }}
-            className="num mt-3 h-12 w-[7em] rounded-[10px] bg-page px-4 text-[20px] text-ink ring-1 ring-inset ring-line-strong outline-none placeholder:text-[16px] placeholder:font-medium placeholder:text-faint focus:ring-2 focus:ring-brand"
+            className="num mt-3 h-12 w-[7em] rounded-[10px] bg-page px-4 text-[20px] text-ink ring-1 ring-inset ring-faint outline-none placeholder:text-[16px] placeholder:font-medium placeholder:text-faint focus:ring-2 focus:ring-brand"
           />
         </div>
       )}
       <ChipGroup
-        label="만 19세 미만 자녀(배 속 아이 포함)"
+        label="자녀 수 (만 19세 미만)"
         size="compact"
         options={CHILDREN}
         value={profile.children}
@@ -247,9 +247,9 @@ function FamilyStep({ profile, update }: StepProps) {
 
 /** 혼자 사는 사람에게 「등본에 같이 올라 있는 가족」은 낯설다 — 같은 값, 쉬운 문구 */
 const HOME_SOLO = [
-  { label: "집이 없어요", value: "none" as const, sub: "분양권·입주권도 집으로 쳐요" },
+  { label: "집이 없어요", value: "none" as const, sub: "분양권·입주권이 있으면 아래를 골라 주세요" },
   { label: "제 이름으로 된 집이 있어요", value: "own" as const, sub: "분양권·입주권 포함" },
-  { label: "같은 세대로 올라 있는 가족 중에 집 가진 사람이 있어요", value: "familyOwn" as const, sub: "부모님과 한 세대라면" },
+  { label: "함께 사는 가족 명의 집이 있어요", value: "familyOwn" as const, sub: "등본에 같이 오른 부모님 등" },
 ];
 
 function HomeStep({ profile, update }: StepProps) {
@@ -287,8 +287,8 @@ function IncomeStep({ profile, update, skip, setSkip }: StepProps) {
           cols="grid-cols-2 sm:grid-cols-3"
         />
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <label htmlFor="income-exact" className="text-[15px] font-medium text-body">
-            정확히 알면
+          <label htmlFor="income-exact" className="text-[16px] font-medium text-body">
+            직접 입력
           </label>
           <span className="flex items-center gap-2">
             <input
@@ -305,9 +305,9 @@ function IncomeStep({ profile, update, skip, setSkip }: StepProps) {
                   update({ income: exactBand(Number(v)) });
                 }
               }}
-              className="num h-11 w-[6em] rounded-[10px] bg-page px-3 text-[18px] text-ink ring-1 ring-inset ring-line-strong outline-none placeholder:text-[15px] placeholder:font-medium placeholder:text-faint focus:ring-2 focus:ring-brand"
+              className="num h-11 w-[6em] rounded-[10px] bg-page px-3 text-[18px] text-ink ring-1 ring-inset ring-faint outline-none placeholder:text-[16px] placeholder:font-medium placeholder:text-faint focus:ring-2 focus:ring-brand"
             />
-            <span className="text-[15px] font-medium text-body">만 원</span>
+            <span className="text-[16px] font-medium text-body">만 원</span>
           </span>
           <div>
             <Chip
@@ -323,7 +323,7 @@ function IncomeStep({ profile, update, skip, setSkip }: StepProps) {
             </Chip>
           </div>
         </div>
-        {skip.income && <p className="t-small mt-2 text-sub">괜찮아요. 소득을 보는 공고는 「확인 필요」로 남겨 둘게요.</p>}
+        {skip.income && <p className="t-small mt-2 text-sub">괜찮아요. 소득 기준이 있는 공고는 확인 필요로 둘게요.</p>}
       </div>
 
       {married && <YesNo q={YES_NO.dualIncome} value={profile.dualIncome} onChange={(v) => update({ dualIncome: v })} />}
@@ -333,27 +333,27 @@ function IncomeStep({ profile, update, skip, setSkip }: StepProps) {
           <p className="text-[16px] font-semibold text-ink">
             우리 집({ruler.size}인{ruler.dual ? " · 맞벌이" : ""}) 기준 소득 상한
           </p>
-          <p className="mt-0.5 text-[14px] text-muted">
+          <p className="mt-0.5 text-[15px] text-muted">
             유형마다 기준이 되는 금액과 %가 달라요.{" "}
             <Link href="/guide/income" target="_blank" className="font-semibold text-ink underline decoration-line-strong underline-offset-4">
               소득 기준표 보기
             </Link>
           </p>
-          <ul className="mt-3 border-t border-ink">
+          <ul className="mt-3 border-t border-line-strong">
             {ruler.rows.map((r, i) => (
               <li key={r.key} className="grid grid-cols-[20px_minmax(0,1fr)_auto] items-center gap-x-3 border-b border-line py-2.5">
                 <WinMark tri={r.tri} delay={reduce ? 0 : i * 0.02} />
-                <span className="min-w-0 text-[14px] text-body">
+                <span className="min-w-0 text-[15px] text-body">
                   {r.label} <span className="text-muted">{r.basisShort} {r.pct}%</span>
                 </span>
-                <span className="data text-[14px] text-ink">월 {manwon(Math.round(r.limit))}</span>
+                <span className="data text-[15px] text-ink">월 {manwon(Math.round(r.limit))}</span>
               </li>
             ))}
           </ul>
           <ul className="t-small mt-3 space-y-0.5 text-muted">
             {ruler.bases.map((b) => (
               <li key={b.kind}>
-                {b.short} 100% = 월 {manwon(Math.round(b.value))} · {b.note}
+                {b.short} 100%: 월 {manwon(Math.round(b.value))}
               </li>
             ))}
           </ul>
@@ -381,7 +381,7 @@ function AssetsStep({ profile, update, skip, setSkip }: StepProps) {
       />
       <ChipGroup
         label="그중 부동산(집·땅·건물)"
-        help="공공분양·특별공급이 따로 보는 값이에요."
+        help="공공분양과 특별공급은 부동산만 따로 봐요."
         options={PROPERTY.map(({ label, value, sub }) => ({ label, value, sub: value.max === 0 ? sub : undefined }))}
         value={profile.property}
         onChange={(v) => update({ property: v })}
@@ -397,7 +397,7 @@ function AssetsStep({ profile, update, skip, setSkip }: StepProps) {
             setSkip("assets", true);
           }}
         >
-          잘 모르겠어요 — 나중에 할게요
+          잘 모르겠어요
         </Chip>
       </div>
     </div>
@@ -412,7 +412,7 @@ function AccountStep({ profile, update }: StepProps) {
   return (
     <div className="space-y-8">
       <YesNo
-        q={YES_NO.hasAccount}
+        q={{ ...YES_NO.hasAccount, label: "" }}
         value={profile.hasAccount}
         onChange={(v) => update(v ? { hasAccount: true } : { hasAccount: false, accountMonths: undefined, payments: undefined, deposit: undefined })}
       />
@@ -460,7 +460,7 @@ function HouseholdStep({ profile, update }: StepProps) {
     <div className="space-y-8">
       <YesNo q={YES_NO.householdHead} value={profile.householdHead} onChange={(v) => update({ householdHead: v })} />
       <Stepper
-        label={`${profile.sido ?? "지금 사는 시·도"}에 주민등록을 두고 계속 산 지`}
+        label={`${profile.sido ?? "지금 사는 시·도"}에 산 기간`}
         value={profile.residenceYears}
         onChange={(v) => update({ residenceYears: v })}
         max={20}
@@ -469,14 +469,14 @@ function HouseholdStep({ profile, update }: StepProps) {
       {none && (
         <div>
           <Stepper
-            label="집 없이 지낸 지"
-            help="집을 판 적이 있다면 판 뒤부터 세요."
+            label="무주택 기간"
+            help="집을 판 적이 있으면 판 날부터 계산해요."
             value={always ? undefined : profile.homelessYears}
             onChange={(v) => update({ homelessYears: v })}
             max={30}
             text={(v) => (v === 0 ? "1년 미만" : v >= 30 ? "30년 이상" : `${v}년`)}
           />
-          <label className="mt-3 flex min-h-11 cursor-pointer items-center gap-2.5 text-[15px] text-body">
+          <label className="mt-3 flex min-h-11 cursor-pointer items-center gap-2.5 text-[16px] text-body">
             <input
               type="checkbox"
               checked={always}
@@ -510,11 +510,11 @@ function SpecialStep({ profile, update }: StepProps) {
   return (
     <div className="space-y-8">
       {elder && (
-        <p className="border-y border-line py-3 text-[15px] font-medium text-ink">만 65세 이상이라 고령자 계층은 따로 고르지 않아도 자동으로 봐요.</p>
+        <p className="border-y border-line py-3 text-[16px] font-medium text-ink">만 65세 이상이라 고령자 계층은 따로 고르지 않아도 자동으로 봐요.</p>
       )}
       <fieldset>
         <legend className="text-[16px] font-semibold text-ink">해당하는 걸 모두 골라 주세요</legend>
-        <p className="mt-0.5 text-[14px] text-muted">기초연금은 기초생활수급이 아니에요.</p>
+        <p className="mt-0.5 text-[15px] text-muted">기초연금만 받으면 수급자가 아니에요.</p>
         <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
           {SPECIAL.map((o) => (
             <Chip key={o.value} size="compact" selected={cur.includes(o.value)} onClick={() => update({ special: cur.includes(o.value) ? cur.filter((x) => x !== o.value) : [...cur, o.value] })}>
@@ -592,7 +592,7 @@ function Delta({ value }: { value: number }) {
           animate={{ opacity: 1, y: -2 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: DUR.base, ease: EASE.out }}
-          className={`absolute left-full top-0 ml-1 text-[13px] font-bold tabular ${d.n > 0 ? "text-brand" : "text-muted"}`}
+          className={`absolute left-full top-0 ml-1 text-[14px] md:text-[15px] font-bold tabular ${d.n > 0 ? "text-brand" : "text-muted"}`}
         >
           {d.n > 0 ? `+${d.n}` : d.n}
         </motion.span>
@@ -613,20 +613,20 @@ function LivePanel({ results }: { results: NoticeResult[] }) {
       <Facade items={items} cols={4} door={false} className="mt-5 max-w-[240px]" />
       <dl className="mt-5 flex gap-8">
         <div>
-          <dt className="text-[13px] font-semibold text-sub">신청 가능</dt>
+          <dt className="text-[14px] md:text-[15px] font-semibold text-sub">신청 가능</dt>
           <dd className={`t-num-l relative mt-1 w-fit ${counts.ok ? "text-brand" : "text-muted"}`}>
             <Odometer value={counts.ok} />
             <Delta value={counts.ok} />
           </dd>
         </div>
         <div>
-          <dt className="text-[13px] font-semibold text-sub">확인 필요</dt>
+          <dt className="text-[14px] md:text-[15px] font-semibold text-sub">확인 필요</dt>
           <dd className={`t-num-l mt-1 ${counts.maybe ? "text-maybe-ink" : "text-muted"}`}>
             <Odometer value={counts.maybe} />
           </dd>
         </div>
       </dl>
-      <p className="t-small mt-3 text-muted">답할수록 「확인 필요」가 「신청 가능」이나 「해당 없음」으로 정해져요.</p>
+      <p className="t-small mt-3 text-muted">답할수록 확인 필요가 줄어요.</p>
       <WinLegend className="mt-4" states={["ok", "maybe", "no"]} />
     </div>
   );
@@ -634,7 +634,7 @@ function LivePanel({ results }: { results: NoticeResult[] }) {
 
 /* ───────────────────────── 완료·요약 ───────────────────────── */
 
-/** 「1분 더 답하기」·「조건 고치기」 직전 건수를 남긴다 — 결과 화면이 무엇이 바뀌었는지 알려 준다 */
+/** 「추가 질문 답하기」·「조건 고치기」 직전 건수를 남긴다 — 결과 화면이 무엇이 바뀌었는지 알려 준다 */
 function rememberBefore(results: NoticeResult[]) {
   try {
     if (sessionStorage.getItem(BEFORE_KEY)) return;
@@ -644,7 +644,7 @@ function rememberBefore(results: NoticeResult[]) {
 }
 
 /**
- * 입력 끝. 창은 전부 「확인 필요」(반 칸)에서 시작해 0.25초 뒤 최종 상태로 정해진다 —
+ * 입력 완료. 창은 전부 「확인 필요」(반 칸)에서 시작해 0.25초 뒤 최종 상태로 정해진다 —
  * 답한 만큼 판정이 정해지는 순간을 보여 준다. 제목 숫자는 처음부터 최종값이다.
  */
 function DoneView({ results, profile }: { results: NoticeResult[]; profile: Profile }) {
@@ -682,19 +682,19 @@ function DoneView({ results, profile }: { results: NoticeResult[]; profile: Prof
   return (
     <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
       <div className="lg:col-span-7">
-        <p className="text-[14px] font-semibold text-sub">입력 끝</p>
+        <p className="text-[15px] font-semibold text-sub">입력 완료</p>
         <h1 className="t-h1 mt-2">
           신청할 수 있는 공고 <span className={counts.ok ? "text-brand" : "text-sub"}>{counts.ok}건</span>
         </h1>
         <p className="t-body-l mt-4 max-w-[30em] text-sub">
           {counts.maybe > 0 ? (
             <>
-              아직 모르는 공고가 <span className="font-semibold text-maybe-ink">{counts.maybe}건</span> 있어요.{" "}
+              <span className="font-semibold text-maybe-ink">{counts.maybe}건</span>은 확인이 더 필요해요.{" "}
               {more
                 ? moreCount > 0
                   ? `${withJosa(moreLabels, "을/를")} 답하면 ${moreCount}건이 더 정해져요.`
                   : `${withJosa(moreLabels, "을/를")} 답하면 결과가 더 정확해져요.`
-                : "공고 상세에서 무엇이 걸리는지 볼 수 있어요."}
+                : "공고를 누르면 무엇이 부족한지 보여요."}
             </>
           ) : (
             "답한 조건으로 모든 공고의 결과가 정해졌어요."
@@ -704,10 +704,10 @@ function DoneView({ results, profile }: { results: NoticeResult[]; profile: Prof
           {moreFirst ? (
             <>
               <ButtonLink href={moreHref} size="lg" arrow onClick={() => rememberBefore(results)}>
-                1분 더 답하기
+                추가 질문 답하기
               </ButtonLink>
               <ButtonLink href="/results" size="lg" variant="outline">
-                결과 먼저 보기
+                결과 보기
               </ButtonLink>
             </>
           ) : (
@@ -717,14 +717,14 @@ function DoneView({ results, profile }: { results: NoticeResult[]; profile: Prof
               </ButtonLink>
               {more && (
                 <ButtonLink href={moreHref} size="lg" variant="outline" onClick={() => rememberBefore(results)}>
-                  1분 더 답하기
+                  추가 질문 답하기
                 </ButtonLink>
               )}
             </>
           )}
         </div>
         {top.length > 0 && (
-          <ul className="mt-10 border-t border-ink">
+          <ul className="mt-10 border-t border-line-strong">
             {top.map((r, k) => (
               <motion.li
                 key={r.a.id}
@@ -735,29 +735,29 @@ function DoneView({ results, profile }: { results: NoticeResult[]; profile: Prof
               >
                 <Link href={`/notice/${r.a.id}`} className="group grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 py-4">
                   <span className="min-w-0">
-                    <span className="block truncate text-[14px] text-muted">
+                    <span className="block truncate text-[15px] text-muted">
                       {programLine(r)} · {placeText(r.a)}
                     </span>
                     <span className="block truncate text-[18px] font-bold tracking-[-0.03em] text-ink group-hover:underline">{r.a.complex}</span>
                     <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
                       <StatusBadge status={r.verdict === "ok" ? "ok" : "maybe"}>{r.verdict === "ok" ? "신청 가능" : "확인 필요"}</StatusBadge>
-                      {r.best.rank && <span className={`text-[15px] font-bold ${rankTone(r.verdict, r.best.rank)}`}>{r.best.rank.label}</span>}
+                      {r.best.rank && <span className={`text-[16px] font-bold ${rankTone(r.verdict)}`}>{r.best.rank.label}</span>}
                     </span>
                   </span>
                   <span className="text-right">
                     <span className={`t-num-m block ${isUrgent(r) ? "text-hot-ink" : "text-ink"}`}>{dayText(r).big}</span>
-                    <span className="block text-[13px] font-medium text-muted">{dayText(r).small}</span>
+                    <span className="block text-[14px] md:text-[15px] font-medium text-muted">{dayText(r).small}</span>
                   </span>
                 </Link>
               </motion.li>
             ))}
           </ul>
         )}
-        <p className="t-small mt-6 text-muted">결과는 참고용 예상이에요. 최종 자격과 순위는 공급기관이 서류로 심사해 정해요.</p>
+        <p className="t-small mt-6 text-muted">참고용 결과예요. 최종 자격과 순위는 공급기관 심사로 정해져요.</p>
       </div>
       <div className="lg:col-span-4 lg:col-start-9">
         <div className="section-head">
-          <span>불 켜진 창 = 신청 가능</span>
+          <span>전체 공고 {results.length}건</span>
         </div>
         <Facade items={items} cols={4} className="mt-5 max-w-[200px] lg:max-w-[300px]" />
         <WinLegend className="mt-4" states={["ok", "maybe", "no", "closed"]} />
@@ -783,13 +783,13 @@ function SummaryView({ profile }: { profile: Profile }) {
     <div className="max-w-[640px]">
       <h1 className="t-h1">조건 고치기</h1>
       <p className="t-body mt-3 text-sub">고칠 항목만 눌러 바꾸면 결과에 바로 반영돼요.</p>
-      <ul className="mt-8 border-t border-ink">
+      <ul className="mt-8 border-t border-line-strong">
         {rows.map((r) => (
           <li key={r.step} className="border-b border-line">
             <Link href={`/check?step=${r.step}&edit=1`} className="group grid grid-cols-[6em_minmax(0,1fr)_auto] items-center gap-4 py-4">
-              <span className="text-[15px] font-semibold text-ink">{r.label}</span>
-              <span className={`truncate text-[15px] ${r.value ? "text-body" : "text-muted"}`}>{r.value || "아직 안 넣음"}</span>
-              <span className="text-[14px] font-semibold text-ink underline decoration-line-strong underline-offset-4 group-hover:decoration-ink">고치기</span>
+              <span className="text-[16px] font-semibold text-ink">{r.label}</span>
+              <span className={`truncate text-[16px] ${r.value ? "text-body" : "text-muted"}`}>{r.value || "입력 전"}</span>
+              <span className="text-[15px] font-semibold text-ink underline decoration-line-strong underline-offset-4 group-hover:decoration-ink">고치기</span>
             </Link>
           </li>
         ))}
@@ -857,13 +857,13 @@ export function CheckFlow() {
           <Logo />
           <div className="flex items-center gap-3">
             {!done && !summary && !single && (
-              <span className="data text-[14px] text-muted">
-                {EXTRA.includes(step) && <span className="mr-2 font-medium">정확도 올리기</span>}
+              <span className="data text-[15px] text-muted">
+                {EXTRA.includes(step) && <span className="mr-2 font-medium">추가 질문</span>}
                 <span className="text-ink">{railIndex + 1}</span> / {rail.length}
               </span>
             )}
-            <Link href="/results" className="-mr-2 inline-flex h-11 items-center px-2 text-[14px] font-semibold text-sub underline decoration-line-strong underline-offset-4 hover:text-ink">
-              {done || EXTRA.includes(step) || single ? "결과로" : "나중에"}
+            <Link href="/results" className="-mr-2 inline-flex h-11 items-center px-2 text-[15px] font-semibold text-sub underline decoration-line-strong underline-offset-4 hover:text-ink">
+              결과 보기
             </Link>
           </div>
         </div>
@@ -900,9 +900,9 @@ export function CheckFlow() {
                   animate={{ opacity: 1, x: 0, transition: { duration: 0.28, ease: EASE.out } }}
                   exit={reduce ? undefined : { opacity: 0, x: -16, transition: { duration: 0.14, ease: EASE.exit } }}
                 >
-                  <p className="text-[14px] font-semibold text-sub">
+                  <p className="text-[15px] font-semibold text-sub">
                     {single ? meta.tag : `${railIndex + 1}/${rail.length} · ${meta.tag}`}
-                    {EXTRA.includes(step) && <span className="ml-2 font-medium text-muted">선택</span>}
+                    {EXTRA.includes(step) && <span className="ml-1.5 font-medium text-muted">(선택)</span>}
                   </p>
                   <h1 className="t-h1 mt-2">{meta.title}</h1>
                   {meta.help && <p className="t-body mt-3 max-w-[34em] text-sub">{meta.help}</p>}
@@ -935,7 +935,7 @@ export function CheckFlow() {
                 </Button>
               )}
               <Button size="lg" onClick={() => go(1)} disabled={!nextOk} className="flex-1 sm:w-52 sm:flex-none">
-                {single ? "저장하고 결과 보기" : last ? (EXTRA.includes(step) ? "결과 보기" : "다 했어요") : "다음"}
+                {single ? "저장하고 결과 보기" : last ? (EXTRA.includes(step) ? "결과 보기" : "입력 완료") : "다음"}
                 <Arrow size="lg" />
               </Button>
             </div>
@@ -957,14 +957,14 @@ function MobileCounts({ results }: { results: NoticeResult[] }) {
         ))}
       </span>
       <span className="mt-2 flex h-7 items-center gap-5">
-        <span className="flex items-baseline gap-1.5 text-[14px] font-semibold text-sub">
+        <span className="flex items-baseline gap-1.5 text-[15px] font-semibold text-sub">
           신청 가능
           <span className={`t-num-m relative leading-none ${c.ok ? "text-brand" : "text-muted"}`}>
             <Odometer value={c.ok} />
             <Delta value={c.ok} />
           </span>
         </span>
-        <span className="flex items-baseline gap-1.5 text-[14px] font-semibold text-sub">
+        <span className="flex items-baseline gap-1.5 text-[15px] font-semibold text-sub">
           확인 필요
           <span className={`t-num-m leading-none ${c.maybe ? "text-maybe-ink" : "text-muted"}`}>{c.maybe}</span>
         </span>

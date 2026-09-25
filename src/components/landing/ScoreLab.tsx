@@ -1,26 +1,21 @@
 "use client";
 
+import { br } from "@/lib/text";
 import Link from "next/link";
 import { GajeomCalc } from "@/components/guide/GajeomCalc";
 
 /** 가점 84칸 — 민영 아파트 일반공급 점수를 직접 맞춰 보는 구역 */
 export function ScoreLab() {
   return (
-    <section id="score" aria-labelledby="score-title" className="scroll-mt-20 border-t border-line bg-wash py-14 md:py-20">
+    <section id="score" aria-labelledby="score-title" className="scroll-mt-20 border-t border-line bg-wash py-12 md:py-20">
       <div className="wrap">
-        <div className="section-head">
-          <span>가점 계산기</span>
-          <span className="text-muted">민영 아파트 일반공급 · 84점 만점</span>
-        </div>
-        <div className="mt-6 grid gap-10 md:mt-8 lg:grid-cols-12 lg:gap-8">
+        <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-4">
             <h2 id="score-title" className="t-h2">
-              84칸 중에
-              <br />
-              몇 칸이 켜질까요
+              {br("내 청약 가점은 | 몇 점일까요")}
             </h2>
-            <p className="t-body mt-5 text-sub">1점이 1칸이에요. 무주택 기간 32칸, 부양가족 35칸, 통장 가입 기간 17칸을 합쳐 84칸이에요.</p>
-            <dl className="mt-6 divide-y divide-line border-y border-line text-[15px]">
+            <p className="t-body-l mt-3 text-sub">민영 아파트 일반공급은 가점으로 뽑아요. 무주택 기간 32점, 부양가족 35점, 통장 가입 기간 17점. 합쳐서 84점 만점이에요.</p>
+            <dl className="mt-6 divide-y divide-line border-y border-line text-[16px]">
               {[
                 ["무주택 기간", "1년 미만 2점, 1년마다 2점씩 더해 15년 이상 32점"],
                 ["부양가족", "0명이어도 5점, 1명마다 5점씩 더해 6명 이상 35점"],

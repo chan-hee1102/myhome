@@ -35,12 +35,12 @@ const PORTAL = {
   gh: { where: "GH 경기주택도시공사", url: "https://www.gh.or.kr" },
   hug: { where: "주택도시보증공사(HUG)", url: "https://www.khug.or.kr" },
   myhome: { where: "마이홈포털", url: "https://www.myhome.go.kr" },
-  youthSafe: { where: "서울시 청년안심주택 누리집", url: "https://soco.seoul.go.kr" },
+  youthSafe: { where: "청년안심주택 누리집", url: "https://soco.seoul.go.kr" },
 } as const;
 
-const CAVEAT = "필요한 서류와 제출 시기는 공고마다 달라요. 공고문의 「제출 서류」를 꼭 확인하세요.";
-const CERT = "공동인증서나 금융인증서 같은 인증서";
-const LATER = "당첨되거나 서류 심사 대상이 되면 주민등록등본·가족관계증명서 등 서류를 내요";
+const CAVEAT = "서류와 제출 시기는 공고마다 달라요. 공고문의 제출 서류 항목을 꼭 확인하세요.";
+const CERT = "공동인증서 또는 금융인증서";
+const LATER = "당첨 뒤: 주민등록등본, 가족관계증명서 등";
 
 /** 공고를 받는 공공기관(임대·공공분양)의 누리집 */
 function agencyPortal(a: Pick<Announcement, "agency">) {
@@ -65,15 +65,15 @@ function howToBase(a: Pick<Announcement, "agency" | "program" | "source">): HowT
     case "privateApt":
       return {
         ...PORTAL.applyhome,
-        method: "청약홈에서 인터넷으로 신청해요. 특별공급·1순위·2순위 접수일이 서로 달라요.",
+        method: "인터넷으로 신청해요. 특별공급, 1순위, 2순위 접수일이 달라요.",
         bring: [CERT, "청약통장(가입 은행 확인)", LATER],
         caveat: CAVEAT,
       };
     case "permanent":
       // 가이드(permanent-rental): 「주민등록지 읍·면·동 주민센터에 신청하면 지자체가 자격을 확인해 순위와 배점을 매긴다」
       return {
-        where: "주민등록지 행정복지센터(주민센터)",
-        method: "주민등록지 행정복지센터(주민센터)에 가서 신청해요. 지자체가 자격을 확인하고 순위를 매겨요.",
+        where: "주민센터",
+        method: "주민센터에 직접 가서 신청해요. 지자체가 자격을 확인하고 순위를 정해요.",
         bring: ["신분증", "주민센터에서 안내하는 서류"],
         caveat: CAVEAT,
         visit: true,
@@ -81,14 +81,14 @@ function howToBase(a: Pick<Announcement, "agency" | "program" | "source">): HowT
     case "youthSafe":
       return {
         ...PORTAL.youthSafe,
-        method: "서울시 청년안심주택 누리집에 올라온 모집공고를 보고 신청해요. 공공임대분과 민간임대분의 접수 방법이 다를 수 있어요.",
+        method: "누리집 모집공고를 보고 신청해요. 공공임대분과 민간임대분은 접수 방법이 다를 수 있어요.",
         bring: [CERT, LATER],
         caveat: CAVEAT,
       };
     case "deundeun":
       return {
         ...PORTAL.hug,
-        method: "주택도시보증공사(HUG) 누리집의 차수별 공고에 따라 신청해요. 접수 기간이 짧고 마감되면 공고가 내려가요.",
+        method: "차수별 공고에 따라 인터넷으로 신청해요. 접수 기간이 짧고, 끝나면 공고가 내려가요.",
         bring: [CERT, LATER],
         caveat: CAVEAT,
       };
@@ -99,8 +99,8 @@ function howToBase(a: Pick<Announcement, "agency" | "program" | "source">): HowT
         where: portal?.where ?? "공고한 기관",
         url: portal?.url,
         method: portal
-          ? `${portal.where} 누리집에서 인터넷으로 신청해요.${sale ? " 특별공급과 일반공급 접수일이 달라요." : ""}`
-          : "공고문에 적힌 기관·방법으로 신청해요.",
+          ? `인터넷으로 신청해요.${sale ? " 특별공급과 일반공급 접수일이 달라요." : ""}`
+          : "공고문에 적힌 기관과 방법으로 신청해요.",
         bring: sale ? [CERT, "청약통장(가입 은행 확인)", LATER] : [CERT, LATER],
         caveat: CAVEAT,
       };

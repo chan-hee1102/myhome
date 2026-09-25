@@ -22,8 +22,8 @@ const variants: Record<Variant, string> = {
 };
 
 const sizes: Record<Size, string> = {
-  sm: "h-9 gap-1.5 rounded-[10px] px-3.5 text-[14px]",
-  md: "h-11 gap-2 rounded-[10px] px-5 text-[15px]",
+  sm: "h-9 gap-1.5 rounded-[10px] px-3.5 text-[15px]",
+  md: "h-11 gap-2 rounded-[10px] px-5 text-[16px]",
   lg: "h-14 gap-2 rounded-[10px] px-7 text-[17px]",
 };
 
@@ -35,7 +35,7 @@ const iconSizes: Record<Size, string> = {
 
 export function buttonClass(variant: Variant = "primary", size: Size = "md", opts: { icon?: boolean; block?: boolean } = {}) {
   // 밑줄 링크는 높이·패딩 없이 글자 크기만
-  const box = variant === "link" ? (size === "sm" ? "gap-1 text-[14px]" : "gap-1.5 text-[15px]") : opts.icon ? iconSizes[size] : sizes[size];
+  const box = variant === "link" ? (size === "sm" ? "gap-1 text-[15px]" : "gap-1.5 text-[16px]") : opts.icon ? iconSizes[size] : sizes[size];
   return [base, variants[variant], box, opts.block ? "w-full" : ""].join(" ");
 }
 

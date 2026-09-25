@@ -14,6 +14,7 @@ import { isEmptyProfile, useHydrated, useProfile } from "@/lib/profile";
 import { countVerdicts, evaluateAll, type NoticeResult } from "@/lib/rules/evaluate";
 import { PROGRAMS } from "@/lib/rules/programs";
 import { SITE } from "@/lib/site";
+import { br } from "@/lib/text";
 
 /** 예시 조건 — 한 칸씩 더해지며 창이 걸러진다(실제 판정 엔진 결과) */
 const DEMO: { chip: string; patch: Partial<Profile> }[] = [
@@ -56,7 +57,7 @@ function BirthStart() {
         go();
       }}
     >
-      <label htmlFor="hero-birth" className="text-[15px] font-semibold text-ink">
+      <label htmlFor="hero-birth" className="text-[16px] font-semibold text-ink">
         몇 년생이세요?
       </label>
       <div className="mt-2.5 flex max-w-[420px] gap-2">
@@ -70,7 +71,7 @@ function BirthStart() {
           placeholder={profile.birthYear ? String(profile.birthYear) : "예: 1990"}
           onChange={(e) => setText(e.target.value.replace(/\D/g, "").slice(0, 4))}
           size={4}
-          className="num h-14 w-0 min-w-0 flex-1 rounded-[10px] bg-page px-4 text-[22px] text-ink ring-1 ring-inset ring-line-strong outline-none transition-shadow placeholder:font-medium placeholder:text-faint focus:ring-2 focus:ring-brand"
+          className="num h-14 w-0 min-w-0 flex-1 rounded-[10px] bg-page px-4 text-[22px] text-ink ring-1 ring-inset ring-faint outline-none transition-shadow placeholder:font-medium placeholder:text-faint focus:ring-2 focus:ring-brand"
         />
         <button
           type="submit"
@@ -80,7 +81,7 @@ function BirthStart() {
           <Arrow size="lg" />
         </button>
       </div>
-      <p className="mt-2 h-5 text-[14px] text-sub">
+      <p className="mt-2 h-5 text-[15px] text-sub">
         {valid ? (
           <>
             올해 만 <span className="data text-ink">{year - n - 1}</span>세 또는 <span className="data text-ink">{year - n}</span>세예요
@@ -140,7 +141,7 @@ function HeroFacade() {
 
   return (
     <div ref={ref} className="relative">
-      <div className="flex items-baseline justify-between gap-4 border-t border-ink pt-3.5 text-[13px] font-semibold text-sub">
+      <div className="flex items-baseline justify-between gap-4 border-t border-line-strong pt-3.5 text-[14px] md:text-[15px] font-semibold text-sub">
         <span>{mine ? "내 조건으로 본 공고" : "예시 조건으로 본 공고"}</span>
         <span className="text-muted">{SITE.sampleData ? `예시 공고 ${items.length}건` : `공고 ${items.length}건`}</span>
       </div>
@@ -148,7 +149,7 @@ function HeroFacade() {
       {/* 조건 칩 줄 */}
       <div className="mt-4 flex min-h-[64px] flex-wrap content-start gap-1.5" aria-live="polite">
         {mine ? (
-          <p className="t-small text-sub">창 1칸이 공고 1건이에요. 눌러서 자세히 보세요.</p>
+          <p className="t-small text-sub">칸을 누르면 그 공고를 볼 수 있어요.</p>
         ) : (
           <AnimatePresence initial={false}>
             {DEMO.slice(0, step + 1).map((d) => (
@@ -158,7 +159,7 @@ function HeroFacade() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.32, ease: EASE.out }}
-                className="inline-flex h-7 items-center rounded-[4px] bg-page px-2.5 text-[13px] font-medium text-body ring-1 ring-inset ring-line-strong"
+                className="inline-flex h-7 items-center rounded-[4px] bg-page px-2.5 text-[14px] md:text-[15px] font-medium text-body ring-1 ring-inset ring-line-strong"
               >
                 {d.chip}
               </motion.span>
@@ -170,9 +171,9 @@ function HeroFacade() {
       <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-5 md:gap-8">
         <Facade items={items} cols={4} onActive={setActive} className="max-w-[220px] sm:max-w-[340px]" />
         <div className="pb-2 text-right">
-          <p className="text-[13px] font-semibold text-sub">신청 가능</p>
+          <p className="text-[14px] md:text-[15px] font-semibold text-sub">신청 가능</p>
           <p className={`t-num-xl ${!results.length ? "text-faint" : counts.ok ? "text-brand" : "text-muted"}`}>{results.length ? <Odometer value={counts.ok} /> : "–"}</p>
-          <p className="mt-4 text-[13px] font-semibold text-sub">확인 필요</p>
+          <p className="mt-4 text-[14px] md:text-[15px] font-semibold text-sub">확인 필요</p>
           <p className={`t-num-m ${!results.length ? "text-faint" : counts.maybe ? "text-maybe-ink" : "text-muted"}`}>{results.length ? <Odometer value={counts.maybe} /> : "–"}</p>
         </div>
       </div>
@@ -198,7 +199,7 @@ function HeroFacade() {
             <button
               type="button"
               onClick={() => setStep(-1)}
-              className="text-[14px] font-semibold text-sub underline decoration-line-strong underline-offset-4 hover:text-ink"
+              className="text-[15px] font-semibold text-sub underline decoration-line-strong underline-offset-4 hover:text-ink"
             >
               다시 보기
             </button>
@@ -212,22 +213,22 @@ function HeroFacade() {
 export function Hero() {
   return (
     <section className="overflow-x-clip pt-16">
-      <div className="wrap grid gap-12 pb-16 pt-10 md:pb-24 md:pt-16 lg:grid-cols-12 lg:gap-8 lg:pt-20">
+      <div className="wrap grid gap-12 pb-10 pt-10 md:pb-24 md:pt-16 lg:grid-cols-12 lg:items-center lg:gap-8 lg:pt-20">
         <div className="lg:col-span-6">
           <h1 className="t-h1">
             청약 공고 중
             <br />
             내가 넣을 수 있는 것만
           </h1>
-          <p className="t-body-l mt-5 max-w-[30em] text-sub md:mt-6">
-            나이, 사는 곳, 가족, 집, 소득, 재산을 눌러서 답하면 공고마다 신청할 수 있는지 창에 불이 켜져요. 로그인은 없고, 입력한 내용은 이
-            기기에만 남아요.
+          <p className="t-body-l mt-5 text-sub md:mt-6">
+            <span className="block">{br("질문 6개에 답하면 | 공고마다 신청할 수 있는지 알려 드려요.")}</span>
+            <span className="block">{br("로그인 없이 쓰고, | 입력한 내용은 이 기기에만 남아요.")}</span>
           </p>
           <BirthStart />
           {SITE.sampleData && (
-            <p className="mt-8 max-w-[34em] border-t border-line pt-3 text-[14px] leading-relaxed text-sub">
-              <span className="mr-1.5 font-semibold text-maybe-ink">예시 공고</span>
-              지금 보이는 공고는 예시예요. 자격 기준은 2026년 법령 값이고, 실제 공고는 공공데이터 연결 후 바뀌어요.
+            <p className="mt-8 max-w-[34em] border-t border-line pt-3 text-[15px] leading-relaxed text-sub">
+              <span className="mr-1.5 font-semibold text-ink">예시 공고</span>
+              지금 공고는 예시예요. 자격 기준은 2026년 법령 그대로예요.
             </p>
           )}
         </div>

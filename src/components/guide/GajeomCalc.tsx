@@ -34,10 +34,10 @@ function Slider({
   return (
     <div className={disabled ? "opacity-40" : ""}>
       <div className="flex items-baseline justify-between gap-4">
-        <label htmlFor={id} className="text-[15px] font-semibold text-ink">
+        <label htmlFor={id} className="text-[16px] font-semibold text-ink">
           {label}
         </label>
-        <span className="data text-[15px] text-ink">{text}</span>
+        <span className="data text-[16px] text-ink">{text}</span>
       </div>
       <input
         id={id}
@@ -79,7 +79,7 @@ function Ruler({ lines }: { lines: { key: string; label: string; points: number;
         const gap = n ? Math.min(16, 320 / n) : 0;
         return (
           <div key={l.key} className="min-w-0" style={{ flex: `${l.max} 1 0` }}>
-            <div className="text-[13px] font-semibold leading-tight">
+            <div className="text-[14px] md:text-[15px] font-semibold leading-tight">
               <span className="block truncate text-sub">{l.label}</span>
               <span className="data block text-ink">
                 {l.points}
@@ -94,7 +94,7 @@ function Ruler({ lines }: { lines: { key: string; label: string; points: number;
                 return (
                   <span
                     key={k}
-                    className={`block h-full flex-1 origin-bottom rounded-[1.5px] ${on ? "bg-brand" : "bg-well"}`}
+                    className={`block h-full flex-1 origin-bottom rounded-[1.5px] ${on ? "bg-ink" : "bg-well"}`}
                     style={{
                       transform: on ? "scaleY(1)" : "scaleY(0.45)",
                       transition: `transform 200ms cubic-bezier(0.16,1,0.3,1) ${order * gap}ms, background-color 120ms linear ${order * gap}ms`,
@@ -136,18 +136,18 @@ export function GajeomCalc() {
   };
 
   return (
-    <div className="rounded-[4px] bg-page p-5 ring-1 ring-inset ring-line md:p-8">
-      <div className="flex items-start justify-between gap-4 border-b border-ink pb-5">
+    <div className="rounded-[4px] bg-page p-5 ring-1 ring-inset ring-line-strong md:p-8">
+      <div className="flex items-start justify-between gap-4 border-b border-line-strong pb-5">
         <div>
-          <p className="text-[13px] font-semibold text-sub">{explain ? "내 조건으로 계산한 가점" : "청약 가점"}</p>
+          <p className="text-[14px] md:text-[15px] font-semibold text-sub">{explain ? "내 조건으로 계산한 가점" : "청약 가점"}</p>
           {canFill && !explain && (
-            <button type="button" onClick={fill} className="mt-1 text-[14px] font-semibold text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
+            <button type="button" onClick={fill} className="mt-1 text-[15px] font-semibold text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
               내 조건으로 채우기
             </button>
           )}
         </div>
         <p className="text-ink">
-          <span className="t-num-xl text-brand">
+          <span className="t-num-xl text-ink">
             <Odometer value={total} />
           </span>
           <span className="ml-1.5 text-[18px] font-semibold text-muted">/ {GAJEOM_MAX.total}점</span>
@@ -169,9 +169,9 @@ export function GajeomCalc() {
             text={homeless ? homeLabel(homelessYears) : "0점"}
             disabled={!homeless}
           />
-          <label className="mt-2 flex min-h-11 cursor-pointer items-center gap-2.5 text-[14px] text-body">
+          <label className="mt-2 flex min-h-11 cursor-pointer items-center gap-2.5 text-[15px] text-body">
             <input type="checkbox" checked={!homeless} onChange={(e) => setHomeless(!e.target.checked)} className="size-5 accent-[#2447d6]" />
-            집이 있거나, 만 30세 전이고 결혼하지 않았어요(무주택 0점)
+            무주택 0점 (집이 있거나 만 30세 전 미혼)
           </label>
         </div>
         <Slider id="gj-dep" label="부양가족(본인 제외)" value={dependents} max={6} onChange={setDependents} text={dependents === 6 ? "6명 이상" : `${dependents}명`} />
@@ -181,7 +181,7 @@ export function GajeomCalc() {
       {explain && <p className="t-small mt-5 border-t border-line pt-3 font-medium text-ink">{explain}</p>}
 
       <p className="t-small mt-6 border-t border-line pt-4 text-muted">
-        무주택 기간은 만 30세부터 세요. 그 전에 혼인신고를 했다면 혼인신고일부터예요. 만 30세 전이고 미혼이면 0점이에요.
+        무주택 기간은 만 30세부터 계산해요. 그 전에 결혼했다면 혼인신고일부터예요.
       </p>
     </div>
   );

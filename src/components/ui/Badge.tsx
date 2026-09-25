@@ -21,7 +21,7 @@ const GLYPH: Record<Status, WinState> = { ok: "ok", maybe: "maybe", no: "no", cl
 
 export function StatusBadge({ status, children, dot = true }: { status: Status; children: ReactNode; dot?: boolean }) {
   return (
-    <span className={`inline-flex w-fit shrink-0 items-center gap-1.5 text-[14px] font-semibold whitespace-nowrap ${TEXT[status]}`}>
+    <span className={`inline-flex w-fit shrink-0 items-center gap-1.5 text-[15px] font-semibold whitespace-nowrap ${TEXT[status]}`}>
       {dot && <WinGlyph state={GLYPH[status]} />}
       {children}
     </span>
@@ -30,12 +30,12 @@ export function StatusBadge({ status, children, dot = true }: { status: Status; 
 
 export function Tag({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-flex h-8 w-fit shrink-0 items-center rounded-[4px] px-2.5 text-[14px] font-medium whitespace-nowrap text-body ring-1 ring-inset ring-line-strong">
+    <span className="inline-flex h-8 w-fit shrink-0 items-center rounded-[4px] px-2.5 text-[15px] font-medium whitespace-nowrap text-body ring-1 ring-inset ring-line-strong">
       {children}
     </span>
   );
 }
 
 export function CountPill({ children, inverted = false }: { children: ReactNode; inverted?: boolean }) {
-  return <span className={`tabular text-[13px] font-semibold ${inverted ? "text-white/75" : "text-muted"}`}>{children}</span>;
+  return <span className={`tabular text-[14px] md:text-[15px] font-semibold ${inverted ? "text-white/75" : "text-muted"}`}>{children}</span>;
 }

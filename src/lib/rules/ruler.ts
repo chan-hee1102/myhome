@@ -135,7 +135,7 @@ function basesFor(std: Standards, size: number): RulerBase[] {
       kind: "rent",
       short: BASIS_SHORT.rent,
       value: income100(std, size, "rent"),
-      note: `도시근로자 월평균소득(${n}) — 행복·국민·영구·매입·전세임대, 청년안심주택. 1인 +20%p·2인 +10%p를 더해요`,
+      note: `도시근로자 월평균소득(${n}): 행복·국민·영구·매입·전세임대, 청년안심주택. 1인 +20%p·2인 +10%p를 더해요`,
     },
     {
       kind: "sale",
@@ -143,14 +143,14 @@ function basesFor(std: Standards, size: number): RulerBase[] {
       value: income100(std, size, "sale"),
       note:
         size <= 3
-          ? "도시근로자 월평균소득(3인 이하 가구당 한 값) — 공공분양·민영 특별공급. 가구원 수로 더하지 않아요"
-          : `도시근로자 월평균소득(${n}) — 공공분양·민영 특별공급. 가구원 수로 더하지 않아요`,
+          ? "도시근로자 월평균소득(3인 이하 가구당 한 값): 공공분양·민영 특별공급. 가구원 수로 더하지 않아요"
+          : `도시근로자 월평균소득(${n}): 공공분양·민영 특별공급. 가구원 수로 더하지 않아요`,
     },
     {
       kind: "median",
       short: BASIS_SHORT.median,
       value: income100(std, size, "median"),
-      note: `기준 중위소득(${n}) — 통합공공임대`,
+      note: `기준 중위소득(${n}): 통합공공임대`,
     },
   ];
 }
@@ -272,7 +272,7 @@ export function poolLine(p: Profile, key: PoolKey, opts: { announced?: string; t
         const what = t.last
           ? `신청 기준(${dual && t.pctDual ? "맞벌이 " : ""}${lim}%) 안인지는`
           : `${t.name}(${limText(t, dual)} 이하)에 드는지는`;
-        return { joined: false, text: `${what} 정확한 금액을 알려주시면 가려져요` };
+        return { joined: false, text: `${what} 정확한 금액을 알려주시면 정해져요` };
       }
     }
     const last = tiers[tiers.length - 1];

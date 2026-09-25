@@ -191,7 +191,7 @@ export function groupCounts(r: NoticeResult): Record<Verdict, number> {
 
 /** 공급 대상 기준값 출처 안내 — basis=template(법령 기본값)일 때만 */
 export function basisText(g: SupplyGroup): string | undefined {
-  return g.basis === "template" ? "공고문 대신 법에 정한 기본 기준으로 봤어요." : undefined;
+  return g.basis === "template" ? "법령 기본 기준으로 계산했어요." : undefined;
 }
 
 /* ───────────────────────── 지역 관련성·정렬 ───────────────────────── */
@@ -242,7 +242,7 @@ export const ASK_TOPICS = [
   { id: "region", label: "사는 곳", keys: ["sido", "sigungu"] as ProfileKey[] },
   { id: "home", label: "집", keys: ["home"] as ProfileKey[] },
   { id: "income", label: "소득", keys: ["income", "dualIncome"] as ProfileKey[] },
-  { id: "assets", label: "자산·자동차", keys: ["assets", "car", "property"] as ProfileKey[] },
+  { id: "assets", label: "재산", keys: ["assets", "car", "property"] as ProfileKey[] },
   {
     id: "account",
     label: "청약통장",
@@ -339,6 +339,5 @@ export function suggestAsks(rs: NoticeResult[], profile?: Profile): AskSuggestio
  * 없으면(다른 정보도 함께 필요하면) 「더 정확해져요」.
  */
 export function askLine(s: Pick<AskSuggestion, "label" | "count" | "settles">): string {
-  const what = withJosa(s.label, "을/를");
-  return s.settles > 0 ? `${what} 알려주시면 공고 ${s.settles}건의 결과가 정해져요` : `${what} 알려주시면 공고 ${s.count}건의 결과가 더 정확해져요`;
+  return s.settles > 0 ? `${s.label}만 답하면 ${s.settles}건이 정해져요` : `${withJosa(s.label, "을/를")} 답하면 ${s.count}건이 더 정확해져요`;
 }

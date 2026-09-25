@@ -11,7 +11,7 @@ import { placeText } from "@/lib/place";
 import { useHydrated } from "@/lib/profile";
 import { evaluate, type GroupResult } from "@/lib/rules/evaluate";
 import { PROGRAMS } from "@/lib/rules/programs";
-import { soft } from "@/lib/text";
+import { br, soft } from "@/lib/text";
 
 const BEAT = 0.32; // 조건 한 줄에 걸리는 시간
 
@@ -58,30 +58,27 @@ export function NoticeReader() {
   const v = data?.g.verdict;
 
   return (
-    <section aria-labelledby="reader-title" className="border-t border-line bg-wash py-14 md:py-20">
+    <section aria-labelledby="reader-title" className="border-t border-line py-12 md:py-20">
       <div className="wrap">
-        <div className="section-head">
-          <span>결과를 읽는 법</span>
-          <span className="text-muted">예시 조건 · 97년생 · 서울 강동구 · 미혼 · 무주택 · 월 300만 원대</span>
-        </div>
-        <h2 id="reader-title" className="t-h2 mt-6 max-w-[18em] md:mt-8">
-          수십 쪽 공고문에서 자격 조건만 찾아, 내 상황과 한 줄씩 맞춰 봐요
+        <h2 id="reader-title" className="t-h2">
+          {br("공고문 속 자격 조건을 | 내 상황과 한 줄씩 맞춰 봐요")}
         </h2>
+        <p className="t-body-l mt-3 max-w-[40em] text-sub">97년생, 서울 강동구, 미혼, 무주택, 월 소득 300만 원대인 예시예요.</p>
 
         <div ref={ref} className="mt-10 grid items-start gap-6 md:mt-12 lg:grid-cols-12 lg:gap-8">
           {/* 공고문 */}
-          <figure className="self-start rounded-[4px] bg-page p-5 ring-1 ring-inset ring-line md:p-7 lg:col-span-5">
-            <figcaption className="border-b border-ink pb-3">
-              <span className="block text-[12px] font-semibold text-muted">{data ? `${data.a.agency} · ${placeText(data.a)} · 예시 공고` : " "}</span>
+          <figure className="self-start rounded-[4px] bg-page p-5 ring-1 ring-inset ring-line-strong md:p-7 lg:col-span-5">
+            <figcaption className="border-b border-line-strong pb-3">
+              <span className="block text-[14px] md:text-[15px] font-semibold text-muted">{data ? `${data.a.agency} · ${placeText(data.a)} · 예시 공고` : " "}</span>
               <span className="mt-1 block text-[17px] font-bold tracking-[-0.03em] text-ink">
-                {data ? `${PROGRAMS[data.a.program].name} 입주자 모집공고 — ${data.a.complex}` : "입주자 모집공고"}
+                {data ? `${data.a.complex} ${PROGRAMS[data.a.program].name} 입주자 모집공고` : "입주자 모집공고"}
               </span>
             </figcaption>
-            {data && <p className="mt-3 text-[13px] leading-[1.7] text-muted">{data.a.summary.join(" ")}</p>}
-            <p className="mt-4 text-[13px] font-bold text-ink">■ 신청 자격 — {data?.g.group.label ?? ""}</p>
+            {data && <p className="mt-3 text-[15px] leading-[1.7] text-sub">{data.a.summary.join(" ")}</p>}
+            <p className="mt-4 text-[15px] font-bold text-ink">■ 신청 자격: {data?.g.group.label ?? ""}</p>
             <ol className="mt-2 space-y-1.5">
               {checks.map((c, i) => (
-                <li key={c.key + i} className="text-[13px] leading-[1.7] text-body">
+                <li key={c.key + i} className="text-[15px] leading-[1.7] text-body">
                   <span className="relative inline">
                     <motion.span
                       aria-hidden
@@ -97,14 +94,14 @@ export function NoticeReader() {
                 </li>
               ))}
             </ol>
-            <p className="mt-4 text-[13px] leading-[1.7] text-muted">
-              소득·자산은 공급기관이 직접 조회해 확인해요. 제출 서류와 일정은 공고문에 따로 안내돼요.
+            <p className="mt-4 text-[15px] leading-[1.7] text-sub">
+              소득과 자산은 공급기관이 직접 조회해 확인해요. 제출 서류와 일정은 공고문에 따로 나와요.
             </p>
           </figure>
 
           {/* 대조표 */}
           <div className="lg:col-span-7">
-            <div className="grid grid-cols-[24px_minmax(0,0.9fr)_minmax(0,1fr)] gap-x-3 border-b border-ink pb-2 text-[13px] font-semibold text-muted">
+            <div className="hidden grid-cols-[24px_minmax(0,0.9fr)_minmax(0,1fr)] gap-x-3 border-b border-ink pb-2 text-[14px] font-semibold text-sub md:grid md:text-[15px]">
               <span />
               <span>필요 조건</span>
               <span>내 상황</span>
@@ -113,17 +110,18 @@ export function NoticeReader() {
               {checks.map((c, i) => (
                 <motion.li
                   key={c.key + i}
-                  className="grid grid-cols-[24px_minmax(0,0.9fr)_minmax(0,1fr)] items-start gap-x-3 border-b border-line py-3.5"
+                  className="grid grid-cols-[24px_minmax(0,1fr)] items-start gap-x-3 border-b border-line py-3.5 first:border-t first:border-line-strong md:grid-cols-[24px_minmax(0,0.9fr)_minmax(0,1fr)] md:first:border-t-0"
                   initial={reduce ? false : { opacity: 0, x: -12 }}
                   animate={play ? { opacity: 1, x: 0 } : undefined}
                   transition={{ ...SPRING.land, delay: i * BEAT + 0.12 }}
                 >
                   <WinMark tri={c.tri} delay={i * BEAT + 0.22} play={play} className="mt-1" />
                   <span className="min-w-0">
-                    <span className="block text-[15px] font-semibold text-ink">{c.label}</span>
-                    <span className="block text-[13px] text-muted">{soft(c.need)}</span>
+                    <span className="block text-[16px] font-semibold text-ink">{c.label}</span>
+                    <span className="block text-[14px] md:text-[15px] text-muted">{soft(c.need)}</span>
                   </span>
-                  <span className={`text-[15px] ${c.tri === "fail" ? "text-muted line-through decoration-no" : c.tri === "unknown" ? "font-semibold text-maybe-ink" : "font-medium text-ink"}`}>
+                  <span className={`col-start-2 mt-1 text-[16px] md:col-start-auto md:mt-0 ${c.tri === "fail" ? "text-muted line-through decoration-no" : c.tri === "unknown" ? "font-semibold text-maybe-ink" : "font-medium text-ink"}`}>
+                    <span className="mr-1.5 font-normal text-muted md:hidden">내 상황</span>
                     {soft(c.mine)}
                   </span>
                 </motion.li>
@@ -137,10 +135,10 @@ export function NoticeReader() {
             >
               <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
                 {v && <StatusBadge status={v}>{v === "ok" ? "신청 가능" : v === "maybe" ? "확인 필요" : "해당 없음"}</StatusBadge>}
-                <span className="text-[15px] text-body">{data?.g.rank && data.g.verdict !== "no" ? `${data.g.rank.label}${data.g.rank.detail ? ` · ${data.g.rank.detail}` : ""}` : ""}</span>
+                <span className="text-[16px] text-body">{data?.g.rank && data.g.verdict !== "no" ? `${data.g.rank.label}${data.g.rank.detail ? `. ${data.g.rank.detail}` : ""}` : ""}</span>
               </span>
               {data && (
-                <Link href={`/notice/${data.a.id}`} className="inline-flex h-11 items-center text-[15px] font-semibold text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
+                <Link href={`/notice/${data.a.id}`} className="inline-flex h-11 items-center text-[16px] font-semibold text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
                   이 공고 자세히 보기
                 </Link>
               )}

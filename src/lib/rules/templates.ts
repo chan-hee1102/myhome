@@ -465,7 +465,7 @@ const permanent: Partial<Record<GroupId, Template>> = {
       key: "region",
       label: "사는 곳",
       need: `${localAreaName(ctx.a)}에 주민등록`,
-      mine: ctx.p.sido ? placeText({ sido: ctx.p.sido, sigungu: ctx.p.sigungu }) : "아직 입력 안 함",
+      mine: ctx.p.sido ? placeText({ sido: ctx.p.sido, sigungu: ctx.p.sigungu }) : "입력 전",
       tri: local === "pass" ? "pass" : "unknown",
       ask: local === "unknown" ? (ctx.p.sido ? ["sigungu"] : ["sido"]) : undefined,
       hint:
@@ -479,7 +479,7 @@ const permanent: Partial<Record<GroupId, Template>> = {
       rank =
         tier1.tri === "unknown"
           ? { label: "예상 1~2순위", order: 2, tri: "unknown", detail: "수급자·한부모 등에 해당하면 1순위, 아니면 소득 기준으로 2순위예요.", ask: ["special"] }
-          : { label: "예상 2순위", order: 2, tri: "pass", detail: "소득이 기준 안쪽이라 2순위예요." };
+          : { label: "예상 2순위", order: 2, tri: "pass", detail: "소득이 기준 이하이라 2순위예요." };
     else rank = { label: "순위 확인 필요", order: 4, tri: "unknown" };
     return {
       checks: [who, where, C.homelessHousehold(ctx), C.assets(ctx, ctx.std.assets.permanent), C.car(ctx, ctx.std.assets.car)],
@@ -530,7 +530,7 @@ function youthPurchase(ctx: C.Ctx, jeonse: boolean): TemplateOut {
     t1.tri === "pass"
       ? { label: "예상 1순위", order: 1, tri: "pass", detail: "수급자·차상위·한부모라 1순위예요." }
       : tier3 === "pass"
-        ? { label: "예상 2~3순위", order: 2, tri: "unknown", detail: "부모님 소득까지 합쳐 기준 안쪽이면 2순위, 본인만 기준 안쪽이면 3순위예요." }
+        ? { label: "예상 2~3순위", order: 2, tri: "unknown", detail: "부모님과 합친 소득이 기준 이하면 2순위, 본인 소득만 기준 이하면 3순위예요." }
         : { label: "순위 확인 필요", order: 4, tri: "unknown", ask: [...(t3.ask ?? []), ...(t3a.ask ?? [])] };
   const qualifies: Check = {
     key: "tier",
@@ -543,8 +543,8 @@ function youthPurchase(ctx: C.Ctx, jeonse: boolean): TemplateOut {
       t1.tri === "pass" || tier3 !== "unknown"
         ? undefined
         : t3.tri === "unknown"
-          ? (t3.hint ?? "소득을 알려주시면 가려져요.")
-          : (t3a.hint ?? "총자산을 알려주시면 가려져요."),
+          ? (t3.hint ?? "소득을 알려주시면 정해져요.")
+          : (t3a.hint ?? "총자산을 알려주시면 정해져요."),
   };
   return {
     checks: [C.age(ctx, ...AGE.youth), C.single(ctx), C.homelessSelf(ctx), qualifies],
@@ -723,7 +723,7 @@ const publicSale: Partial<Record<GroupId, Template>> = withSaleRegion({
     ],
     score: publicNewlywedScore(ctx),
     rank: { label: "순위·배점", order: 3, tri: "pass" },
-    notes: compact(["70%는 소득 100%(맞벌이 120%) 이하에서 순위·배점으로, 20%는 130% 이하에서, 나머지는 추첨이에요.", pool(ctx, "publicNewlywed")]),
+    notes: compact(["물량 70%는 소득 100% 이하(맞벌이 120%)에서 순위와 배점으로 뽑아요.", "20%는 소득 130% 이하에서 뽑고, 나머지는 추첨이에요.", pool(ctx, "publicNewlywed")]),
   }),
   spFirst: (ctx) => {
     const { p } = ctx;
@@ -749,7 +749,7 @@ const publicSale: Partial<Record<GroupId, Template>> = withSaleRegion({
         C.taxFive(ctx),
       ],
       rank: { label: "추첨", order: 5, tri: "pass" },
-      notes: compact(["모두 추첨이에요. 70%는 소득 100% 이하, 20%는 130% 이하에서 먼저 뽑아요.", pool(ctx, "publicFirst")]),
+      notes: compact(["모두 추첨으로 뽑아요.", "70%는 소득 100% 이하에서, 20%는 130% 이하에서 먼저 뽑아요.", pool(ctx, "publicFirst")]),
     };
   },
   spMultiChild: (ctx) => ({
@@ -791,7 +791,7 @@ const publicSale: Partial<Record<GroupId, Template>> = withSaleRegion({
     ],
     score: publicNewlywedScore(ctx),
     rank: { label: "배점·추첨", order: 3, tri: "pass" },
-    notes: compact(["70%는 소득 100%(맞벌이 120%) 이하, 20%는 140% 이하에서 뽑고 나머지는 추첨이에요.", pool(ctx, "publicNewborn")]),
+    notes: compact(["물량 70%는 소득 100% 이하(맞벌이 120%)에서 뽑아요.", "20%는 소득 140% 이하에서 뽑고, 나머지는 추첨이에요.", pool(ctx, "publicNewborn")]),
   }),
 });
 
@@ -811,7 +811,7 @@ function privateReq(ctx: C.Ctx): Check[] {
       key: "twoHomes",
       label: "주택 수",
       need: "집이 2채 이상인 세대가 아님",
-      mine: ctx.p.home === undefined ? "아직 입력 안 함" : ctx.p.home === "none" ? "무주택" : "집 있음(몇 채인지 모름)",
+      mine: ctx.p.home === undefined ? "입력 전" : ctx.p.home === "none" ? "무주택" : "집 있음(몇 채인지 모름)",
       tri: homeTri,
       ask: homeTri === "unknown" && ctx.p.home === undefined ? (["home"] as ProfileKey[]) : undefined,
       hint:
@@ -839,7 +839,7 @@ function areaList(areas: number[]): string {
 /**
  * 1순위 경쟁 시 가점·추첨 비율을 주택형 면적 구간별로 — 같은 비율인 주택형끼리 묶는다.
  *   하나면 「이 단지(전용 59~84㎡)는 1순위끼리 경쟁하면 가점 40% · 추첨 60%로 뽑아요.」
- *   여럿이면 「1순위끼리 경쟁하면 주택형마다 뽑는 방식이 달라요 — 59㎡: 가점 40% · 추첨 60% / 84㎡: 가점 70% · 추첨 30%」
+ *   여럿이면 「1순위끼리 경쟁하면 주택형마다 뽑는 방식이 달라요. 59㎡는 가점 40%, 추첨 60%. 84㎡는 가점 70%, 추첨 30%예요.」
  */
 export function gajeomRatioNote(a: Pick<C.Ctx["a"], "regulation" | "units">): string {
   const groups = new Map<string, number[]>();
@@ -851,10 +851,10 @@ export function gajeomRatioNote(a: Pick<C.Ctx["a"], "regulation" | "units">): st
     const [[ratio, areas]] = [...groups];
     const lo = Math.min(...areas);
     const hi = Math.max(...areas);
-    return `이 단지(전용 ${lo === hi ? `${lo}㎡` : `${lo}~${hi}㎡`})는 1순위끼리 경쟁하면 ${withJosa(ratio, "으로/로")} 뽑아요.`;
+    return `이 단지(전용 ${lo === hi ? `${lo}㎡` : `${lo}~${hi}㎡`})는 1순위끼리 경쟁하면 ${withJosa(ratio.replace(/ · /g, ", "), "으로/로")} 뽑아요.`;
   }
-  const parts = [...groups].map(([ratio, areas]) => `${areaList(areas)}: ${ratio}`);
-  return `1순위끼리 경쟁하면 주택형마다 뽑는 방식이 달라요 — ${parts.join(" / ")}`;
+  const parts = [...groups].map(([ratio, areas]) => `${areaList(areas)}는 ${ratio.replace(/ · /g, ", ")}`);
+  return `1순위끼리 경쟁하면 주택형마다 뽑는 방식이 달라요. ${parts.join(". ")}예요.`;
 }
 
 /**
@@ -870,8 +870,8 @@ function depositByAreaNote(ctx: C.Ctx): string | null {
     tiers.set(need, [...(tiers.get(need) ?? []), u.area]);
   }
   if (tiers.size < 2) return null;
-  const parts = [...tiers].sort((x, y) => x[0] - y[0]).map(([need, areas]) => `${areaList(areas)} ${manwon(need)}`);
-  return `1순위 예치금은 주택형마다 달라요(${s} 거주 기준) — ${parts.join(" · ")}. 넣을 주택형 기준으로 채우세요.`;
+  const parts = [...tiers].sort((x, y) => x[0] - y[0]).map(([need, areas]) => `${areaList(areas)}는 ${manwon(need)}`);
+  return `1순위 예치금은 주택형마다 달라요(${s} 거주 기준). ${parts.join(", ")}이에요. 넣을 주택형 기준으로 채우세요.`;
 }
 
 /** 특별공급 소득 풀 한 줄(소득·가구원 수를 모르면 null) */
@@ -943,8 +943,8 @@ const privateApt: Partial<Record<GroupId, Template>> = withSaleRegion({
           ? { label: "순위 확인 필요", order: 4, tri: "unknown", ask: ["children"] }
           : kids > 0
             ? { label: "1순위", order: 1, tri: "pass", detail: "혼인 중이고 자녀가 있어서 1순위예요." }
-            : { label: "2순위", order: 2, tri: "pass", detail: "자녀가 없으면 2순위예요 — 신청은 할 수 있어요." },
-      notes: compact(["50%는 소득 100%(맞벌이 120%) 이하, 20%는 140%(160%) 이하에서 순위대로, 30%는 추첨이에요.", pool(ctx, "privateNewlywed")]),
+            : { label: "2순위", order: 2, tri: "pass", detail: "자녀가 없으면 2순위로 신청해요." },
+      notes: compact(["물량 50%는 소득 100% 이하(맞벌이 120%)에서 순위대로 뽑아요.", "20%는 140% 이하(맞벌이 160%)에서 뽑고, 30%는 추첨이에요.", pool(ctx, "privateNewlywed")]),
     };
   },
   spFirst: (ctx) => {

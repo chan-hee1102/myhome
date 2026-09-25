@@ -144,11 +144,11 @@ export function homelessBasis(p: Profile, d: Derived = derive(p)): HomelessBasis
         state: "counting",
         points: p.homelessYears !== undefined ? homelessPoints(0) : null,
         years: 0,
-        text: `만 30세 전에 결혼했다면 혼인신고일부터 세요. 혼인신고 연도를 알려주시면 정확해져요`,
+        text: `만 30세 전에 결혼했다면 혼인신고일부터 계산해요. 혼인신고 연도를 적으면 정확해져요.`,
         ask: ["marriedYear"],
       };
     }
-    return { state: "notCounting", points: 0, text: `${by}년생 · 만 30세(${turn30}년)부터 세요. 지금은 0점이에요` };
+    return { state: "notCounting", points: 0, text: `${turn30}년(만 30세)부터 계산해요. 지금은 0점이에요.` };
   }
   const start = marriedBefore30 ? my! : turn30;
   const since = Math.max(0, d.year - start);
@@ -160,7 +160,7 @@ export function homelessBasis(p: Profile, d: Derived = derive(p)): HomelessBasis
   // 연도로만 세므로, 올해 생일(또는 신고일)이 아직이면 1년 짧다 — 점수가 한 칸 낮을 수 있음을 밝힌다
   const edge = since >= 1 ? ` (올해 ${marriedBefore30 ? "신고일" : "생일"}이 아직이면 1년 짧아요)` : "";
   if (p.homelessYears === undefined)
-    return { state: "counting", points: null, text: `${head} · 무주택이 된 지 알려주시면 짧은 쪽으로 세요${tail}`, ask: ["homelessYears"] };
+    return { state: "counting", points: null, text: `${head}. 무주택 기간을 적으면 둘 중 짧은 쪽으로 계산해요.${tail}`, ask: ["homelessYears"] };
   if (p.homelessYears >= 99) return { state: "counting", years: since, points: homelessPoints(since), text: `${head} (쭉 무주택)${tail || edge}` };
   const years = Math.min(since, p.homelessYears);
   return {

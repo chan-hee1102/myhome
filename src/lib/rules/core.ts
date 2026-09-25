@@ -15,7 +15,7 @@ export interface Check {
   label: string;
   /** 기준. 예) "만 19~39세" */
   need: string;
-  /** 내 값. 예) "만 29세" / "아직 입력 안 함" */
+  /** 내 값. 예) "만 29세" / "입력 전" */
   mine: string;
   tri: Tri;
   /** unknown일 때 무엇을 알려주면 풀리는지 */
@@ -79,7 +79,7 @@ export function manwon(n: number): string {
  *   정확한 금액(min === max)은 그 금액 하나로 — 「720만 원」.
  */
 export function bandText(b: Band | undefined, unit: (n: number) => string = manwon): string {
-  if (!b) return "아직 입력 안 함";
+  if (!b) return "입력 전";
   if (b.max === 0) return "없음";
   if (b.max != null && b.min === b.max) return unit(b.min);
   const lo = b.min % 10 === 1 ? b.min - 1 : b.min;
@@ -93,7 +93,7 @@ export function bandText(b: Band | undefined, unit: (n: number) => string = manw
 
 /** 월소득 표기: 「월 300만 원대」, 「월 720만 원」 */
 export function incomeText(b: Band | undefined): string {
-  return b ? `월 ${bandText(b)}` : "아직 입력 안 함";
+  return b ? `월 ${bandText(b)}` : "입력 전";
 }
 
 /**
@@ -101,7 +101,7 @@ export function incomeText(b: Band | undefined): string {
  *   [0,5] → 「6개월 미만」, [6,11] → 「6개월~1년」, 정확한 연수 [60,71] → 「5년」, [60,119] → 「5~10년」, [180,null] → 「15년 이상」
  */
 export function monthsBandText(b: Band | undefined): string {
-  if (!b) return "아직 입력 안 함";
+  if (!b) return "입력 전";
   const y = (m: number) => (m % 12 === 0 ? `${m / 12}년` : `${m}개월`);
   if (b.max == null) return `${y(b.min)} 이상`;
   if (b.min === b.max) return y(b.min);
@@ -114,7 +114,7 @@ export function monthsBandText(b: Band | undefined): string {
 
 /** 거주·무주택 연수 표기: 0 → 「1년 미만」, 99 → 「쭉(태어나서부터)」, 7 → 「7년」 */
 export function yearsText(n: number | undefined): string {
-  if (n === undefined) return "아직 입력 안 함";
+  if (n === undefined) return "입력 전";
   if (n >= 99) return "태어나서 쭉";
   if (n < 1) return "1년 미만";
   return `${Math.floor(n)}년`;
@@ -194,6 +194,6 @@ export function derive(p: Profile, today = new Date()): Derived {
  * 하나로 정해지면 「만 65세」.
  */
 export function ageText(age?: [number, number]): string {
-  if (!age) return "아직 입력 안 함";
+  if (!age) return "입력 전";
   return age[0] === age[1] ? `만 ${age[0]}세` : `만 ${age[0]}세 또는 ${age[1]}세(생일 전후)`;
 }

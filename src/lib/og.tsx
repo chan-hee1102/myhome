@@ -49,7 +49,7 @@ function Facade() {
       <div style={{ width: 200, height: 14, borderTop: "3px solid #14171c", borderLeft: "3px solid #14171c", borderRight: "3px solid #14171c" }} />
       <div style={{ display: "flex", flexWrap: "wrap", width: 260, padding: "26px 28px 30px", gap: 22, border: "3px solid #14171c", background: "#fff" }}>
         {states.map((s, i) => {
-          const frame = s === "ok" ? "#2447d6" : s === "maybe" ? "#e8930c" : "#c9ced6";
+          const frame = s === "ok" ? "#2447d6" : s === "maybe" ? "#e67700" : "#c9ced6";
           return (
             // 화면의 창 부품(Pane)과 같은 규격: 5:7, 가운데 창살 하나, 확인 필요는 아래 창만
             <div key={i} style={{ position: "relative", display: "flex", width: 46, height: 64, borderRadius: 3, border: `3px solid ${frame}`, background: "#fff", overflow: "hidden" }}>

@@ -23,24 +23,24 @@ export function SiteNav({ cta = true }: { cta?: boolean }) {
         <ul className="hidden items-center gap-1 lg:flex">
           {LINKS.map((l) => (
             <li key={l.href}>
-              <Link href={l.href} className="inline-flex h-9 items-center rounded-[10px] px-3.5 text-[15px] font-medium text-sub hover:bg-well hover:text-ink">
+              <Link href={l.href} className="inline-flex h-9 items-center rounded-[10px] px-3.5 text-[16px] font-medium text-sub hover:bg-well hover:text-ink">
                 {l.label}
               </Link>
             </li>
           ))}
         </ul>
         <div className="flex items-center gap-1">
-          <Link href="/guide" className="inline-flex h-9 items-center rounded-[10px] px-3 text-[15px] font-medium text-sub hover:bg-well hover:text-ink lg:hidden">
+          <Link href="/guide" className="inline-flex h-9 items-center rounded-[10px] px-3 text-[16px] font-medium text-sub hover:bg-well hover:text-ink lg:hidden">
             가이드
           </Link>
           {cta &&
             (mine ? (
-              <ButtonLink href="/results" size="sm">
+              <ButtonLink href="/results" size="sm" variant="outline">
                 내 결과
               </ButtonLink>
             ) : (
-              <ButtonLink href="/check" size="sm">
-                내 조건 넣기
+              <ButtonLink href="/check" size="sm" variant="outline">
+                자격 확인하기
               </ButtonLink>
             ))}
         </div>

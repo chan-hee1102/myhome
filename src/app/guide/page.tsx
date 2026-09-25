@@ -68,7 +68,7 @@ const HUB_FAQ = [
 
 function GuideCards({ category }: { category: "기준표" | "특별공급" }) {
   return (
-    <ul className="border-t border-ink">
+    <ul className="border-t border-line-strong">
       {GUIDES.filter((g) => g.category === category).map((g) => (
         <li key={g.slug} className="border-b border-line">
           <Link href={`/guide/${g.slug}`} className="group grid gap-1 py-4 md:grid-cols-[14em_minmax(0,1fr)] md:gap-6">
@@ -111,8 +111,7 @@ export default function GuideHub() {
       <main className="wrap pb-20 pt-24 md:pb-28 md:pt-32">
         <Breadcrumbs items={[{ name: "홈", href: "/" }, { name: "청약 가이드" }]} />
         <header className="mt-8 max-w-[52em]">
-          <p className="text-[13px] font-semibold text-sub">청약 가이드</p>
-          <h1 className="t-h1 mt-3">{br("2026 청약·공공임대 | 자격 기준 한눈에 보기")}</h1>
+          <h1 className="t-h1">{br("2026 청약·공공임대 | 자격 기준 한눈에 보기")}</h1>
           <p id="answer" className="t-body-l mt-5 max-w-[38em] text-body">
             {GUIDE_HUB.answer}
           </p>
@@ -136,7 +135,7 @@ export default function GuideHub() {
               <li key={slug}>
                 <Link
                   href={`/guide/${slug}`}
-                  className="text-[15px] text-body underline decoration-line-strong underline-offset-4 hover:text-ink hover:decoration-ink"
+                  className="text-[16px] text-body underline decoration-line-strong underline-offset-4 hover:text-ink hover:decoration-ink"
                 >
                   {name} 자격 조건
                 </Link>

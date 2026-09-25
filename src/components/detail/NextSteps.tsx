@@ -5,6 +5,7 @@ import { dayText, topicFor } from "@/components/results/verdict";
 import { depositGapText, howTo, residenceNote, scheduleNote, weekendNote } from "@/lib/howto";
 import { withJosa } from "@/lib/josa";
 import { useProfile } from "@/lib/profile";
+import { soft } from "@/lib/text";
 import type { GroupResult, NoticeResult } from "@/lib/rules/evaluate";
 
 /**
@@ -35,11 +36,12 @@ export function NextSteps({ r, g }: { r: NoticeResult; g: GroupResult }) {
     const fail = [...g.checks, ...g.rankChecks].find((c) => c.tri === "fail");
     const others = r.groups.filter((x) => x.group.id !== g.group.id && x.verdict !== "no");
     steps.push({
-      title: "이 대상으로는 신청하기 어려워요",
+      title: "이 대상으로는 신청할 수 없어요",
       body: fail ? (
         <>
-          {fail.label} 조건({fail.need})에 맞지 않아요.
-          {fail.hint && <span className="block">{fail.hint}</span>}
+          {fail.label} 조건에 맞지 않아요.
+          <span className="block">필요: {soft(fail.need)}</span>
+          {fail.hint && <span className="block">{soft(fail.hint)}</span>}
         </>
       ) : (
         "자격 조건에 맞지 않아요."
@@ -47,7 +49,7 @@ export function NextSteps({ r, g }: { r: NoticeResult; g: GroupResult }) {
     });
     steps.push(
       others.length
-        ? { title: `${withJosa(others.map((x) => x.group.label).join("·"), "은/는")} 볼 수 있어요`, body: "위에서 그 대상을 눌러 조건을 확인해 보세요." }
+        ? { title: "다른 대상은 가능성이 있어요", body: `위에서 ${withJosa(others.map((x) => x.group.label).join(", "), "을/를")} 눌러 확인해 보세요.` }
         : {
             title: "다른 공고를 찾아보세요",
             body: (
@@ -60,12 +62,12 @@ export function NextSteps({ r, g }: { r: NoticeResult; g: GroupResult }) {
   } else {
     if (unknown.length && topic) {
       steps.push({
-        title: `모르는 조건 ${unknown.length}개부터 알려주세요`,
+        title: `${unknown.length}가지만 더 답해 주세요`,
         body: (
           <>
-            {unknown.map((c) => c.label).join(", ")} 값을 넣으면 신청할 수 있는지가 정해져요.{" "}
+            {withJosa(unknown.map((c) => c.label).join(", "), "을/를")} 답하면 결과가 정해져요.{" "}
             <Link href={`/check?topic=${topic}`} className="font-semibold text-ink underline decoration-line-strong underline-offset-4">
-              알려주기
+              답하기
             </Link>
           </>
         ),
@@ -73,12 +75,12 @@ export function NextSteps({ r, g }: { r: NoticeResult; g: GroupResult }) {
     }
     if (residence) {
       // 공고 지역 밖에 살면 접수 안내보다 먼저 — 「N일 안에 신청하세요」가 모순처럼 읽히지 않게
-      steps.push({ title: "신청 자격 지역부터 확인하세요", body: residence });
+      steps.push({ title: "신청 자격 지역부터 확인하세요", body: soft(residence) });
     }
     if (gap) {
       steps.push({
         title: `이번엔 2순위로 신청할 수 있어요`,
-        body: `예치금은 입주자 모집공고일 기준으로 따져서, 공고가 난 뒤에 넣은 돈은 이번 공고에 인정되지 않아요. 다음 공고에서 1순위가 되려면 ${gap} 넣어 두세요.`,
+        body: `공고일 뒤에 넣은 돈은 이번 공고에 인정되지 않아요. 다음 공고에서 1순위가 되려면 ${gap} 넣어 두세요.`,
       });
     }
     steps.push({
@@ -90,7 +92,8 @@ export function NextSteps({ r, g }: { r: NoticeResult; g: GroupResult }) {
             : `${residence ? "자격이 되면 " : ""}${r.daysLeft === 1 ? "내일까지" : `${r.daysLeft}일 안에`} ${how.where}에서 신청하세요`,
       body: (
         <>
-          {how.method} {order}
+          {soft(how.method)}
+          {order && <span className="block">{soft(order)}</span>}
           {warn.map((w) => (
             <span key={w} className="mt-1.5 block font-semibold text-hot-ink">
               {w}
@@ -101,7 +104,7 @@ export function NextSteps({ r, g }: { r: NoticeResult; g: GroupResult }) {
               href={how.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-3 flex h-10 w-fit items-center rounded-[10px] px-3.5 text-[14px] font-semibold text-ink ring-1 ring-inset ring-line-strong hover:ring-ink"
+              className="mt-3 flex h-10 w-fit items-center rounded-[10px] px-3.5 text-[15px] font-semibold text-ink ring-1 ring-inset ring-line-strong hover:ring-ink"
             >
               {how.where} 열기 ↗
             </a>
@@ -113,8 +116,13 @@ export function NextSteps({ r, g }: { r: NoticeResult; g: GroupResult }) {
       title: "챙길 것",
       body: (
         <>
-          {how.bring.join(" · ")}. {how.certHelp && <span className="block">{how.certHelp}</span>}
-          <span className="text-muted">{how.caveat}</span>
+          {how.bring.map((b) => (
+            <span key={b} className="block">
+              {soft(b)}
+            </span>
+          ))}
+          {how.certHelp && <span className="block">{soft(how.certHelp)}</span>}
+          <span className="mt-1 block text-muted">{soft(how.caveat)}</span>
         </>
       ),
     });
@@ -125,13 +133,13 @@ export function NextSteps({ r, g }: { r: NoticeResult; g: GroupResult }) {
       <div className="section-head">
         <span id="next-title">지금 할 일</span>
       </div>
-      <ol className="mt-3 rounded-[4px] bg-page px-5 ring-1 ring-inset ring-line md:px-7">
+      <ol className="mt-3 rounded-[4px] bg-page px-5 ring-1 ring-inset ring-line-strong md:px-7">
         {steps.map((s, i) => (
           <li key={s.title} className="grid grid-cols-[28px_minmax(0,1fr)] gap-x-3 border-b border-line py-4 last:border-b-0">
             <span className="num text-[20px] leading-6 text-ink">{i + 1}</span>
             <div>
               <p className="text-[16px] font-semibold text-ink">{s.title}</p>
-              <p className="t-small mt-1 text-sub">{s.body}</p>
+              <p className="t-small mt-1 text-body">{s.body}</p>
             </div>
           </li>
         ))}

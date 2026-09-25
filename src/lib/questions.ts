@@ -15,7 +15,7 @@ export const MARITAL: Option<Marital>[] = [
   { label: "결혼 예정", value: "engaged", sub: "예비부부" },
   { label: "결혼 7년 이내", value: "newlywed" },
   { label: "결혼 7년 넘음", value: "married" },
-  { label: "혼자예요", value: "solo", sub: "이혼·사별 등" },
+  { label: "이혼·사별", value: "solo", sub: "지금은 혼자예요" },
 ];
 
 export const CHILDREN: Option<number>[] = [
@@ -46,13 +46,9 @@ export function youngChildrenOptions(children: number | undefined): Option<numbe
 }
 
 export const HOME: Option<HomeStatus>[] = [
-  {
-    label: "주민등록등본에 같이 올라 있는 가족은 아무도 집이 없어요",
-    value: "none",
-    sub: "분양권·입주권도 집으로 쳐요",
-  },
-  { label: "제 이름으로 된 집이 있어요", value: "own", sub: "분양권·입주권도 집으로 쳐요" },
-  { label: "같이 올라 있는 가족 중에 집 가진 사람이 있어요", value: "familyOwn", sub: "배우자·부모님 등" },
+  { label: "우리 세대 모두 집이 없어요", value: "none", sub: "등본에 함께 오른 가족 기준" },
+  { label: "제 이름으로 된 집이 있어요", value: "own", sub: "분양권·입주권 포함" },
+  { label: "함께 사는 가족 명의 집이 있어요", value: "familyOwn", sub: "배우자, 부모님 등" },
 ];
 
 const b = (min: number, max: number | null): Band => ({ min, max });
@@ -157,7 +153,7 @@ export const PROPERTY: Option<Band>[] = bandsFrom(
     { at: STD_ASSETS.publicSaleSmall, sub: "공공분양 기준까지" },
     { at: STD_ASSETS.special29, sub: "민영 특공 추첨분 기준까지" },
   ],
-  { label: "없어요", value: b(0, 0), sub: "월세·전세만 살아요" },
+  { label: "없어요", value: b(0, 0), sub: "전세나 월세로 살아요" },
 );
 
 /** 자동차가액(만원, 가장 비싼 차) — 기준 하나(standards.ts car)만 가른다 */
@@ -234,15 +230,15 @@ export const YES_NO = {
   },
   neverOwned: {
     key: "neverOwned",
-    label: "우리 세대에 집을 가졌던 적이 있는 사람이 있나요?",
-    help: "지금은 없어도, 예전에 가졌다가 판 적이 있으면 「있어요」예요",
+    label: "세대원 중 집을 가져 본 사람이 있나요?",
+    help: "팔았어도 한 번 가졌으면 있어요를 골라 주세요.",
     // 값이 반대: 「있어요」 = neverOwned false
     options: [{ label: "있어요", value: false }, { label: "없어요", value: true }],
   },
   wonRecently: {
     key: "wonRecently",
     label: "최근 5년 안에 청약에 당첨된 적이 있나요?",
-    help: "세대원 누구든 당첨됐으면 「있어요」예요",
+    help: "세대원 누구든 당첨됐으면 있어요를 골라 주세요.",
     options: [{ label: "있어요", value: true }, { label: "없어요", value: false }],
   },
   student: { key: "student", label: "대학생인가요?", help: "재학·입학 예정·졸업 2년 이내", options: [YES, NO] },

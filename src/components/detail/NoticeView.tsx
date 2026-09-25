@@ -49,7 +49,7 @@ function CheckRow({ c, i }: { c: Check; i: number }) {
   return (
     <li className="grid grid-cols-[20px_minmax(0,1fr)] gap-x-3 border-b border-line py-4 last:border-b-0 md:grid-cols-[20px_112px_minmax(0,1fr)_minmax(0,1fr)]">
       <WinMark tri={c.tri} delay={t} className="mt-1" />
-      <span className="text-[15px] font-semibold text-ink">{c.label}</span>
+      <span className="text-[16px] font-semibold text-ink">{c.label}</span>
       <span className="t-small col-start-2 mt-1 text-sub md:col-start-auto md:mt-0.5">
         <span className="mr-1.5 text-muted md:hidden">필요 조건</span>
         {soft(c.need)}
@@ -71,8 +71,8 @@ function CheckRow({ c, i }: { c: Check; i: number }) {
         <span className="col-start-2 mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 md:col-span-3 md:col-start-2">
           {c.hint && <span className="t-small text-sub">{c.hint}</span>}
           {topic && (
-            <Link href={`/check?topic=${topic}`} className="text-[14px] font-semibold text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
-              알려주기
+            <Link href={`/check?topic=${topic}`} className="text-[15px] font-semibold text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
+              답하기
             </Link>
           )}
         </span>
@@ -85,26 +85,26 @@ function CheckRow({ c, i }: { c: Check; i: number }) {
 function ScoreCard({ g }: { g: GroupResult }) {
   const s = g.score!;
   return (
-    <div className="rounded-[4px] bg-page p-5 ring-1 ring-inset ring-line md:p-6">
-      <p className="text-[13px] font-semibold text-sub">{s.title}</p>
+    <div className="rounded-[4px] bg-page p-5 ring-1 ring-inset ring-line-strong md:p-6">
+      <p className="text-[14px] md:text-[15px] font-semibold text-sub">{s.title}</p>
       <p className="mt-1 text-ink">
-        <span className="t-num-l text-brand">{s.total}</span>
+        <span className="t-num-l text-ink">{s.total}</span>
         <span className="ml-1.5 text-[18px] font-semibold text-muted">/ {s.max}점</span>
       </p>
       {s.partialNote && <p className="t-caption mt-2 text-maybe-ink">{s.partialNote}</p>}
       <ul className="mt-5 space-y-3.5">
         {s.lines.map((l, i) => (
           <li key={l.label}>
-            <div className="flex items-baseline justify-between gap-3 text-[14px]">
+            <div className="flex items-baseline justify-between gap-3 text-[15px]">
               <span className="font-medium text-body">{l.label}</span>
-              <span className="data shrink-0 text-[13px] text-ink">
+              <span className="data shrink-0 text-[14px] md:text-[15px] text-ink">
                 {l.points === null ? "?" : l.points}
                 <span className="text-muted"> / {l.max}</span>
               </span>
             </div>
             <div className="mt-1.5 h-1.5 overflow-hidden rounded-[2px] bg-well">
               <motion.div
-                className={`h-full origin-left rounded-[2px] ${l.points === null ? "bg-maybe/50" : "bg-brand"}`}
+                className={`h-full origin-left rounded-[2px] ${l.points === null ? "bg-maybe/50" : "bg-ink"}`}
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: (l.points ?? 0) / l.max }}
                 transition={{ duration: DUR.slow, ease: EASE.out, delay: 0.1 + i * 0.06 }}
@@ -133,7 +133,7 @@ function DayBar({ r }: { r: NoticeResult }) {
   return (
     <div className="mt-4" aria-hidden>
       <div
-        className={`relative h-2 overflow-hidden rounded-[2px] ${r.phase === "closed" ? "bg-well" : r.phase === "upcoming" ? "bg-page ring-[1.5px] ring-inset ring-brand/60" : hot ? "bg-hot" : "bg-brand"}`}
+        className={`relative h-2 overflow-hidden rounded-[2px] ${r.phase === "closed" ? "bg-well" : r.phase === "upcoming" ? "bg-page ring-[1.5px] ring-inset ring-bar" : hot ? "bg-hot" : "bg-ink"}`}
       >
         {r.phase === "open" && (
           <motion.div
@@ -144,7 +144,7 @@ function DayBar({ r }: { r: NoticeResult }) {
           />
         )}
       </div>
-      <div className="mt-1.5 flex justify-between text-[12px] font-medium text-muted tabular">
+      <div className="mt-1.5 flex justify-between text-[14px] md:text-[15px] font-medium text-muted tabular">
         <span>{shortDate(r.a.schedule.applyStart)}</span>
         <span>{shortDate(r.a.schedule.applyEnd)}</span>
       </div>
@@ -157,11 +157,11 @@ function DayCard({ r }: { r: NoticeResult }) {
   const day = dayText(r);
   const hot = isUrgent(r);
   return (
-    <div className="rounded-[4px] bg-page p-5 ring-1 ring-inset ring-line md:p-6">
+    <div className="rounded-[4px] bg-page p-5 ring-1 ring-inset ring-line-strong md:p-6">
       <p className={`t-num-l ${hot ? "text-hot-ink" : "text-ink"}`}>{day.big}</p>
-      <p className="mt-1 text-[13px] font-semibold text-sub">{day.small}</p>
+      <p className="mt-1 text-[14px] md:text-[15px] font-semibold text-sub">{day.small}</p>
       <DayBar r={r} />
-      <dl className="mt-5 space-y-2 border-t border-line pt-4 text-[14px]">
+      <dl className="mt-5 space-y-2 border-t border-line pt-4 text-[15px]">
         <div className="flex justify-between gap-4">
           <dt className="text-muted">접수</dt>
           <dd className="data text-ink">
@@ -248,8 +248,8 @@ function Timeline({ r }: { r: NoticeResult }) {
           <li key={x.k} className="relative flex items-center gap-4 md:block md:pr-3">
             <span className={`relative z-10 block size-3 shrink-0 rounded-[2px] border-[1.5px] ${done ? "border-ink bg-ink" : "border-line-strong bg-page"}`} />
             <div className="md:mt-3">
-              <p className={`text-[14px] font-semibold ${done ? "text-muted" : "text-ink"}`}>{x.k}</p>
-              <p className="data mt-0.5 text-[13px] font-medium text-sub">{shortDate(x.d)}</p>
+              <p className={`text-[15px] font-semibold ${done ? "text-muted" : "text-ink"}`}>{x.k}</p>
+              <p className="data mt-0.5 text-[14px] md:text-[15px] font-medium text-sub">{shortDate(x.d)}</p>
             </div>
           </li>
         );
@@ -265,9 +265,9 @@ function Units({ a }: { a: Announcement }) {
   return (
     <>
       {/* 데스크탑 표 */}
-      <table className="hidden w-full text-left text-[15px] md:table">
+      <table className="hidden w-full text-left text-[16px] md:table">
         <thead>
-          <tr className="border-b border-ink text-[12px] text-muted">
+          <tr className="border-b border-ink text-[14px] md:text-[15px] text-muted">
             <th className="py-2.5 pr-4 font-semibold">주택형</th>
             <th className="py-2.5 pr-4 font-semibold">세대</th>
             <th className="py-2.5 text-right font-semibold">{prog.kind === "rent" ? "보증금 · 월 임대료" : "분양가"}</th>
@@ -289,9 +289,9 @@ function Units({ a }: { a: Announcement }) {
           <li key={u.name} className="border-b border-line py-3.5 last:border-b-0">
             <p className="flex items-baseline justify-between gap-3">
               <span className="text-[16px] font-semibold text-ink">{u.name}</span>
-              <span className="data text-[14px] text-sub">{u.units.toLocaleString("ko-KR")}세대</span>
+              <span className="data text-[15px] text-sub">{u.units.toLocaleString("ko-KR")}세대</span>
             </p>
-            <p className="data mt-1 text-[15px] text-ink">{priceOf(u)}</p>
+            <p className="data mt-1 text-[16px] text-ink">{priceOf(u)}</p>
           </li>
         ))}
       </ul>
@@ -354,7 +354,7 @@ export function NoticeView({ id }: { id: string }) {
     <div className="min-h-dvh bg-wash">
       <AppHeader />
       <main className="wrap-app pb-20 pt-24 md:pb-28 md:pt-28">
-        <Link href="/results" className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-sub hover:text-ink">
+        <Link href="/results" className="inline-flex items-center gap-1.5 text-[15px] font-semibold text-sub hover:text-ink">
           <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
             <path d="M13 8H3.5M7.5 4l-4 4 4 4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -369,8 +369,8 @@ export function NoticeView({ id }: { id: string }) {
         <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-10">
           <div className="min-w-0">
             {/* 제목 */}
-            <p className="text-[13px] font-semibold text-sub">
-              {a.agency} · {prog.name} · {prog.kind === "rent" ? "임대" : "분양"} · {placeText(a)}
+            <p className="text-[14px] md:text-[15px] font-semibold text-sub">
+              {a.agency} · {prog.name} · {placeText(a)}
             </p>
             <h1 className="t-h1 mt-2">{a.complex}</h1>
             <p className="t-body mt-2 text-sub">{a.title}</p>
@@ -378,19 +378,19 @@ export function NoticeView({ id }: { id: string }) {
               <a href="#verdict-title" className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 border-y border-line py-3 lg:hidden">
                 <StatusBadge status={badgeStatus(r)}>{VERDICT[badgeStatus(r)].label}</StatusBadge>
                 {r.best.rank && r.verdict !== "no" && r.phase !== "closed" && (
-                  <span className={`text-[15px] font-bold ${rankTone(r.verdict, r.best.rank)}`}>{r.best.rank.label}</span>
+                  <span className={`text-[16px] font-bold ${rankTone(r.verdict)}`}>{r.best.rank.label}</span>
                 )}
-                <span className={`ml-auto text-[14px] font-semibold tabular ${isUrgent(r) ? "text-hot-ink" : "text-sub"}`}>{dayText(r).line}</span>
+                <span className={`ml-auto text-[15px] font-semibold tabular ${isUrgent(r) ? "text-hot-ink" : "text-sub"}`}>{dayText(r).line}</span>
               </a>
             )}
 
             {/* 핵심 수치 */}
-            <dl className="mt-6 grid grid-cols-3 border-y border-ink">
+            <dl className="mt-6 grid grid-cols-3 border-y border-line-strong">
               {figures.map((f, i) => (
                 <div key={f.k} className={`py-4 ${i ? "border-l border-line pl-4" : ""}`}>
-                  <dt className="text-[12px] font-semibold text-muted">{f.k}</dt>
+                  <dt className="text-[14px] md:text-[15px] font-semibold text-muted">{f.k}</dt>
                   <dd className="num mt-1 text-[17px] leading-tight text-ink md:text-[22px]">{f.v}</dd>
-                  {"sub" in f && f.sub && <dd className="mt-0.5 text-[12px] text-sub">{f.sub}</dd>}
+                  {"sub" in f && f.sub && <dd className="mt-0.5 text-[14px] md:text-[15px] text-sub">{f.sub}</dd>}
                 </div>
               ))}
             </dl>
@@ -407,10 +407,10 @@ export function NoticeView({ id }: { id: string }) {
             {/* 내 자격 */}
             <section className="mt-12 md:mt-14" aria-labelledby="verdict-title">
               <div className="section-head">
-                <span id="verdict-title">나도 신청할 수 있을까?</span>
+                <span id="verdict-title">내 자격</span>
                 {empty && (
                   <Link href="/check" className="text-ink underline decoration-line-strong underline-offset-4">
-                    조건 넣고 확인하기
+                    자격 확인하기
                   </Link>
                 )}
               </div>
@@ -427,7 +427,7 @@ export function NoticeView({ id }: { id: string }) {
                         role="tab"
                         aria-selected={on}
                         onClick={() => setPick(x.group.id)}
-                        className={`relative inline-flex shrink-0 items-center gap-1.5 pb-3 pt-1 text-[15px] font-semibold ${on ? "text-ink" : "text-muted hover:text-ink"}`}
+                        className={`relative inline-flex shrink-0 items-center gap-1.5 pb-3 pt-1 text-[16px] font-semibold ${on ? "text-ink" : "text-muted hover:text-ink"}`}
                       >
                         <WinGlyph state={xs} />
                         {x.group.label}
@@ -445,7 +445,7 @@ export function NoticeView({ id }: { id: string }) {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: DUR.fast }}
-                  className="mt-5 rounded-[4px] bg-page px-5 py-5 ring-1 ring-inset ring-line md:px-7 md:py-6"
+                  className="mt-5 rounded-[4px] bg-page px-5 py-5 ring-1 ring-inset ring-line-strong md:px-7 md:py-6"
                 >
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <StatusBadge status={r.phase === "closed" ? "closed" : g.verdict}>{v.label}</StatusBadge>
@@ -454,15 +454,15 @@ export function NoticeView({ id }: { id: string }) {
                   <p className="t-h2 mt-2">{v.headline}</p>
                   {g.rank && g.verdict !== "no" && (
                     <div className="mt-4">
-                      <p className={`t-num-m ${rankTone(g.verdict, g.rank)}`}>{g.rank.label}</p>
+                      <p className={`t-num-m ${rankTone(g.verdict)}`}>{g.rank.label}</p>
                       {g.rank.detail && <p className="t-small mt-1 text-sub">{g.rank.detail}</p>}
                     </div>
                   )}
 
                   <SupplyShare a={a} pick={g.group.id} />
 
-                  <ul className="mt-6 border-t border-ink">
-                    <li className="hidden grid-cols-[20px_112px_minmax(0,1fr)_minmax(0,1fr)] gap-x-3 py-2.5 text-[12px] font-semibold text-muted md:grid">
+                  <ul className="mt-6 border-t border-line-strong">
+                    <li className="hidden grid-cols-[20px_112px_minmax(0,1fr)_minmax(0,1fr)] gap-x-3 py-2.5 text-[14px] md:text-[15px] font-semibold text-muted md:grid">
                       <span />
                       <span>조건</span>
                       <span>필요 조건</span>
@@ -474,8 +474,9 @@ export function NoticeView({ id }: { id: string }) {
                   </ul>
                   {g.rankChecks.length > 0 && g.verdict !== "no" && (
                     <>
-                      <p className="mt-7 text-[14px] font-semibold text-ink">1순위 조건 — 하나라도 모자라면 2순위로 신청해요</p>
-                      <ul className="mt-2 border-t border-ink">
+                      <p className="mt-7 text-[16px] font-semibold text-ink">1순위 조건</p>
+                      <p className="t-small text-sub">하나라도 못 채우면 2순위로 신청해요.</p>
+                      <ul className="mt-2 border-t border-line-strong">
                         {g.rankChecks.map((c, i) => (
                           <CheckRow key={`r-${c.key}-${i}`} c={c} i={g.checks.length + i} />
                         ))}
@@ -483,18 +484,18 @@ export function NoticeView({ id }: { id: string }) {
                     </>
                   )}
                   <div className="mt-7 border-t border-line pt-4">
-                    <p className="text-[14px] font-semibold text-ink">뽑는 방식</p>
+                    <p className="text-[15px] font-semibold text-ink">뽑는 방식</p>
                     <ul className="mt-2 space-y-1.5">
                       {g.notes.map((n) => (
                         <li key={n} className="t-small flex gap-2.5 text-body">
                           <span aria-hidden className="mt-[0.7em] h-px w-2 shrink-0 bg-muted" />
-                          {n}
+                          {soft(n)}
                         </li>
                       ))}
                     </ul>
                     {guide && (
-                      <Link href={`/guide/${guide}`} className="mt-3 inline-block text-[14px] font-semibold text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
-                        {prog.name} 자격 기준 근거 보기
+                      <Link href={`/guide/${guide}`} className="mt-3 inline-block text-[15px] font-semibold text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
+                        {prog.name} 자격 기준 보기
                       </Link>
                     )}
                   </div>
@@ -519,7 +520,7 @@ export function NoticeView({ id }: { id: string }) {
               <div className="section-head">
                 <span id="schedule-title">일정</span>
               </div>
-              <div className="mt-5 rounded-[4px] bg-page p-5 ring-1 ring-inset ring-line md:p-7">
+              <div className="mt-5 rounded-[4px] bg-page p-5 ring-1 ring-inset ring-line-strong md:p-7">
                 <Timeline r={r} />
               </div>
             </section>
@@ -528,14 +529,14 @@ export function NoticeView({ id }: { id: string }) {
               <div className="section-head">
                 <span id="units-title">주택형</span>
               </div>
-              <div className="mt-3 rounded-[4px] bg-page px-5 py-2 ring-1 ring-inset ring-line md:px-7">
+              <div className="mt-3 rounded-[4px] bg-page px-5 py-2 ring-1 ring-inset ring-line-strong md:px-7">
                 <Units a={a} />
               </div>
             </section>
 
             <p className="t-small mt-10 max-w-[46em] text-muted">
               {a.sample ? "예시 공고라 실제 출처가 없어요. " : `출처: ${source?.owner} ${source?.name}${source?.kind === "manual" ? " (원문 확인 후 직접 정리)" : " (공공데이터포털)"}. `}
-              결과는 공고문과 법령 기준을 옮겨 계산한 참고용이고, 최종 자격은 공급기관의 서류 심사로 정해져요.
+              참고용 결과예요. 최종 자격과 순위는 공급기관 심사로 정해져요.
             </p>
           </div>
 

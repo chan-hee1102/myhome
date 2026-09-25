@@ -40,7 +40,7 @@ export default function PrivacyPage() {
         <p className="t-body-l mt-5 max-w-[38em] text-body">
           {SITE.name}은 입력한 조건을 서버로 보내지 않아요. 모든 결과는 쓰는 사람의 브라우저 안에서 계산돼요.
         </p>
-        <div className="mt-10 max-w-[48em] border-t border-ink">
+        <div className="mt-10 max-w-[48em] border-t border-line-strong">
           {ITEMS.map((it) => (
             <section key={it.h} className="grid gap-2 border-b border-line py-5 md:grid-cols-[12em_minmax(0,1fr)] md:gap-6">
               <h2 className="t-h3 text-ink">{it.h}</h2>

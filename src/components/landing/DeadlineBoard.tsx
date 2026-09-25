@@ -73,20 +73,14 @@ export function DeadlineBoard() {
   const openNow = rows.filter((r) => r.s <= BEFORE && BEFORE <= r.e).length;
 
   return (
-    <section aria-labelledby="board-title" className="py-14 md:py-20">
+    <section aria-labelledby="board-title" className="py-12 md:py-20">
       <div className="wrap">
-        <div className="section-head">
-          <span>접수 일정</span>
-          <span className="text-muted">{SITE.sampleData ? "예시 공고" : "공고"} · 마감 가까운 순</span>
-        </div>
-        <div className="mt-6 grid gap-4 md:mt-8 lg:grid-cols-12">
-          <h2 id="board-title" className="t-h2 lg:col-span-5">
-            공고는 기관마다 따로 올라와요.
-            <br />
-            여기서는 한 줄로 봐요.
+        <div className="grid gap-3 lg:grid-cols-12 lg:items-end">
+          <h2 id="board-title" className="t-h2 lg:col-span-6">
+            마감이 가까운 공고부터
           </h2>
-          <p className="t-body text-sub lg:col-span-6 lg:col-start-7 lg:pt-2">
-            LH·SH·GH·HUG·청약홈 공고를 마감이 가까운 순서로 놓았어요. 막대 하나가 공고 하나의 접수 기간이에요.
+          <p className="t-body-l text-sub lg:col-span-6">
+            LH, SH, GH, 청약홈 공고를 한 줄에 모았어요.{SITE.sampleData && <span className="ml-1.5 text-muted">(예시)</span>}
           </p>
         </div>
 
@@ -95,7 +89,7 @@ export function DeadlineBoard() {
           <div className="hidden md:block">
             <div className="grid grid-cols-[260px_minmax(0,1fr)]">
               <div />
-              <div className="relative h-7 text-[13px] font-medium text-muted">
+              <div className="relative h-7 text-[14px] md:text-[15px] font-medium text-muted">
                 {hydrated &&
                   [0, 14, 21, 28].map((t) => (
                     <span key={t} className="absolute -translate-x-1/2 tabular" style={{ left: pct(t) }}>
@@ -103,7 +97,7 @@ export function DeadlineBoard() {
                     </span>
                   ))}
                 {hydrated && (
-                  <motion.span className="absolute -translate-x-1/2 whitespace-nowrap rounded-[4px] bg-ink px-1.5 py-0.5 text-[12px] font-semibold text-white" style={{ left }}>
+                  <motion.span className="absolute -translate-x-1/2 whitespace-nowrap rounded-[4px] bg-ink px-1.5 py-0.5 text-[14px] md:text-[15px] font-semibold text-white" style={{ left }}>
                     오늘 {label(BEFORE)}
                   </motion.span>
                 )}
@@ -125,7 +119,7 @@ export function DeadlineBoard() {
           </div>
 
           {/* 모바일: D-day 목록 */}
-          <ul className="border-t border-ink md:hidden">
+          <ul className="border-t border-line-strong md:hidden">
             {(hydrated ? rows : Array.from({ length: 5 }, () => null)).map((r, i) => (
               <li key={r ? r.a.id : i} className="border-b border-line">
                 {r ? <ListRow r={r} /> : <div className="h-[68px]" />}
@@ -141,7 +135,7 @@ export function DeadlineBoard() {
                 </>
               )}
             </p>
-            <Link href="/results" className="inline-flex h-11 items-center text-[15px] font-semibold text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
+            <Link href="/results" className="inline-flex h-11 items-center text-[16px] font-semibold text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
               공고 전체 보기
             </Link>
           </div>
@@ -153,35 +147,37 @@ export function DeadlineBoard() {
 
 /** 문구는 목록·상세와 같은 dday()로 만든다 */
 function dayOf(r: Row) {
-  if (BEFORE > r.e) return { ...dday("closed", 0, 0), tone: "text-muted" };
-  if (BEFORE < r.s) return { ...dday("upcoming", r.s - BEFORE, 0), tone: "text-sub" };
+  const dates = { start: r.a.schedule.applyStart, end: r.a.schedule.applyEnd };
+  if (BEFORE > r.e) return { ...dday("closed", 0, 0, dates), tone: "text-muted" };
+  if (BEFORE < r.s) return { ...dday("upcoming", r.s - BEFORE, 0, dates), tone: "text-sub" };
   const left = r.e - BEFORE;
-  return { ...dday("open", 0, left), tone: left <= 3 ? "text-hot-ink" : "text-ink" };
+  return { ...dday("open", 0, left, dates), tone: left <= 3 ? "text-hot-ink" : "text-ink" };
 }
 
 function BarRow({ r }: { r: Row }) {
   const s = Math.max(0, r.s);
   const e = Math.min(SPAN - 1, r.e);
   const open = r.s <= BEFORE && BEFORE <= r.e;
+  const hot = open && r.e - BEFORE <= 3;
   const d = dayOf(r);
   return (
     <Link href={`/notice/${r.a.id}`} className="group grid grid-cols-[260px_minmax(0,1fr)] items-center">
       <span className="min-w-0 py-3 pr-4">
-        <span className="block truncate text-[15px] font-semibold text-ink group-hover:underline">{r.a.complex}</span>
-        <span className="block truncate text-[13px] text-muted">
+        <span className="block truncate text-[16px] font-semibold text-ink group-hover:underline">{r.a.complex}</span>
+        <span className="block truncate text-[14px] md:text-[15px] text-muted">
           {r.a.agency} · {PROGRAMS[r.a.program].name} · {r.a.sido}
         </span>
       </span>
       <span className="relative block h-[64px]">
         <span
-          className={`absolute top-1/2 h-3 -translate-y-1/2 rounded-[2px] ${open ? "bg-brand" : "bg-page ring-[1.5px] ring-inset ring-brand/60"}`}
+          className={`absolute top-1/2 h-2.5 -translate-y-1/2 rounded-[2px] ${hot ? "bg-hot" : open ? "bg-bar" : "bg-page ring-[1.5px] ring-inset ring-bar"}`}
           style={{ left: `${(s / SPAN) * 100}%`, width: `${((e - s + 1) / SPAN) * 100}%` }}
         />
         <span
-          className={`data absolute top-1/2 -translate-y-1/2 whitespace-nowrap pl-2 text-[14px] ${d.tone}`}
+          className={`data absolute top-1/2 -translate-y-1/2 whitespace-nowrap pl-2 text-[15px] ${d.tone}`}
           style={{ left: `min(${((e + 1) / SPAN) * 100}%, calc(100% - 116px))` }}
         >
-          {d.line}
+          {BEFORE < r.s ? d.line : BEFORE > r.e ? "마감" : r.e === BEFORE ? "오늘 마감" : d.big}
         </span>
       </span>
     </Link>
@@ -191,14 +187,14 @@ function BarRow({ r }: { r: Row }) {
 function ListRow({ r }: { r: Row }) {
   const d = dayOf(r);
   return (
-    <Link href={`/notice/${r.a.id}`} className="grid grid-cols-[76px_minmax(0,1fr)] items-center gap-3 py-3.5">
+    <Link href={`/notice/${r.a.id}`} className="grid grid-cols-[96px_minmax(0,1fr)] items-center gap-3 py-3.5">
       <span className="min-w-0">
         <span className={`num block whitespace-nowrap text-[20px] leading-tight ${d.tone}`}>{d.big}</span>
-        <span className="block text-[12px] font-medium text-muted">{d.small}</span>
+        <span className="block whitespace-nowrap text-[14px] md:text-[15px] font-medium text-sub">{d.small}</span>
       </span>
       <span className="min-w-0">
         <span className="block truncate text-[16px] font-semibold text-ink">{r.a.complex}</span>
-        <span className="block truncate text-[13px] text-muted">
+        <span className="block truncate text-[14px] md:text-[15px] text-muted">
           {r.a.agency} · {PROGRAMS[r.a.program].name} · {placeText(r.a)}
         </span>
       </span>

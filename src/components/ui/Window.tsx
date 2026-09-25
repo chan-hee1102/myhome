@@ -21,27 +21,30 @@ export const WIN_LABEL: Record<WinState, string> = {
   ok: "신청 가능",
   maybe: "확인 필요",
   no: "해당 없음",
-  closed: "접수 마감",
+  closed: "마감",
   off: "아직 모름",
 };
 
 const FILL: Record<WinState, number> = { ok: 1, maybe: 0.5, no: 0, closed: 0, off: 0 };
 
-/** 크기별 규격. 작은 창은 틀이 묻히지 않게 「해당 없음」 틀을 한 단계 진하게 쓴다(광학 보정) */
+/**
+ * 크기별 규격. 작은 창은 틀이 묻히지 않게 「해당 없음」 틀을 한 단계 진하게 쓰고(광학 보정),
+ * 켜진 창의 창살은 옅게 한다 — 14px 이하에선 흰 가로줄이 「−」 아이콘처럼 읽힌다.
+ */
 const SIZE = {
-  lg: { box: "w-full rounded-[2px]", no: "ring-line-strong", noBar: "bg-line-strong" },
-  md: { box: "w-3.5 rounded-[2px]", no: "ring-faint", noBar: "bg-faint" },
-  sm: { box: "w-2.5 rounded-[1.5px]", no: "ring-faint", noBar: "bg-faint" },
+  lg: { box: "w-full rounded-[2px]", no: "ring-line-strong", noBar: "bg-line-strong", okBar: "bg-white/70" },
+  md: { box: "w-3.5 rounded-[2px]", no: "ring-faint", noBar: "bg-faint", okBar: "bg-white/35" },
+  sm: { box: "w-2.5 rounded-[1.5px]", no: "ring-faint", noBar: "bg-faint", okBar: "bg-white/35" },
 } as const;
 
 type Size = keyof typeof SIZE;
 
 function frameOf(s: WinState, size: Size) {
-  return s === "ok" ? "ring-brand" : s === "maybe" ? "ring-maybe" : s === "no" ? SIZE[size].no : s === "closed" ? "ring-ghost bg-well" : "ring-ghost";
+  return s === "ok" ? "ring-brand" : s === "maybe" ? "ring-maybe" : s === "no" ? SIZE[size].no : s === "closed" ? "ring-[#b0b8c2] bg-closed" : "ring-ghost";
 }
 
 function barOf(s: WinState, size: Size) {
-  return s === "ok" ? "bg-white/70" : s === "maybe" ? "bg-maybe" : s === "no" ? SIZE[size].noBar : "bg-ghost";
+  return s === "ok" ? SIZE[size].okBar : s === "maybe" ? "bg-maybe" : s === "no" ? SIZE[size].noBar : s === "closed" ? "bg-[#b0b8c2]" : "bg-ghost";
 }
 
 /**
@@ -95,7 +98,7 @@ export function WinGlyph({ state, className = "" }: { state: WinState; className
 /** 범례 한 줄 */
 export function WinLegend({ className = "", states = ["ok", "maybe", "no"] }: { className?: string; states?: WinState[] }) {
   return (
-    <ul className={`flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-sub ${className}`}>
+    <ul className={`flex flex-wrap items-center gap-x-4 gap-y-1 text-[14px] md:text-[15px] text-sub ${className}`}>
       {states.map((s) => (
         <li key={s} className="inline-flex items-center gap-1.5">
           <WinGlyph state={s} />

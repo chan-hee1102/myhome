@@ -10,16 +10,17 @@
  */
 @theme {
   --color-page: #ffffff;
-  --color-wash: #f6f7f9; /* 앱 화면 바탕 */
-  --color-well: #eff1f4; /* 입력칸·트랙·꺼진 창 */
-  --color-line: #e3e6ea;
-  --color-line-strong: #c9ced6;
+  --color-wash: #f4f6f8; /* 앱 화면 바탕 */
+  --color-well: #eceff3; /* 입력칸·트랙·꺼진 창 */
+  --color-line: #dde1e6;
+  --color-line-strong: #c3c9d1;
 
-  --color-ink: #14171c; /* 제목·숫자 */
-  --color-body: #2e333b; /* 본문 */
-  --color-sub: #4b525c; /* 보조 */
-  --color-muted: #676e78; /* 캡션 — 흰 바탕 5.2:1 */
-  --color-faint: #9aa1ab; /* 글자에 쓰지 않음(비활성·자리표시) */
+  /* 글자색은 넷. 회색이 흐려 보인다는 피드백(2026-09-26)으로 한 단계씩 진하게 — 보조 글자도 흰 바탕 7:1 이상 */
+  --color-ink: #111418; /* 제목·숫자 */
+  --color-body: #23272e; /* 본문 */
+  --color-sub: #3f454e; /* 보조 — 9.6:1 */
+  --color-muted: #59606a; /* 캡션·메타 — 6.4:1 */
+  --color-faint: #8a9099; /* 작은 창틀·입력칸 테두리·자리표시 — 흰 바탕 3.2:1(비텍스트 3:1 이상) */
   --color-ghost: #cdd2d9; /* 창틀·점·선 */
 
   /* 군청 — 청약의 「청」 */
@@ -33,11 +34,13 @@
   /* 상태: 신청 가능 = 군청(꽉 찬 창) · 확인 필요 = 주황(반 칸) · 해당 없음 = 선만 · 마감 임박 = 빨강 글자 */
   --color-ok: #2447d6;
   --color-ok-ink: #1c38a8;
-  --color-maybe: #e8930c;
-  --color-maybe-ink: #945600;
-  --color-maybe-soft: #fff4e0;
+  --color-maybe: #e67700; /* 반 칸 채움 — 흰 바탕 3.0:1, 붉은기 없는 주황 */
+  --color-maybe-ink: #b34700; /* 흰 5.5 · wash 5.1:1. 주황은 「확인 필요」에만 쓴다(예시 표시는 회색) */
+  --color-maybe-soft: #fff3e0;
   --color-no: #c9ced6;
-  --color-no-ink: #676e78;
+  --color-closed: #d5dae1; /* 접수 마감 창 채움 */
+  --color-bar: #8a95a5; /* 일정 막대 — 판정과 무관한 기간은 파랑을 쓰지 않는다 */
+  --color-no-ink: #59606a;
   --color-hot: #e5484d;
   --color-hot-ink: #c4262c;
 
@@ -67,8 +70,8 @@
     color: var(--color-body);
     font-family: var(--font-sans);
     font-size: 16px;
-    line-height: 1.7;
-    letter-spacing: -0.01em;
+    line-height: 1.65;
+    letter-spacing: -0.012em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     word-break: keep-all;
@@ -102,27 +105,39 @@
   .t-num-xl { font-weight: 700; font-size: 52px; line-height: 1; letter-spacing: -0.045em; font-variant-numeric: tabular-nums lining-nums; color: var(--color-ink); }
   .t-num-l { font-weight: 700; font-size: 32px; line-height: 1.05; letter-spacing: -0.04em; font-variant-numeric: tabular-nums lining-nums; }
   .t-num-m { font-weight: 700; font-size: 22px; line-height: 1.15; letter-spacing: -0.03em; font-variant-numeric: tabular-nums lining-nums; }
-  .t-h1 { font-weight: 700; font-size: 30px; line-height: 1.25; letter-spacing: -0.035em; color: var(--color-ink); }
-  .t-h2 { font-weight: 700; font-size: 22px; line-height: 1.34; letter-spacing: -0.03em; color: var(--color-ink); }
-  .t-h3 { font-weight: 650; font-size: 18px; line-height: 1.45; letter-spacing: -0.02em; color: var(--color-ink); }
-  .t-body-l { font-size: 16px; line-height: 1.7; }
-  .t-body { font-size: 15px; line-height: 1.65; }
-  .t-small { font-size: 14px; line-height: 1.55; letter-spacing: -0.005em; }
-  .t-caption { font-size: 13px; line-height: 1.5; font-weight: 500; letter-spacing: 0; }
+  .t-h1 { font-weight: 700; font-size: 29px; line-height: 1.3; letter-spacing: -0.035em; color: var(--color-ink); }
+  .t-h2 { font-weight: 700; font-size: 23px; line-height: 1.38; letter-spacing: -0.03em; color: var(--color-ink); }
+  .t-h3 { font-weight: 700; font-size: 18px; line-height: 1.45; letter-spacing: -0.02em; color: var(--color-ink); }
+  .t-body-l { font-size: 17px; line-height: 1.7; }
+  .t-body { font-size: 16px; line-height: 1.68; }
+  .t-small { font-size: 15px; line-height: 1.6; letter-spacing: -0.008em; }
+  .t-caption { font-size: 14px; line-height: 1.55; font-weight: 400; letter-spacing: -0.005em; }
+  /* 기관·지역·날짜 같은 메타, dt·th·열 제목 라벨 — 데스크탑에서 15px 아래로 내려가지 않는다 */
+  .t-meta { font-size: 14px; line-height: 1.5; color: var(--color-muted); }
+  .t-label { font-size: 14px; line-height: 1.4; font-weight: 600; color: var(--color-sub); }
   @media (min-width: 48rem) {
     .t-num-xl { font-size: 72px; }
     .t-num-l { font-size: 40px; }
-    .t-num-m { font-size: 24px; }
-    .t-h1 { font-size: 48px; line-height: 1.22; }
-    .t-h2 { font-size: 30px; line-height: 1.3; }
-    .t-h3 { font-size: 19px; }
-    .t-body-l { font-size: 17px; }
-    .t-body { font-size: 16px; }
+    .t-num-m { font-size: 25px; }
+    .t-h1 { font-size: 44px; line-height: 1.25; }
+    .t-h2 { font-size: 30px; line-height: 1.32; }
+    .t-h3 { font-size: 20px; }
+    .t-body-l { font-size: 18px; }
+    .t-body { font-size: 17px; }
+    .t-small { font-size: 15px; }
+    .t-caption, .t-meta, .t-label { font-size: 15px; }
   }
 
-  /* 섹션 머리글 — 색 eyebrow 대신 회색 글자 + 위 괘선 */
-  .section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; border-top: 1px solid var(--color-ink); padding-top: 14px; font-size: 13px; font-weight: 600; color: var(--color-sub); letter-spacing: 0; }
+  /*
+   * 섹션 소제목 — 작은 회색 눈썹 글자는 「안 보인다」는 피드백(2026-09-26)으로 버렸다.
+   * 첫 칸은 굵은 잉크 소제목, 나머지 칸(개수·링크)은 보통 굵기 보조 글자.
+   */
+  .section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; font-size: 19px; font-weight: 700; line-height: 1.4; color: var(--color-ink); letter-spacing: -0.025em; }
   .section-head > :first-child { white-space: nowrap; }
+  .section-head > :not(:first-child) { font-size: 15px; font-weight: 500; letter-spacing: -0.01em; }
+  @media (min-width: 48rem) {
+    .section-head { font-size: 20px; }
+  }
 
   .num { font-weight: 700; font-variant-numeric: tabular-nums lining-nums; letter-spacing: -0.03em; }
   .data { font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
@@ -137,11 +152,11 @@
   .no-scrollbar { scrollbar-width: none; }
 
   /* 표 — 가이드·비교표 */
-  .guide-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 15px; }
-  .guide-table caption { caption-side: top; text-align: left; padding: 0 0 10px; font-size: 14px; font-weight: 600; color: var(--color-sub); }
-  .guide-table th, .guide-table td { padding: 12px 14px; border-bottom: 1px solid var(--color-line); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; vertical-align: top; }
+  .guide-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 16px; }
+  .guide-table caption { caption-side: top; text-align: left; padding: 0 0 10px; font-size: 16px; font-weight: 700; color: var(--color-ink); }
+  .guide-table th, .guide-table td { padding: 10px 12px; border-bottom: 1px solid var(--color-line); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; vertical-align: top; }
   .guide-table th:first-child, .guide-table td:first-child { text-align: left; position: sticky; left: 0; background: var(--color-page); box-shadow: 1px 0 0 var(--color-line); }
-  .guide-table thead th { font-size: 13px; font-weight: 600; color: var(--color-muted); border-bottom: 1px solid var(--color-ink); background: var(--color-page); }
+  .guide-table thead th { font-size: 15px; font-weight: 600; color: var(--color-sub); border-bottom: 1px solid var(--color-ink); background: var(--color-page); }
   .guide-table tbody tr:last-child td, .guide-table tbody tr:last-child th { border-bottom: 0; }
   .guide-table tbody th { font-weight: 600; color: var(--color-ink); }
   .guide-table td { color: var(--color-body); }

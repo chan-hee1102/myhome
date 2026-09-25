@@ -37,27 +37,24 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
         <div className="mt-8 lg:grid lg:grid-cols-12 lg:gap-8">
           <article className="min-w-0 lg:col-span-8">
             <header>
-              <p className="text-[13px] font-semibold text-sub">{g.category}</p>
-              <h1 className="t-h1 mt-3">{br(g.h1.replace(" (", " | ("))}</h1>
+              <h1 className="t-h1">{br(g.h1.replace(" (", " | ("))}</h1>
               <p id="answer" className="t-body-l mt-5 max-w-[38em] text-body">
                 {br(g.answer)}
               </p>
               <ul className="mt-6 flex flex-wrap gap-1.5" aria-label="핵심 기준">
                 {g.facts.map((f) => (
-                  <li key={f} className="inline-flex h-8 items-center rounded-[4px] px-2.5 text-[14px] font-semibold text-ink ring-1 ring-inset ring-line-strong">
+                  <li key={f} className="inline-flex h-8 items-center rounded-[4px] px-2.5 text-[15px] font-semibold text-ink ring-1 ring-inset ring-line-strong">
                     {f}
                   </li>
                 ))}
               </ul>
-              <p className="t-small mt-6 flex max-w-[44em] flex-wrap gap-x-4 gap-y-1 border-y border-line py-3 text-sub">
-                <span className="whitespace-nowrap">
-                  <span className="font-semibold text-ink">기준일</span> 소득 2026-01-01 이후 공고
+              <p className="t-small mt-6 max-w-[44em] border-y border-line py-3 text-sub">
+                <span className="block">
+                  <span className="font-semibold text-ink">기준일</span> 소득은 1월 1일, 자산은 2월 27일 이후 공고부터
                 </span>
-                <span className="whitespace-nowrap">자산 2026-02-27 이후 공고</span>
-                <span className="whitespace-nowrap">
-                  <span className="font-semibold text-ink">최종 확인</span> <time dateTime={g.updated}>{g.updated}</time>
+                <span className="block">
+                  <span className="font-semibold text-ink">최종 확인</span> <time dateTime={g.updated}>{g.updated}</time> · 공고문 값이 우선이에요
                 </span>
-                <span className="whitespace-nowrap">공고문 값이 우선이에요</span>
               </p>
               {g.pending && (
                 <p className="t-small mt-3 max-w-[44em] border-b border-line pb-3 text-sub">
@@ -68,7 +65,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
             {g.sections.map((s) => (
               <section key={s.id} id={s.id} className="mt-14 scroll-mt-24 md:mt-16">
-                <h2 className="t-h2 border-t border-ink pt-4">{br(s.h2)}</h2>
+                <h2 className="t-h2">{br(s.h2)}</h2>
                 {s.blocks.map((b, i) => (
                   <BlockView key={i} b={b} />
                 ))}
@@ -96,8 +93,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                 ))}
               </ol>
               <p className="t-small mt-6 max-w-[44em] text-muted">
-                이 페이지는 법령·고시·공급기관 안내를 바탕으로 정리한 참고 자료예요. 단지마다 공고문에서 기준을 바꿀 수 있으니, 신청 전에 꼭 입주자 모집공고문을 확인하세요.
-                계산 결과는 참고용이고, 최종 자격은 공급기관 심사로 정해져요.
+                법령과 고시, 공급기관 안내를 바탕으로 쓴 참고 자료예요. 단지마다 기준이 조금씩 다를 수 있으니 신청 전에 입주자 모집공고문을 꼭 확인하세요.
               </p>
             </section>
 
@@ -108,7 +104,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
           <aside className="hidden lg:col-span-3 lg:col-start-10 lg:block">
             <div className="sticky top-24 space-y-4">
-              <nav aria-label="목차" className="border-t border-ink pt-4">
+              <nav aria-label="목차" className="border-t border-line-strong pt-4">
                 <p className="t-caption font-semibold text-muted">이 페이지에서</p>
                 <ol className="mt-3 space-y-2">
                   {g.sections.map((s) => (

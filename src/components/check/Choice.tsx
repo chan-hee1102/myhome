@@ -16,7 +16,7 @@ export type ChipSize = "md" | "compact" | "pill";
 const SIZE: Record<ChipSize, string> = {
   md: "min-h-14 justify-between rounded-[10px] px-4 py-3 text-left text-[16px]",
   compact: "h-[52px] justify-center rounded-[10px] px-2 text-center text-[16px]",
-  pill: "h-11 justify-center rounded-[10px] px-4 text-[15px] whitespace-nowrap",
+  pill: "h-11 justify-center rounded-[10px] px-4 text-[16px] whitespace-nowrap",
 };
 
 export function Chip({
@@ -44,7 +44,7 @@ export function Chip({
     >
       <span className="min-w-0">
         <span className="block">{children}</span>
-        {sub && <span className={`mt-0.5 block text-[14px] font-normal ${selected ? "text-brand-ink/80" : "text-muted"}`}>{sub}</span>}
+        {sub && <span className={`mt-0.5 block text-[15px] font-normal ${selected ? "text-brand-ink/80" : "text-muted"}`}>{sub}</span>}
       </span>
     </motion.button>
   );
@@ -72,8 +72,8 @@ export function ChipGroup<T>({
   return (
     <fieldset>
       {label && <legend className="text-[16px] font-semibold text-ink">{label}</legend>}
-      {help && <p className="mt-0.5 text-[14px] text-muted">{help}</p>}
-      <div className={`grid gap-2 ${cols} ${label ? "mt-3" : ""}`}>
+      {help && <p className="mt-0.5 text-[15px] text-muted">{help}</p>}
+      <div className={`grid gap-2 ${cols} ${label || help ? "mt-3" : ""}`}>
         {options.map((o) => (
           <Chip key={o.label} size={size} sub={o.sub} selected={value !== undefined && equals(value, o.value)} onClick={() => onChange(o.value)}>
             {o.label}
@@ -130,7 +130,7 @@ export function Stepper({
       <label htmlFor={id} className="text-[16px] font-semibold text-ink">
         {label}
       </label>
-      {help && <p className="mt-0.5 text-[14px] text-muted">{help}</p>}
+      {help && <p className="mt-0.5 text-[15px] text-muted">{help}</p>}
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <button
           type="button"
@@ -141,7 +141,7 @@ export function Stepper({
         >
           −
         </button>
-        <span className={`flex h-12 items-center gap-1 rounded-[10px] px-3 ${value === undefined ? "bg-page ring-1 ring-inset ring-line-strong" : "bg-brand-soft ring-2 ring-inset ring-brand"}`}>
+        <span className={`flex h-12 items-center gap-1 rounded-[10px] px-3 ${value === undefined ? "bg-page ring-1 ring-inset ring-faint" : "bg-brand-soft ring-2 ring-inset ring-brand"}`}>
           <input
             id={id}
             inputMode="numeric"
@@ -166,7 +166,7 @@ export function Stepper({
         >
           +
         </button>
-        <span className="min-w-0 text-[14px] text-muted">{value === undefined ? "숫자를 적거나 +를 누르세요" : text(value)}</span>
+        <span className="min-w-0 text-[15px] text-muted">{value === undefined ? "숫자를 적거나 +를 누르세요" : text(value)}</span>
       </div>
     </div>
   );

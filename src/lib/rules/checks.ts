@@ -26,7 +26,7 @@ export interface Ctx {
   params: GroupParams;
 }
 
-const NOT_YET = "아직 입력 안 함";
+const NOT_YET = "입력 전";
 
 /* ───────────────────────── 인적 조건 ───────────────────────── */
 
@@ -224,7 +224,7 @@ export function parents(ctx: Ctx): Check {
     key: "parents",
     label: "부양",
     need: "만 65세 이상 부모님을 3년 이상 모심(같은 주민등록)",
-    mine: v === undefined ? NOT_YET : v ? "모시고 있음" : "해당 없음",
+    mine: v === undefined ? NOT_YET : v ? "모시고 있음" : "모시지 않음",
     tri: v === undefined ? "unknown" : v ? "pass" : "fail",
     ask: v === undefined ? ["livesWithParents"] : undefined,
   };
@@ -297,7 +297,7 @@ export function specialAny(ctx: Ctx, list: (keyof typeof SPECIAL_LABEL)[], label
     key: "special",
     label,
     need: list.map((k) => SPECIAL_LABEL[k]).join(" · "),
-    mine: s === undefined ? NOT_YET : s.length ? s.map((k) => SPECIAL_LABEL[k]).join(", ") : "해당 없음",
+    mine: s === undefined ? NOT_YET : s.length ? s.map((k) => SPECIAL_LABEL[k]).join(", ") : "없음",
     tri,
     ask: s === undefined ? ["special"] : undefined,
   };
@@ -404,7 +404,7 @@ export function income(ctx: Ctx, rule: IncomeRule, label = "소득"): Check {
 
 /** 구간이 기준선에 걸쳤을 때 한 줄 */
 export function straddleHint(what: string, limit: number, monthly = false): string {
-  return `기준(${monthly ? "월 " : ""}${manwon(limit)})이 고르신 ${what} 구간 안에 있어요. 정확한 금액을 알려주시면 가려져요.`;
+  return `기준(${monthly ? "월 " : ""}${manwon(limit)})이 고르신 ${what} 구간 안에 있어요. 정확한 금액을 알려주시면 정해져요.`;
 }
 
 export function assets(ctx: Ctx, max: number, label = "총자산"): Check {
@@ -457,7 +457,7 @@ export function property(ctx: Ctx, max: number): Check {
     ask: tri === "unknown" ? ["property"] : undefined,
     hint:
       t === "fail" || (t === "unknown" && p.assets)
-        ? "부동산(토지·건물)만 따져요. 예금·자동차를 빼면 기준 안쪽일 수 있어요. 부동산만 따로 알려주시면 정확해져요."
+        ? "이 기준은 부동산만 봐요. 부동산 금액을 따로 넣으면 정확해져요."
         : undefined,
   };
 }
@@ -645,9 +645,9 @@ export function tierCheck(tier1: Check, tier2: Check, need: string): Check {
   else mine = tier2.mine === NOT_YET ? NOT_YET : `소득 ${tier2.mine}`;
   let hint: string | undefined;
   if (tri === "unknown") {
-    if (tier1.tri === "fail") hint = tier2.hint ?? "소득이 기준 안쪽인지 알려주시면 가려져요.";
+    if (tier1.tri === "fail") hint = tier2.hint ?? "소득이 기준 이하인지 알려주시면 정해져요.";
     else if (tier2.tri === "fail") hint = `소득은 기준(${tier2.need})을 넘어요. 수급자·한부모 등에 해당하면 신청할 수 있어요.`;
-    else hint = "해당 계층이나 소득을 알려주시면 가려져요.";
+    else hint = "해당 계층이나 소득을 알려주시면 정해져요.";
   }
   return { key: "tier", label: "대상 계층", need, mine, tri, ask: tri === "unknown" && ask.length ? ask : undefined, hint };
 }
