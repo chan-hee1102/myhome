@@ -71,11 +71,11 @@ function GuideCards({ category }: { category: "기준표" | "특별공급" }) {
         <Link
           key={g.slug}
           href={`/guide/${g.slug}`}
-          className="flex min-h-[168px] flex-col rounded-[20px] bg-coal p-6 ring-1 ring-inset ring-line transition-colors hover:bg-graphite hover:ring-line-strong"
+          className="flex min-h-[168px] flex-col rounded-[20px] bg-page p-6 shadow-card ring-1 ring-inset ring-line transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-lift"
         >
-          <span className="t-title text-cloud">{g.short}</span>
-          <span className="t-small mt-2 text-ash">{g.description.split(". ")[0]}.</span>
-          <span className="t-caption mt-auto pt-4 text-dim">{g.facts.join(" · ")}</span>
+          <span className="t-title text-ink">{g.short}</span>
+          <span className="t-small mt-2 text-sub">{g.description.split(". ")[0]}.</span>
+          <span className="t-caption mt-auto pt-4 text-muted">{g.facts.join(" · ")}</span>
         </Link>
       ))}
     </div>
@@ -106,35 +106,35 @@ export default function GuideHub() {
           faqNode(HUB_FAQ, url),
         ])}
       />
-      <main className="wrap pb-20 pt-28 md:pb-32 md:pt-40">
+      <main className="wrap pb-20 pt-24 md:pb-28 md:pt-32">
         <Breadcrumbs items={[{ name: "홈", href: "/" }, { name: "청약 가이드" }]} />
         <header className="mt-8 max-w-[52em]">
           <p className="eyebrow">청약 가이드</p>
-          <h1 className="t-display-l mt-4 text-pure">{br("2026 청약·공공임대 | 자격 기준 한눈에 보기")}</h1>
-          <p id="answer" className="t-body-l mt-6 max-w-[38em] text-cloud">
+          <h1 className="t-display-l mt-3">{br("2026 청약·공공임대 | 자격 기준 한눈에 보기")}</h1>
+          <p id="answer" className="t-body-l mt-5 max-w-[38em] text-body">
             {GUIDE_HUB.answer}
           </p>
-          <p className="t-small mt-6 text-dim">
+          <p className="t-small mt-5 text-muted">
             최종 확인 <time dateTime={GUIDE_HUB.updated}>{GUIDE_HUB.updated}</time> · 법령·고시 원문 기준 · 공고문의 값이 우선합니다
           </p>
         </header>
 
-        <section id="tables" className="mt-16 scroll-mt-28 md:mt-24">
-          <h2 className="t-display-s text-pure">기준표와 계산기</h2>
+        <section id="tables" className="mt-14 scroll-mt-24 md:mt-20">
+          <h2 className="t-display-s">기준표와 계산기</h2>
           <div className="mt-8">
             <GuideCards category="기준표" />
           </div>
         </section>
 
-        <section id="types" className="mt-16 scroll-mt-28 md:mt-24">
-          <h2 className="t-display-s text-pure">{br("주택 유형별 자격은 | 어떻게 다른가요?")}</h2>
+        <section id="types" className="mt-14 scroll-mt-24 md:mt-20">
+          <h2 className="t-display-s">{br("주택 유형별 자격은 | 어떻게 다른가요?")}</h2>
           <TableView table={COMPARE} />
           <ul className="mt-6 flex flex-wrap gap-2">
             {Object.entries(SLUG_BY_NAME).map(([name, slug]) => (
               <li key={slug}>
                 <Link
                   href={`/guide/${slug}`}
-                  className="inline-flex h-10 items-center rounded-full px-4 text-[14px] font-medium text-mist ring-1 ring-inset ring-white/14 transition-colors hover:bg-white/6 hover:text-pure"
+                  className="inline-flex h-10 items-center rounded-full bg-page px-4 text-[14px] font-medium text-body ring-1 ring-inset ring-line transition-colors hover:text-brand hover:ring-brand"
                 >
                   {name} 자격 조건
                 </Link>
@@ -143,9 +143,9 @@ export default function GuideHub() {
           </ul>
         </section>
 
-        <section id="special" className="mt-16 scroll-mt-28 md:mt-24">
-          <h2 className="t-display-s text-pure">특별공급</h2>
-          <p className="t-body-l mt-4 max-w-[38em] text-mist">
+        <section id="special" className="mt-14 scroll-mt-24 md:mt-20">
+          <h2 className="t-display-s">특별공급</h2>
+          <p className="t-body-l mt-4 max-w-[38em] text-body">
             신혼부부·생애최초·신생아·노부모부양 특별공급은 공공분양과 민영주택의 기준이 달라 나란히 비교했습니다. 다자녀 특별공급은 배점표 원문을 다시 확인한 뒤 공개합니다.
           </p>
           <div className="mt-8">
@@ -153,12 +153,14 @@ export default function GuideHub() {
           </div>
         </section>
 
-        <section id="faq" className="mt-16 scroll-mt-28 md:mt-24">
-          <h2 className="t-display-s text-pure">자주 묻는 질문</h2>
-          <FaqList items={HUB_FAQ} />
+        <section id="faq" className="mt-14 scroll-mt-24 md:mt-20">
+          <h2 className="t-display-s">자주 묻는 질문</h2>
+          <div className="mt-5">
+            <FaqList items={HUB_FAQ} />
+          </div>
         </section>
 
-        <div className="mt-16 md:mt-24">
+        <div className="mt-14 md:mt-20">
           <CheckCta />
         </div>
       </main>

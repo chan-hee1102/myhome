@@ -30,7 +30,7 @@ src/
   app/                 라우트 + robots·sitemap·manifest·llms·rss·opengraph-image
   components/
     landing/ check/ results/ detail/ guide/   화면별
-    ui/                Button(sm/md/lg × primary/secondary/ghost/glass) · Badge(StatusBadge/Tag/CountPill) · Logo · AppHeader
+    ui/                Button(sm/md/lg × primary/secondary/soft/outline/ghost/inverse) · Badge(StatusBadge/Tag/CountPill) · MarkDot · Logo · AppHeader
     motion/ seo/       모션 부품 · JsonLd
   lib/
     rules/             판정 엔진 — core(세 값)·checks·templates·evaluate·gajeom·standards(기준표)·criteria(소득 규칙 한 벌)
@@ -41,7 +41,11 @@ src/
 
 ## 디자인 규격
 
-- 글꼴: 헤드라인 **Noto Serif KR**, 본문·버튼·숫자 **Pretendard**. 글자 크기는 `t-display-xl/l/m/s · t-title · t-body-l · t-body · t-small · t-caption · eyebrow` 토큰만 쓴다.
-- 컨테이너: `.wrap`(1200) · `.wrap-app`(1040) · `.wrap-form`(720) · `.wrap-wide`(색 패널). 간격 4px 단위, 반경 8·12·14·20·24·28.
+- 톤: **밝고 쉬운 화면**(2026-09-25 전환 — 검은 배경·세리프가 「어둡고 어렵다」는 피드백). 흰 바탕(`page`)·연회색 구역(`wash`), 포인트 색은 파랑(`brand`) 하나. 상태 색은 판정에만: 신청 가능 `ok`(초록)·확인 필요 `maybe`(주황)·해당 없음 `no`(회색)·마감 임박 `hot`(빨강) — 각각 `-ink`(글자)·`-soft`(바탕) 한 벌.
+- 글자색: `ink`(제목) · `body`(본문) · `sub`(보조) · `muted`(캡션, 흰 바탕 4.6:1). `faint`·`ghost`는 글자에 쓰지 않는다(비활성·점·선).
+- 글꼴: **Pretendard** 한 벌. 제목 700, 글자 크기는 `t-display-xl/l/m/s · t-title · t-body-l · t-body · t-small · t-caption · eyebrow` 토큰만 쓴다.
+- 카드: 흰 바탕 + `shadow-card`(떠오를 때 `shadow-lift`). 조건 표시는 `MarkDot`(초록 ✓ · 주황 ? · 회색 ✕).
+- 컨테이너: `.wrap`(1200) · `.wrap-app`(1040) · `.wrap-form`(720). 간격 4px 단위, 반경 8·12·14·20·24·28.
+- 말투: 쉬운 말. 화면 글자에 「판정」 대신 「결과·확인」을 쓴다(메타 제목의 검색어는 예외).
 - 줄바꿈: `br("말 쉬는 | 자리")` — 「|」에서만 꺾인다. 「|」 없는 긴 문장은 `br()`/`soft()`가 기호·날짜·단위에서만 붙인다.
 - 모션: `motion`. 시스템 「동작 줄이기」 설정을 따른다.

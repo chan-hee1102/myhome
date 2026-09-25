@@ -34,21 +34,21 @@ export default function PrivacyPage() {
   return (
     <>
       <SiteNav />
-      <main className="wrap pb-20 pt-28 md:pb-32 md:pt-40">
+      <main className="wrap pb-20 pt-24 md:pb-28 md:pt-32">
         <Breadcrumbs items={[{ name: "홈", href: "/" }, { name: "개인정보 처리 안내" }]} />
-        <h1 className="t-display-l mt-8 text-pure">개인정보 처리 안내</h1>
-        <p className="t-body-l mt-6 max-w-[38em] text-cloud">
+        <h1 className="t-display-l mt-6">개인정보 처리 안내</h1>
+        <p className="t-body-l mt-5 max-w-[38em] text-body">
           {SITE.name}은 입력한 조건을 서버로 보내지 않습니다. 모든 판정은 사용자의 브라우저 안에서 계산됩니다.
         </p>
-        <div className="mt-12 max-w-[44em] space-y-10">
+        <div className="mt-10 grid max-w-[56em] gap-3 md:grid-cols-2">
           {ITEMS.map((it) => (
-            <section key={it.h}>
-              <h2 className="t-title text-cloud">{it.h}</h2>
-              <p className="t-body-l mt-3 text-mist">{it.p}</p>
+            <section key={it.h} className="rounded-[20px] bg-wash p-6">
+              <h2 className="t-title text-ink">{it.h}</h2>
+              <p className="t-body mt-2 text-body">{it.p}</p>
             </section>
           ))}
         </div>
-        <p className="t-small mt-16 text-dim">
+        <p className="t-small mt-10 max-w-[56em] text-muted">
           시행일 <time dateTime={PAGE_DATES.privacy}>{PAGE_DATES.privacy}</time>. 회원 가입·알림 같은 기능을 추가해 정보를 서버에 저장하게 되면 이 안내를 먼저 고치고 동의를 받습니다.
         </p>
       </main>

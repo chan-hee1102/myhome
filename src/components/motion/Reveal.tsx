@@ -7,8 +7,8 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 /** 화면에 들어올 때 한 번 아래에서 떠오른다 */
 export function Reveal({
   delay = 0,
-  y = 28,
-  duration = 1.1,
+  y = 24,
+  duration = 0.8,
   amount = 0.25,
   children,
   ...rest
@@ -37,7 +37,7 @@ export function LineReveal({
   className = "",
   lineClassName = "",
   delay = 0,
-  stagger = 0.12,
+  stagger = 0.1,
   immediate = false,
 }: {
   lines: React.ReactNode[];
@@ -54,7 +54,7 @@ export function LineReveal({
   };
   const item = {
     hidden: { y: "105%", opacity: 0 },
-    show: { y: "0%", opacity: 1, transition: { duration: 1.25, ease: EASE } },
+    show: { y: "0%", opacity: 1, transition: { duration: 0.9, ease: EASE } },
   };
   const trigger = immediate
     ? { animate: "show" }

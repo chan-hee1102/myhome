@@ -5,10 +5,13 @@ import { br } from "@/lib/text";
 export function SampleNotice() {
   if (!SITE.sampleData) return null;
   return (
-    <p className="t-small flex items-start gap-2.5 rounded-[12px] bg-maybe/[0.07] px-4 py-3 text-maybe ring-1 ring-inset ring-maybe/25">
-      <span aria-hidden className="mt-[7px] size-1.5 shrink-0 rounded-full bg-maybe" />
+    <p className="t-small flex items-start gap-2.5 rounded-[14px] bg-maybe-soft px-4 py-3 text-maybe-ink">
+      <svg viewBox="0 0 16 16" className="mt-[3px] size-4 shrink-0" fill="none" aria-hidden>
+        <circle cx="8" cy="8" r="7" fill="currentColor" opacity="0.18" />
+        <path d="M8 4.5v4.2M8 11.2v.3" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      </svg>
       <span>
-        {br("지금은 예시 공고로 판정을 보여 드리고 있어요. | 단지 이름과 일정은 실제가 아니고, | 판정 기준은 2026년 법령·지침 값이에요.")}
+        {br("지금은 예시 공고로 보여 드리고 있어요. | 단지 이름과 일정은 실제가 아니고, | 자격 기준은 2026년 법령 값이에요.")}
       </span>
     </p>
   );

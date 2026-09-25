@@ -87,7 +87,7 @@ function BirthStep({ profile, update, onNext }: StepProps) {
   }, []);
   return (
     <div className="flex flex-col items-start">
-      <label className="flex items-baseline gap-3">
+      <label className="flex items-center gap-3">
         <input
           ref={ref}
           value={text}
@@ -103,14 +103,14 @@ function BirthStep({ profile, update, onNext }: StepProps) {
             if (v.length === 4 && y >= 1930 && y <= year - 15) update({ birthYear: y });
           }}
           onKeyDown={(e) => e.key === "Enter" && valid && onNext()}
-          className="num w-[4.4ch] border-b border-line-strong bg-transparent pb-2 text-[72px] leading-none text-pure outline-none transition-colors placeholder:text-white/15 focus:border-pure focus-visible:outline-none md:text-[96px]"
+          className="num w-[5.2ch] rounded-[18px] bg-well px-5 py-3 text-[48px] leading-none text-ink outline-none ring-2 ring-inset ring-transparent transition-[background-color,box-shadow] placeholder:text-ghost focus:bg-page focus:ring-brand focus-visible:outline-none md:text-[64px]"
         />
-        <span className="font-[family-name:var(--font-display)] text-[26px] text-ash md:text-[32px]">년생</span>
+        <span className="text-[24px] font-bold text-ink md:text-[28px]">년생</span>
       </label>
-      <p className="t-body mt-6 h-6 text-mist">
+      <p className="t-body mt-5 h-6 text-sub">
         {valid ? (
           <>
-            올해 만 <span className="data text-pure">{year - n - 1}</span>세 또는 <span className="data text-pure">{year - n}</span>세 (생일 전·후)
+            올해 만 <span className="data text-brand">{year - n - 1}</span>세 또는 <span className="data text-brand">{year - n}</span>세 (생일 전·후)
           </>
         ) : text.length === 4 ? (
           "1930년부터 입력할 수 있어요"
@@ -147,8 +147,8 @@ function RegionStep({ profile, update }: StepProps) {
             transition={{ duration: 0.5, ease: EASE }}
             className="overflow-hidden"
           >
-            <p className="mb-3 text-[14px] font-medium text-ash">
-              {br("시·군·구도 고르면 | 임대주택 순위가 정확해져요")} <span className="text-dim">(선택)</span>
+            <p className="mb-3 text-[15px] font-semibold text-ink">
+              {br("시·군·구도 고르면 | 임대주택 순위가 정확해져요")} <span className="font-medium text-muted">(선택)</span>
             </p>
             <div className="flex flex-wrap gap-2">
               {SIGUNGU[sido].map((g) => (
@@ -180,11 +180,11 @@ function FamilyStep({ profile, update }: StepProps) {
           type="button"
           aria-pressed={!!profile.infant}
           onClick={() => update({ infant: !profile.infant })}
-          className="flex min-h-11 items-center gap-3 text-left text-[15px] text-cloud"
+          className="flex min-h-11 items-center gap-3 text-left text-[16px] font-medium text-body"
         >
           <span
             className={`grid size-6 shrink-0 place-items-center rounded-[8px] transition-colors ${
-              profile.infant ? "bg-pure text-void" : "ring-1 ring-inset ring-white/28"
+              profile.infant ? "bg-brand text-white" : "bg-page ring-2 ring-inset ring-line-strong"
             }`}
           >
             {profile.infant && (
@@ -243,9 +243,9 @@ function IncomeStep({ profile, update }: StepProps) {
         )}
       </div>
       {base && (
-        <p className="t-small rounded-[12px] bg-white/[0.03] px-4 py-3.5 text-ash ring-1 ring-inset ring-line">
+        <p className="t-small rounded-[14px] bg-wash px-4 py-3.5 text-sub">
           {br(`우리 가족(${size}인) 기준 | 도시근로자 월평균소득 100%는 | `)}
-          <span className="text-cloud">{br(`월 ${manwon(base)}`)}</span>
+          <span className="font-semibold text-ink">{br(`월 ${manwon(base)}`)}</span>
           {br("이에요. | 대부분의 공공임대는 | 이 금액의 70~150%를 기준으로 봐요.")}
         </p>
       )}
@@ -275,7 +275,7 @@ function AccountStep({ profile, update }: StepProps) {
             <ChipGroup label="가입한 지" size="compact" options={ACCOUNT_MONTHS} value={profile.accountMonths} onChange={(v) => update({ accountMonths: v })} equals={bandEq} cols="grid-cols-2 sm:grid-cols-4" />
             <ChipGroup label="납입 횟수(인정 회차)" size="compact" options={PAYMENTS} value={profile.payments} onChange={(v) => update({ payments: v })} equals={bandEq} cols="grid-cols-2 sm:grid-cols-4" />
             <ChipGroup label="지금까지 넣은 돈" size="compact" options={DEPOSIT} value={profile.deposit} onChange={(v) => update({ deposit: v })} equals={bandEq} cols="grid-cols-2 sm:grid-cols-4" />
-            <p className="t-small text-ash">{br("은행 앱의 청약통장 화면이나 | 청약홈 「청약통장 순위확인서」에서 | 볼 수 있어요.")}</p>
+            <p className="t-small text-muted">{br("은행 앱의 청약통장 화면이나 | 청약홈 「청약통장 순위확인서」에서 | 볼 수 있어요.")}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -332,7 +332,7 @@ function SpecialStep({ profile, update }: StepProps) {
   return (
     <div className="space-y-8">
       <fieldset>
-        <legend className="mb-3 text-[14px] font-medium text-ash">여러 개 골라도 돼요</legend>
+        <legend className="mb-3 text-[15px] font-semibold text-ink">여러 개 골라도 돼요</legend>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {SPECIAL.map((o) => (
             <Chip
@@ -388,38 +388,38 @@ function DoneView({ ok, maybe, onMore, top }: { ok: number; maybe: number; onMor
   return (
     <div className="flex flex-col items-start">
       <p className="eyebrow">입력 완료</p>
-      <h1 className="t-display-m mt-4 text-pure">
+      <h1 className="t-display-m mt-3">
         {br("신청할 수 있는")}
         <br />
-        공고 <span className="num text-[1.25em]">
+        공고 <span className="num text-[1.25em] text-brand">
           <AnimatedNumber value={ok} />
         </span>
         건
       </h1>
-      <p className="t-body-l mt-6 max-w-[30em] text-ash">
-        {br("정보가 모자라서 판정을 미룬 공고가 |")} <span className="text-maybe">{maybe}건</span>{" "}
-        {br("있어요. | 통장·자산 같은 걸 1분만 더 답하면 | 이 중 상당수가 확정되고, | 분양 공고는 가점까지 계산돼요.")}
+      <p className="t-body-l mt-5 max-w-[30em] text-sub">
+        {br("정보가 모자라서 아직 모르는 공고가 |")} <span className="font-semibold text-maybe-ink">{maybe}건</span>{" "}
+        {br("있어요. | 통장·자산을 1분만 더 답하면 | 이 중 상당수가 확정되고, | 분양 공고는 가점까지 계산돼요.")}
       </p>
-      <div className="mt-10 grid w-full gap-3 sm:w-auto sm:grid-cols-2">
+      <div className="mt-8 grid w-full gap-2.5 sm:w-auto sm:grid-cols-2">
         <ButtonLink href="/results" size="lg" arrow block>
           결과 보기
         </ButtonLink>
-        <Button size="lg" variant="secondary" onClick={onMore} block>
+        <Button size="lg" variant="soft" onClick={onMore} block>
           1분 더 답하기
         </Button>
       </div>
       {top.length > 0 && (
-        <ul className="mt-12 grid w-full gap-3 md:grid-cols-3">
+        <ul className="mt-10 grid w-full gap-3 md:grid-cols-3">
           {top.map((r, k) => (
             <motion.li key={r.a.id} initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.35 + k * 0.12, ease: EASE }}>
-              <Link href={`/notice/${r.a.id}`} className="block rounded-[20px] bg-coal p-5 ring-1 ring-inset ring-line transition-colors hover:bg-graphite hover:ring-line-strong">
+              <Link href={`/notice/${r.a.id}`} className="block rounded-[20px] bg-page p-5 shadow-card ring-1 ring-inset ring-line transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-lift">
                 <span className="flex items-center justify-between gap-3">
                   <StatusBadge status={r.verdict === "ok" ? "ok" : "maybe"}>{r.verdict === "ok" ? "신청 가능" : "확인 필요"}</StatusBadge>
-                  <span className="data text-[13px] text-mist">{dayText(r).big}</span>
+                  <span className="data text-[14px] text-ink">{dayText(r).big}</span>
                 </span>
-                <span className="t-caption mt-4 block truncate text-dim">{programLine(r)}</span>
-                <span className="mt-1 block truncate font-[family-name:var(--font-display)] text-[22px] text-pure">{r.a.complex}</span>
-                <span className="t-small mt-1 block truncate text-ash">
+                <span className="t-caption mt-4 block truncate text-muted">{programLine(r)}</span>
+                <span className="mt-1 block truncate text-[18px] font-bold tracking-[-0.02em] text-ink">{r.a.complex}</span>
+                <span className="t-small mt-1 block truncate text-sub">
                   {r.a.sido} {r.a.sigungu} · {r.best.rank?.label ?? r.best.group.label}
                 </span>
               </Link>
@@ -477,14 +477,14 @@ export function CheckFlow() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-30 bg-obsidian/85 backdrop-blur-xl">
+      <header className="glass sticky top-0 z-30">
         <div className="wrap-form flex h-16 items-center justify-between">
           <Logo />
           <div className="flex items-center gap-2">
             {step !== "done" && (
-              <span className="data text-[13px] text-dim">
+              <span className="data text-[14px] text-muted">
                 {inExtra && <span className="mr-2 font-medium">정확도 올리기</span>}
-                <span className="text-cloud">{railIndex + 1}</span> / {rail.length}
+                <span className="text-brand">{railIndex + 1}</span> / {rail.length}
               </span>
             )}
             <Link href="/results" className={buttonClass("ghost", "sm")}>
@@ -493,11 +493,11 @@ export function CheckFlow() {
           </div>
         </div>
         {step !== "done" && (
-          <div className="wrap-form flex gap-1.5 pb-px">
+          <div className="wrap-form flex gap-1.5 pb-1">
             {rail.map((s, k) => (
-              <span key={s} className="h-[3px] flex-1 overflow-hidden rounded-full bg-white/10">
+              <span key={s} className="h-1 flex-1 overflow-hidden rounded-full bg-well">
                 <motion.span
-                  className="block h-full origin-left rounded-full bg-pure"
+                  className="block h-full origin-left rounded-full bg-brand"
                   initial={false}
                   animate={{ scaleX: k <= railIndex ? 1 : 0 }}
                   transition={{ duration: 0.6, ease: EASE }}
@@ -508,7 +508,7 @@ export function CheckFlow() {
         )}
       </header>
 
-      <main className="wrap-form flex-1 pb-44 pt-10 md:pb-36 md:pt-16">
+      <main className="wrap-form flex-1 pb-44 pt-8 md:pb-36 md:pt-14">
         <AnimatePresence mode="wait" custom={dir} initial={false}>
           <motion.section
             key={step}
@@ -529,11 +529,11 @@ export function CheckFlow() {
               <>
                 <p className="eyebrow">
                   {railIndex + 1}/{rail.length} · {meta!.tag}
-                  {inExtra && <span className="ml-2 font-medium text-dim">선택</span>}
+                  {inExtra && <span className="ml-2 font-medium text-muted">선택</span>}
                 </p>
-                <h1 className="t-display-m mt-4 text-pure">{meta!.title}</h1>
-                {meta!.help && <p className="t-body mt-4 max-w-[34em] text-ash">{meta!.help}</p>}
-                <div className="mt-10 md:mt-12">{View && <View profile={profile} update={update} onNext={() => go(1)} />}</div>
+                <h1 className="t-display-m mt-3">{meta!.title}</h1>
+                {meta!.help && <p className="t-body mt-3 max-w-[34em] text-sub">{meta!.help}</p>}
+                <div className="mt-8 md:mt-10">{View && <View profile={profile} update={update} onNext={() => go(1)} />}</div>
               </>
             )}
           </motion.section>
@@ -541,20 +541,20 @@ export function CheckFlow() {
       </main>
 
       {step !== "done" && (
-        <footer className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-obsidian/90 backdrop-blur-xl">
+        <footer className="glass fixed inset-x-0 bottom-0 z-30 border-t border-line shadow-bar">
           <div className="wrap-form flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:py-4">
-            <Link href="/results" className="group flex h-10 items-center justify-between gap-4 rounded-[12px] bg-white/[0.05] px-4 sm:justify-start">
-              <span className="flex items-center gap-2 text-[13px] text-ash">
-                <span className="size-1.5 rounded-full bg-ok" />
+            <Link href="/results" className="group flex h-10 items-center justify-between gap-4 rounded-[12px] bg-ok-soft px-4 sm:justify-start">
+              <span className="flex items-center gap-2 text-[14px] font-semibold text-ok-ink">
+                <span className="size-2 rounded-full bg-ok" />
                 신청 가능
-                <span className="text-pure">
-                  <span className="num text-[22px] leading-none">
+                <span>
+                  <span className="num text-[20px] leading-none">
                     <AnimatedNumber value={counts.ok} />
                   </span>
                   <span className="ml-0.5 text-[14px]">건</span>
                 </span>
               </span>
-              <span className="text-[13px] text-dim group-hover:text-mist">
+              <span className="text-[13px] font-medium text-sub group-hover:text-ink">
                 확인 필요 <span className="data">{counts.maybe}</span>
               </span>
             </Link>

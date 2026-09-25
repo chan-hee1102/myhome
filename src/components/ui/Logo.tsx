@@ -16,10 +16,13 @@ export function LogoMark({ className = "size-6" }: { className?: string }) {
   );
 }
 
+/** 파란 타일 위 흰 문 + 검은 이름 */
 export function Logo({ className = "" }: { className?: string }) {
   return (
-    <Link href="/" className={`inline-flex items-center gap-2 text-pure ${className}`} aria-label={`${SITE.name} 홈`}>
-      <LogoMark className="size-[22px]" />
+    <Link href="/" className={`inline-flex items-center gap-2 text-ink ${className}`} aria-label={`${SITE.name} 홈`}>
+      <span className="grid size-7 place-items-center rounded-[8px] bg-brand text-white">
+        <LogoMark className="size-[18px]" />
+      </span>
       <span className="text-[19px] font-bold leading-none tracking-[-0.04em]">{SITE.name}</span>
     </Link>
   );

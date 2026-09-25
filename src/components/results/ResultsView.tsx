@@ -56,8 +56,8 @@ function NoticeCard({ r, index }: { r: NoticeResult; index: number }) {
     >
       <Link
         href={`/notice/${r.a.id}`}
-        className={`group grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-3 rounded-[20px] bg-coal/80 p-5 ring-1 ring-inset ring-line transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-graphite hover:ring-line-strong md:grid-cols-[132px_minmax(0,1fr)_104px] md:items-start md:gap-x-6 md:p-6 ${
-          dim ? "opacity-65 hover:opacity-100" : ""
+        className={`group grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-3 rounded-[20px] bg-page p-5 shadow-card transition-[box-shadow,transform,opacity] duration-300 hover:-translate-y-0.5 hover:shadow-lift md:grid-cols-[120px_minmax(0,1fr)_104px] md:items-start md:gap-x-6 md:p-6 ${
+          dim ? "opacity-70 hover:opacity-100" : ""
         }`}
       >
         {/* 상태 */}
@@ -66,28 +66,28 @@ function NoticeCard({ r, index }: { r: NoticeResult; index: number }) {
         </div>
         {/* D-day: 모바일은 상태 옆 오른쪽 위, 데스크탑은 오른쪽 열 */}
         <div className="flex flex-col items-end text-right md:col-start-3 md:row-start-1">
-          <span className={`data text-[20px] leading-none md:text-[26px] ${urgent ? "text-hot" : "text-pure"}`}>{day.big}</span>
-          <span className="t-caption mt-1.5 whitespace-nowrap text-dim">
+          <span className={`num text-[20px] leading-none md:text-[26px] ${urgent ? "text-hot-ink" : "text-ink"}`}>{day.big}</span>
+          <span className="t-caption mt-1.5 whitespace-nowrap text-muted">
             {day.small} · {r.phase === "upcoming" ? shortDate(r.a.schedule.applyStart) : shortDate(r.a.schedule.applyEnd)}
           </span>
         </div>
         {/* 내용 */}
         <div className="col-span-2 min-w-0 md:col-span-1 md:col-start-2 md:row-start-1">
-          <p className="t-caption flex items-center gap-2 text-dim">
+          <p className="t-caption flex items-center gap-2 text-muted">
             <span className="truncate">{programLine(r)}</span>
-            {r.a.sample && <span className="shrink-0 font-semibold text-maybe">예시</span>}
+            {r.a.sample && <span className="shrink-0 rounded-[6px] bg-maybe-soft px-1.5 font-semibold text-maybe-ink">예시</span>}
           </p>
-          <h3 className="mt-1.5 truncate font-[family-name:var(--font-display)] text-[22px] leading-tight text-pure md:text-[24px]">{r.a.complex}</h3>
-          <p className="t-small mt-1.5 flex flex-wrap gap-x-2 text-ash">
+          <h3 className="mt-1 truncate text-[19px] font-bold leading-snug tracking-[-0.025em] text-ink md:text-[21px]">{r.a.complex}</h3>
+          <p className="t-small mt-1.5 flex flex-wrap gap-x-2 text-sub">
             {meta.map((m, k) => (
               <span key={m} className="whitespace-nowrap">
                 {m}
-                {k < meta.length - 1 && <span aria-hidden className="ml-2 text-fog">·</span>}
+                {k < meta.length - 1 && <span aria-hidden className="ml-2 text-ghost">·</span>}
               </span>
             ))}
           </p>
           {reason && (
-            <p className={`t-small mt-2.5 line-clamp-2 ${r.verdict === "maybe" ? "text-maybe" : r.verdict === "no" ? "text-dim" : "text-mist"}`}>{reason}</p>
+            <p className={`t-small mt-3 line-clamp-2 rounded-[10px] px-3 py-2 ${r.verdict === "maybe" ? "bg-maybe-soft text-maybe-ink" : r.verdict === "no" ? "bg-well text-muted" : "bg-ok-soft text-ok-ink"}`}>{reason}</p>
           )}
         </div>
       </Link>
@@ -131,28 +131,28 @@ export function ResultsView() {
   const chips = profileChips(profile);
 
   return (
-    <div className="min-h-dvh">
+    <div className="min-h-dvh bg-wash">
       <AppHeader />
-      <main className="wrap-app pb-20 pt-28 md:pb-32 md:pt-36">
+      <main className="wrap-app pb-20 pt-24 md:pb-28 md:pt-28">
         <SampleNotice />
 
-        <section className="mt-10">
-          <p className="eyebrow">{empty ? "전체 공고" : "내 조건 판정 결과"}</p>
+        <section className="mt-8">
+          <p className="eyebrow">{empty ? "전체 공고" : "내 조건으로 찾은 공고"}</p>
           {empty ? (
-            <h1 className="t-display-l mt-4 text-pure">
+            <h1 className="t-display-l mt-3">
               <LineReveal immediate lines={[br("진행 중인 공고"), br("먼저 둘러보세요")]} />
             </h1>
           ) : (
-            <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: EASE }} className="t-display-l mt-4 text-pure">
-              신청 가능 <span className="num">{hydrated ? <AnimatedNumber value={counts.ok} duration={1.2} /> : "–"}</span>건
+            <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: EASE }} className="t-display-l mt-3">
+              신청 가능 <span className="num text-brand">{hydrated ? <AnimatedNumber value={counts.ok} duration={1.2} /> : "–"}</span>건
             </motion.h1>
           )}
-          <p className="t-body-l mt-4 text-ash">
+          <p className="t-body-l mt-3 text-sub">
             {empty ? (
               br("조건을 넣으면 공고마다 | 신청 가능 여부와 예상 순위를 | 계산해 드려요.")
             ) : (
               <>
-                확인 필요 <span className="data text-maybe">{counts.maybe}</span> · 해당 없음 <span className="data">{counts.no}</span> · 마감{" "}
+                확인 필요 <span className="data text-maybe-ink">{counts.maybe}</span> · 해당 없음 <span className="data">{counts.no}</span> · 마감{" "}
                 <span className="data">{counts.closed}</span>
               </>
             )}
@@ -164,7 +164,7 @@ export function ResultsView() {
               </ButtonLink>
             </div>
           ) : (
-            <ul className="mt-6 flex flex-wrap gap-1.5" aria-label="내 조건">
+            <ul className="mt-5 flex flex-wrap gap-1.5" aria-label="내 조건">
               {chips.map((c) => (
                 <li key={c}>
                   <Tag>{c}</Tag>
@@ -179,15 +179,15 @@ export function ResultsView() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.35, ease: EASE }}
-            className="mt-10 rounded-[24px] bg-gradient-to-br from-deep-iris/35 via-coal to-coal p-5 ring-1 ring-inset ring-line md:p-8"
+            className="mt-8 rounded-[24px] bg-brand-soft p-5 md:p-7"
           >
-            <p className="t-small font-semibold text-pale-iris">이것만 알려주시면 더 정확해져요</p>
-            <p className="t-title mt-2 text-cloud">
-              {br(`${asks[0].label} 정보로 | 공고 ${asks[0].count}건의 판정이 | 달라질 수 있어요.`)}
+            <p className="t-small font-bold text-brand">이것만 알려주시면 더 정확해져요</p>
+            <p className="t-title mt-1.5 text-ink">
+              {br(`${asks[0].label} 정보만 알려주시면 | 공고 ${asks[0].count}건의 결과가 | 확실해져요.`)}
             </p>
             <div className="no-scrollbar -mx-5 mt-5 flex gap-2 overflow-x-auto px-5 md:mx-0 md:flex-wrap md:px-0">
               {asks.slice(0, 4).map((a, k) => (
-                <Link key={a.topic} href={`/check?topic=${a.topic}`} className={buttonClass(k === 0 ? "primary" : "secondary", "sm")}>
+                <Link key={a.topic} href={`/check?topic=${a.topic}`} className={buttonClass(k === 0 ? "primary" : "outline", "sm")}>
                   {a.label}
                   <CountPill inverted={k === 0}>{a.count}</CountPill>
                 </Link>
@@ -197,7 +197,7 @@ export function ResultsView() {
         )}
 
         {/* 필터: 모바일은 탭만 고정, md 이상은 한 줄 */}
-        <div className="sticky top-[68px] z-20 -mx-5 mt-12 bg-obsidian/90 px-5 py-3 backdrop-blur-xl md:top-[80px] md:-mx-8 md:px-8">
+        <div className="sticky top-16 z-20 -mx-5 mt-10 bg-wash/90 px-5 py-3 backdrop-blur-xl md:-mx-8 md:px-8">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <LayoutGroup>
               <div className="no-scrollbar mask-fade-r -mx-1 flex gap-1 overflow-x-auto px-1 md:mask-none">
@@ -209,10 +209,10 @@ export function ResultsView() {
                       type="button"
                       onClick={() => setTab(t.id)}
                       className={`relative inline-flex h-9 shrink-0 items-center gap-1.5 rounded-[10px] px-3.5 text-[14px] font-semibold transition-colors ${
-                        on ? "text-void" : "text-ash hover:text-cloud"
+                        on ? "text-white" : "text-sub hover:text-ink"
                       }`}
                     >
-                      {on && <motion.span layoutId="tab-pill" className="absolute inset-0 rounded-[10px] bg-pure" transition={{ type: "spring", stiffness: 420, damping: 36 }} />}
+                      {on && <motion.span layoutId="tab-pill" className="absolute inset-0 rounded-[10px] bg-ink" transition={{ type: "spring", stiffness: 420, damping: 36 }} />}
                       <span className="relative">{t.label}</span>
                       {hydrated && (
                         <span className="relative">
@@ -242,14 +242,14 @@ export function ResultsView() {
         </div>
 
         <ul className="mt-4 space-y-3">
-          {!hydrated && Array.from({ length: 4 }).map((_, k) => <li key={k} className="h-[132px] animate-pulse rounded-[20px] bg-coal/60 ring-1 ring-inset ring-line" />)}
+          {!hydrated && Array.from({ length: 4 }).map((_, k) => <li key={k} className="h-[132px] animate-pulse rounded-[20px] bg-page shadow-card" />)}
           <AnimatePresence mode="popLayout">
             {shown.map((r, k) => (
               <NoticeCard key={r.a.id} r={r} index={k} />
             ))}
           </AnimatePresence>
         </ul>
-        {hydrated && shown.length === 0 && <p className="t-body mt-10 text-center text-ash">이 조건에 맞는 공고가 없어요. 다른 탭을 눌러 보세요.</p>}
+        {hydrated && shown.length === 0 && <p className="t-body mt-10 text-center text-sub">이 조건에 맞는 공고가 없어요. 다른 탭을 눌러 보세요.</p>}
       </main>
     </div>
   );
@@ -257,7 +257,7 @@ export function ResultsView() {
 
 function KindSwitch({ kind, setKind }: { kind: Kind; setKind: (k: Kind) => void }) {
   return (
-    <div className="flex h-9 items-center gap-0.5 rounded-[10px] p-0.5 ring-1 ring-inset ring-line">
+    <div className="flex h-9 items-center gap-0.5 rounded-[10px] bg-page p-0.5 ring-1 ring-inset ring-line">
       {(
         [
           ["all", "전체"],
@@ -269,7 +269,7 @@ function KindSwitch({ kind, setKind }: { kind: Kind; setKind: (k: Kind) => void 
           key={k}
           type="button"
           onClick={() => setKind(k)}
-          className={`h-8 rounded-[8px] px-3 text-[13px] font-semibold transition-colors ${kind === k ? "bg-white/12 text-pure" : "text-ash hover:text-cloud"}`}
+          className={`h-8 rounded-[8px] px-3 text-[14px] font-semibold transition-colors ${kind === k ? "bg-brand-soft text-brand-ink" : "text-sub hover:text-ink"}`}
         >
           {l}
         </button>

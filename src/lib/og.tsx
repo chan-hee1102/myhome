@@ -32,18 +32,20 @@ export async function renderOg({ eyebrow, title, facts, footer }: { eyebrow: str
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "64px 72px",
-          background: "linear-gradient(180deg, #0f1011 0%, #111a23 45%, #173a6b 82%, #2f6fae 100%)",
-          color: "#ffffff",
+          background: "radial-gradient(60% 70% at 88% 18%, #d6e6fd 0%, rgba(255,255,255,0) 70%), linear-gradient(180deg, #ffffff 0%, #f1f6fe 100%)",
+          color: "#191f28",
           fontFamily: "Pretendard",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-            <path d="M5 21V10.5a7 7 0 0 1 14 0V21" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" />
-            <path d="M9.5 21v-5.2a2.5 2.5 0 0 1 5 0V21" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" />
-          </svg>
+          <div style={{ display: "flex", width: 52, height: 52, borderRadius: 14, background: "#1b64da", alignItems: "center", justifyContent: "center" }}>
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
+              <path d="M5 21V10.5a7 7 0 0 1 14 0V21" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" />
+              <path d="M9.5 21v-5.2a2.5 2.5 0 0 1 5 0V21" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" />
+            </svg>
+          </div>
           <span style={{ fontSize: 34, fontWeight: 700, letterSpacing: -1 }}>{SITE.name}</span>
-          <span style={{ marginLeft: 12, fontSize: 24, color: "#a3a3a6" }}>{eyebrow}</span>
+          <span style={{ marginLeft: 12, fontSize: 24, color: "#1b64da", fontWeight: 700 }}>{eyebrow}</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
           <div style={{ fontSize: 66, fontWeight: 700, lineHeight: 1.2, letterSpacing: -2, maxWidth: 1040, display: "flex", wordBreak: "keep-all" }}>{title}</div>
@@ -55,8 +57,9 @@ export async function renderOg({ eyebrow, title, facts, footer }: { eyebrow: str
                   display: "flex",
                   padding: "10px 22px",
                   borderRadius: 999,
-                  background: "rgba(255,255,255,0.12)",
-                  border: "1px solid rgba(255,255,255,0.22)",
+                  background: "#eaf2fe",
+                  color: "#1550b0",
+                  fontWeight: 700,
                   fontSize: 26,
                 }}
               >
@@ -65,7 +68,7 @@ export async function renderOg({ eyebrow, title, facts, footer }: { eyebrow: str
             ))}
           </div>
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 22, color: "#c8c8cb" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 22, color: "#6b7684" }}>
           <span>{footer}</span>
           <span>{SITE.url.replace(/^https?:\/\//, "")}</span>
         </div>

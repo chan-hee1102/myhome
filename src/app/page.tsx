@@ -12,10 +12,8 @@ import { SiteNav } from "@/components/landing/SiteNav";
 import { SourceMarquee } from "@/components/landing/SourceMarquee";
 import { VerdictTrio } from "@/components/landing/VerdictTrio";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { SOURCES } from "@/lib/data/sources";
 import { HOME_FAQ } from "@/lib/faq";
 import { appNode, faqNode, graph } from "@/lib/jsonld";
-import { PROGRAM_COUNT } from "@/lib/rules/programs";
 import { abs, pageMeta } from "@/lib/seo";
 import { PAGE_DATES, SITE } from "@/lib/site";
 
@@ -51,12 +49,12 @@ export default function Home() {
       />
       <main>
         <Hero />
-        <Problem facts={{ sources: SOURCES.filter((s) => s.kind === "api").length, programs: PROGRAM_COUNT }} />
         <SourceMarquee />
+        <Problem />
         <HowItWorks />
         <AudienceTiles />
-        <ScoreLab />
         <VerdictTrio />
+        <ScoreLab />
         <GuideLinks />
         <Faq />
         <FinalCta />

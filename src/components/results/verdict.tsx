@@ -4,10 +4,10 @@ import { ASK_TOPICS } from "@/lib/rules/evaluate";
 import type { ProfileKey } from "@/lib/domain";
 
 export const VERDICT: Record<Verdict | "closed", { label: string; dot: string; text: string; headline: string }> = {
-  ok: { label: "신청 가능", dot: "bg-ok", text: "text-ok", headline: "신청할 수 있어요" },
-  maybe: { label: "확인 필요", dot: "bg-maybe", text: "text-maybe", headline: "정보가 조금 더 필요해요" },
-  no: { label: "해당 없음", dot: "bg-no", text: "text-ash", headline: "이 대상은 어려워요" },
-  closed: { label: "접수 마감", dot: "bg-steel", text: "text-dim", headline: "접수가 끝났어요" },
+  ok: { label: "신청 가능", dot: "bg-ok", text: "text-ok-ink", headline: "신청할 수 있어요" },
+  maybe: { label: "확인 필요", dot: "bg-maybe", text: "text-maybe-ink", headline: "정보가 조금 더 필요해요" },
+  no: { label: "해당 없음", dot: "bg-no", text: "text-no-ink", headline: "이 대상은 어려워요" },
+  closed: { label: "접수 마감", dot: "bg-ghost", text: "text-muted", headline: "접수가 끝났어요" },
 };
 
 /** 판정 상태 → 뱃지 색 */

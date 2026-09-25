@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Serif_KR } from "next/font/google";
 import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
 import "./globals.css";
 import { MotionProvider } from "@/components/motion/MotionProvider";
@@ -8,16 +7,7 @@ import { graph, orgNode, websiteNode } from "@/lib/jsonld";
 import { robotsFor } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 
-// 헤드라인 세리프(Source Han Serif 계열). Google Fonts가 한글을 unicode-range 조각으로 나눠 주므로
-// latin만 미리 불러오고 한글 조각은 쓰는 글자만 받는다. 본문은 Pretendard(동적 서브셋 CSS).
-const serif = Noto_Serif_KR({
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
-  variable: "--font-serif-kr",
-  display: "swap",
-  preload: false,
-});
-
+// 글꼴은 Pretendard 한 벌(동적 서브셋 CSS — 쓰는 글자 조각만 받는다).
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
@@ -48,13 +38,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0f1011",
-  colorScheme: "dark",
+  themeColor: "#ffffff",
+  colorScheme: "light",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ko" className={serif.variable}>
+    <html lang="ko">
       <body className="min-h-dvh">
         <JsonLd data={graph([orgNode(), websiteNode()])} />
         <MotionProvider>{children}</MotionProvider>

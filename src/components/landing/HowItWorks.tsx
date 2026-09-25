@@ -10,60 +10,60 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 const STEPS = [
   {
-    title: [br("다섯 가지만"), br("답하세요")],
-    body: br("몇 년생인지, 어디 사는지, 가족, 집, 소득. | 전부 눌러서 고르는 방식이라 1분이면 끝나요. | 통장이나 자산은 나중에 더해도 돼요."),
+    title: [br("다섯 가지만"), br("눌러 주세요")],
+    body: br("나이, 사는 곳, 가족, 집, 소득. | 고르기만 하면 돼서 1분이면 끝나요."),
     foot: "입력한 정보는 이 기기에만 저장돼요",
   },
   {
-    title: [br("공고마다"), br("대조해 드려요")],
-    body: br("나이·혼인·무주택·소득·자산 기준을 | 공고별로 하나씩 맞춰 봐요. | 결과는 「신청 가능」「확인 필요」「해당 없음」 | 세 가지로만 말해요."),
-    foot: "모르는 칸은 추측하지 않고 「확인 필요」로 남겨요",
+    title: [br("공고마다"), br("대신 확인해요")],
+    body: br("공고별 나이·소득·자산·무주택 기준을 | 하나씩 맞춰 보고 | 신청할 수 있는지 알려 드려요."),
+    foot: "모르는 칸은 짐작하지 않고 「확인 필요」로 남겨요",
   },
   {
-    title: [br("순위와 가점까지"), br("계산해요")],
-    body: br("임대주택은 예상 순위를, | 분양은 1순위 여부와 가점 84점 중 몇 점인지 | 보여 드려요. | 어떤 항목에서 점수가 났는지도 함께요."),
-    foot: "근거가 되는 기준은 상세 화면에 그대로 적어 둬요",
+    title: [br("순위와 가점까지"), br("알려 드려요")],
+    body: br("임대주택은 예상 순위를, | 분양은 1순위인지와 가점을 | 계산해 보여 드려요."),
+    foot: "어떤 기준으로 계산했는지 그대로 보여 드려요",
   },
 ];
 
 function ScreenQuestion() {
   return (
-    <div className="flex h-full flex-col px-6 pb-6 pt-16">
+    <div className="flex h-full flex-col bg-page px-6 pb-6 pt-14">
       <div className="flex gap-1.5">
         {[1, 1, 1, 0, 0].map((on, i) => (
           <motion.span
             key={i}
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
-            transition={{ delay: 0.1 * i, duration: 0.6, ease: EASE }}
-            className={`h-[3px] flex-1 origin-left rounded-full ${on ? "bg-pure" : "bg-white/15"}`}
+            transition={{ delay: 0.08 * i, duration: 0.5, ease: EASE }}
+            className={`h-1 flex-1 origin-left rounded-full ${on ? "bg-brand" : "bg-well"}`}
           />
         ))}
       </div>
-      <p className="eyebrow mt-8">3/5 · 가족</p>
-      <p className="mt-3 font-[family-name:var(--font-display)] text-[28px] leading-[1.25] text-pure">가족 상황을 알려주세요</p>
-      <div className="mt-7 grid grid-cols-2 gap-2">
+      <p className="mt-7 text-[13px] font-bold text-brand">3/5 · 가족</p>
+      <p className="mt-2 text-[24px] font-bold leading-[1.3] tracking-[-0.03em] text-ink">가족 상황을 알려주세요</p>
+      <div className="mt-6 grid grid-cols-2 gap-2">
         {["미혼", "결혼 예정", "결혼 7년 이내", "결혼 7년 넘음"].map((t, i) => (
           <motion.span
             key={t}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 + i * 0.06, duration: 0.6, ease: EASE }}
-            className={`flex h-12 items-center rounded-[14px] px-3.5 text-[14px] font-medium ${
-              i === 0 ? "bg-pure text-void" : "text-cloud ring-1 ring-inset ring-white/14"
+            transition={{ delay: 0.12 + i * 0.05, duration: 0.5, ease: EASE }}
+            className={`flex h-12 items-center rounded-[14px] px-3.5 text-[14px] font-semibold ${
+              i === 0 ? "bg-brand-soft text-brand-ink ring-2 ring-inset ring-brand" : "text-body ring-1 ring-inset ring-line"
             }`}
           >
             {t}
           </motion.span>
         ))}
       </div>
-      <p className="t-small mt-6 text-ash">미성년 자녀</p>
+      <p className="mt-6 text-[13px] font-semibold text-sub">미성년 자녀</p>
       <div className="mt-2 grid grid-cols-4 gap-2">
-        {["없음", "1명", "2명", "3명 이상"].map((t, i) => (
+        {["없음", "1명", "2명", "3명+"].map((t, i) => (
           <span
             key={t}
-            className={`flex h-11 items-center justify-center rounded-[14px] text-[14px] font-medium whitespace-nowrap ${
-              i === 0 ? "bg-pure text-void" : "text-cloud ring-1 ring-inset ring-white/14"
+            className={`flex h-11 items-center justify-center rounded-[14px] text-[14px] font-semibold whitespace-nowrap ${
+              i === 0 ? "bg-brand-soft text-brand-ink ring-2 ring-inset ring-brand" : "text-body ring-1 ring-inset ring-line"
             }`}
           >
             {t}
@@ -73,12 +73,12 @@ function ScreenQuestion() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.8, ease: EASE }}
-        className="mt-auto flex items-center justify-between rounded-[12px] bg-white/[0.07] px-4 py-3.5"
+        transition={{ delay: 0.45, duration: 0.6, ease: EASE }}
+        className="mt-auto flex items-center justify-between rounded-[14px] bg-ok-soft px-4 py-3.5"
       >
-        <span className="t-small text-ash">지금 조건으로 신청 가능</span>
-        <span className="text-[15px] text-pure">
-          <span className="num text-[24px]">12</span>건
+        <span className="text-[13px] font-semibold text-ok-ink">지금 조건으로 신청 가능</span>
+        <span className="text-[15px] font-bold text-ok-ink">
+          <span className="num text-[22px]">12</span>건
         </span>
       </motion.div>
     </div>
@@ -97,26 +97,26 @@ const LABEL = { ok: "가능", maybe: "확인", no: "없음" } as const;
 
 function ScreenList() {
   return (
-    <div className="flex h-full flex-col px-5 pb-6 pt-16">
-      <p className="font-[family-name:var(--font-display)] text-[26px] text-pure">
-        신청 가능 <span className="num text-[30px]">7</span>건
+    <div className="flex h-full flex-col bg-wash px-4 pb-6 pt-14">
+      <p className="px-1 text-[24px] font-bold tracking-[-0.03em] text-ink">
+        신청 가능 <span className="text-brand">7</span>건
       </p>
-      <p className="t-small mt-1 text-ash">확인 필요 4 · 해당 없음 9</p>
-      <ul className="mt-6 space-y-2">
+      <p className="mt-1 px-1 text-[13px] text-muted">확인 필요 4 · 해당 없음 9</p>
+      <ul className="mt-5 space-y-2">
         {ROWS.map((r, i) => (
           <motion.li
             key={r.t}
             initial={{ opacity: 0, x: 18 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.08 * i, duration: 0.7, ease: EASE }}
-            className={`flex items-center gap-3 rounded-[14px] bg-white/[0.04] px-3.5 py-3 ring-1 ring-inset ring-line ${r.s === "no" ? "opacity-50" : ""}`}
+            transition={{ delay: 0.07 * i, duration: 0.55, ease: EASE }}
+            className={`flex items-center gap-3 rounded-[16px] bg-page px-3.5 py-3 shadow-card ${r.s === "no" ? "opacity-55" : ""}`}
           >
             <StatusBadge status={r.s}>{LABEL[r.s]}</StatusBadge>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[14px] font-medium text-cloud">{r.t}</span>
-              <span className="t-caption block truncate text-dim">{r.m}</span>
+              <span className="block truncate text-[14px] font-semibold text-ink">{r.t}</span>
+              <span className="block truncate text-[12px] text-muted">{r.m}</span>
             </span>
-            <span className="data text-[13px] text-mist">{r.d}</span>
+            <span className={`data text-[13px] ${r.d === "D-3" ? "text-hot-ink" : "text-ink"}`}>{r.d}</span>
           </motion.li>
         ))}
       </ul>
@@ -132,39 +132,39 @@ const BARS = [
 
 function ScreenScore() {
   return (
-    <div className="flex h-full flex-col px-6 pb-6 pt-16">
-      <p className="eyebrow">청약홈 · 민영 아파트</p>
-      <p className="t-small mt-3 text-ash">내 청약 가점</p>
-      <p className="text-pure">
-        <span className="num text-[64px] leading-none">54</span>
-        <span className="num ml-1 text-[22px] text-ash">/ 84</span>
+    <div className="flex h-full flex-col bg-page px-6 pb-6 pt-14">
+      <p className="text-[13px] font-bold text-brand">청약홈 · 민영 아파트</p>
+      <p className="mt-3 text-[14px] font-semibold text-sub">내 청약 가점</p>
+      <p className="text-ink">
+        <span className="num text-[56px] leading-none">54</span>
+        <span className="ml-1 text-[18px] font-semibold text-faint">/ 84점</span>
       </p>
-      <div className="mt-7 space-y-5">
+      <div className="mt-6 space-y-4">
         {BARS.map((b, i) => (
           <div key={b.l}>
             <div className="flex justify-between text-[13px]">
-              <span className="text-cloud">{b.l}</span>
-              <span className="data text-ash">
+              <span className="font-medium text-body">{b.l}</span>
+              <span className="data text-sub">
                 {b.v} / {b.m}
               </span>
             </div>
-            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
+            <div className="mt-2 h-2 overflow-hidden rounded-full bg-well">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${(b.v / b.m) * 100}%` }}
-                transition={{ delay: 0.2 + i * 0.15, duration: 1.2, ease: EASE }}
-                className="h-full rounded-full bg-signal"
+                transition={{ delay: 0.15 + i * 0.12, duration: 1, ease: EASE }}
+                className="h-full rounded-full bg-brand"
               />
             </div>
           </div>
         ))}
       </div>
-      <div className="mt-auto rounded-[12px] bg-white/[0.07] p-4">
-        <p className="t-small text-ash">1순위 조건</p>
-        <ul className="mt-2 space-y-1.5 text-[14px] text-cloud">
+      <div className="mt-auto rounded-[14px] bg-wash p-4">
+        <p className="text-[13px] font-semibold text-sub">1순위 조건</p>
+        <ul className="mt-2 space-y-1.5 text-[14px] text-body">
           {["청약통장 가입 2년 이상", "지역·면적별 예치금 충족", "세대주"].map((t) => (
             <li key={t} className="flex items-center gap-2">
-              <span className="text-ok">✓</span>
+              <span className="grid size-4 place-items-center rounded-full bg-ok text-[10px] font-bold text-white">✓</span>
               {t}
             </li>
           ))}
@@ -179,16 +179,16 @@ const SCREENS = [ScreenQuestion, ScreenList, ScreenScore];
 function Phone({ active, className = "" }: { active: number; className?: string }) {
   const Screen = SCREENS[active];
   return (
-    <div className={`rounded-[52px] p-[10px] ${className}`} style={{ background: "linear-gradient(135deg, #3a3a3c, #131313 45%, #2b2b2c)" }}>
-      <div className="relative h-[560px] overflow-hidden rounded-[43px] bg-obsidian md:h-[640px]">
-        <div className="absolute left-1/2 top-3 z-10 h-[28px] w-[100px] -translate-x-1/2 rounded-full bg-black" />
+    <div className={`rounded-[46px] bg-[#e9edf2] p-[9px] shadow-lift ring-1 ring-inset ring-white ${className}`}>
+      <div className="relative h-[540px] overflow-hidden rounded-[38px] bg-page md:h-[600px]">
+        <div className="absolute left-1/2 top-2.5 z-10 h-[26px] w-[92px] -translate-x-1/2 rounded-full bg-ink" />
         <AnimatePresence mode="wait">
           <motion.div
             key={active}
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.5, ease: EASE }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.4, ease: EASE }}
             className="absolute inset-0"
           >
             <Screen />
@@ -207,19 +207,21 @@ function Step({ i, onActive }: { i: number; onActive: (i: number) => void }) {
   }, [inView, i, onActive]);
   const s = STEPS[i];
   return (
-    <div ref={ref} className="flex flex-col justify-center py-12 lg:min-h-[92vh] lg:py-16">
-      <p className="eyebrow">{i + 1}단계</p>
-      <h3 className="t-display-l mt-4 text-pure">
+    <div ref={ref} className="flex flex-col justify-center py-10 lg:min-h-[60vh] lg:py-12">
+      <span className="grid size-10 place-items-center rounded-full bg-brand text-[17px] font-bold text-white">{i + 1}</span>
+      <h3 className="t-display-l mt-5">
         <LineReveal lines={s.title} />
       </h3>
-      <p className="t-body-l mt-6 max-w-[27em] text-ash">{s.body}</p>
-      <p className="t-small mt-6 inline-flex items-center gap-2 text-mist">
-        <span className="size-1 rounded-full bg-signal" />
+      <p className="t-body-l mt-5 max-w-[26em] text-sub">{s.body}</p>
+      <p className="t-small mt-5 inline-flex w-fit items-center gap-2 rounded-full bg-wash px-3.5 py-2 font-medium text-sub">
+        <svg viewBox="0 0 16 16" className="size-4 shrink-0 text-ok" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden>
+          <path d="M3.5 8.5l3 3 6-7" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
         {s.foot}
       </p>
       {/* 모바일은 옆에 붙는 폰이 없으니 단계마다 화면을 바로 아래 보여준다 */}
-      <div className="mt-10 lg:hidden">
-        <Phone active={i} className="mx-auto w-[min(84vw,340px)]" />
+      <div className="mt-8 lg:hidden">
+        <Phone active={i} className="mx-auto w-[min(84vw,330px)]" />
       </div>
     </div>
   );
@@ -228,22 +230,30 @@ function Step({ i, onActive }: { i: number; onActive: (i: number) => void }) {
 export function HowItWorks() {
   const [active, setActive] = useState(0);
   return (
-    <section id="how" aria-label="판정 방식" className="scroll-mt-10 py-8 md:py-16">
-      <div className="wrap grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-24">
-        <div>
-          {STEPS.map((_, i) => (
-            <Step key={i} i={i} onActive={setActive} />
-          ))}
+    <section id="how" aria-labelledby="how-title" className="scroll-mt-16 py-16 md:py-24">
+      <div className="wrap">
+        <div className="text-center lg:text-left">
+          <p className="eyebrow">이용 방법</p>
+          <h2 id="how-title" className="t-display-l mt-3">
+            <LineReveal lines={[br("세 단계면 끝나요")]} />
+          </h2>
         </div>
-        <div className="hidden lg:block">
-          <div className="sticky top-0 flex h-screen items-center">
-            <div className="w-[380px]">
-              <div className="mb-6 flex gap-2">
-                {STEPS.map((_, i) => (
-                  <span key={i} className={`h-[2px] flex-1 rounded-full transition-colors duration-500 ${i <= active ? "bg-pure" : "bg-white/15"}`} />
-                ))}
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-24">
+          <div>
+            {STEPS.map((_, i) => (
+              <Step key={i} i={i} onActive={setActive} />
+            ))}
+          </div>
+          <div className="hidden lg:block">
+            <div className="sticky top-0 flex h-screen items-center">
+              <div className="w-[360px]">
+                <div className="mb-5 flex gap-2">
+                  {STEPS.map((_, i) => (
+                    <span key={i} className={`h-1 flex-1 rounded-full transition-colors duration-500 ${i <= active ? "bg-brand" : "bg-well"}`} />
+                  ))}
+                </div>
+                <Phone active={active} />
               </div>
-              <Phone active={active} />
             </div>
           </div>
         </div>

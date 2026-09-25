@@ -1,88 +1,83 @@
 "use client";
 
-import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
-import { useRef } from "react";
+import { motion } from "motion/react";
 import { LineReveal, Reveal } from "@/components/motion/Reveal";
 import { br } from "@/lib/text";
 
-// 단어 사이 공백 중 「묶어야 하는 말」은 nbsp로 이어 두었다 — 스크롤 점등은 일반 공백 단위로 나뉜다.
-const PARAGRAPH = [
-  "공고는 LH, SH, GH, HUG, 청약홈, 구청 게시판에 따로 올라와요.",
-  "자격 조건은 수십 쪽짜리 PDF 안에 숨어 있고요.",
-  "나이, 소득, 자산, 무주택 기간, 통장 납입 횟수.",
-  "하나만 어긋나도 서류 단계에서 떨어집니다.",
-  "그래서 청약핏은 공고를 모으는 데서 멈추지 않고,",
-  "조건을 하나씩 대조해서 되는지부터 알려 드려요.",
-].join(" ");
+const EASE = [0.16, 1, 0.3, 1] as const;
 
-function Word({ children, progress, range }: { children: string; progress: MotionValue<number>; range: [number, number] }) {
-  const opacity = useTransform(progress, range, [0.18, 1]);
-  return (
-    <motion.span style={{ opacity }} className="inline">
-      {children}{" "}
-    </motion.span>
-  );
-}
+const PAINS = [
+  {
+    title: "공고가 떴는지도 몰랐어요",
+    body: "LH, SH, GH, HUG, 청약홈… | 공고가 기관마다 따로 올라와요.",
+    tint: "bg-tint-blue text-brand",
+    icon: (
+      <path d="M6 16V10a6 6 0 1 1 12 0v6l1.5 2h-15L6 16ZM10 20.5a2 2 0 0 0 4 0" strokeLinecap="round" strokeLinejoin="round" />
+    ),
+  },
+  {
+    title: "공고문 읽다가 포기했어요",
+    body: "자격 조건이 | 수십 쪽짜리 PDF 안에 숨어 있어요.",
+    tint: "bg-tint-orange text-maybe-ink",
+    icon: (
+      <>
+        <path d="M7 3.5h7l4 4V20a.5.5 0 0 1-.5.5h-10.5A.5.5 0 0 1 6.5 20V4a.5.5 0 0 1 .5-.5Z" strokeLinejoin="round" />
+        <path d="M13.5 3.5V8h4.5M9.5 12h5M9.5 15.5h5" strokeLinecap="round" strokeLinejoin="round" />
+      </>
+    ),
+  },
+  {
+    title: "내가 되는지 모르겠어요",
+    body: "나이, 소득, 자산, 무주택 기간. | 하나만 달라도 떨어져요.",
+    tint: "bg-tint-green text-ok-ink",
+    icon: (
+      <>
+        <circle cx="12" cy="12" r="8.5" />
+        <path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.3M12 16.6v.2" strokeLinecap="round" strokeLinejoin="round" />
+      </>
+    ),
+  },
+];
 
-/** 스크롤에 맞춰 문단 단어가 하나씩 켜진다 */
-function ScrollLitParagraph() {
-  const ref = useRef<HTMLParagraphElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.85", "end 0.5"] });
-  const words = PARAGRAPH.split(" ");
+/** 흔히 겪는 불편 세 가지 → 청약핏이 대신 해 주는 일 */
+export function Problem() {
   return (
-    <p
-      ref={ref}
-      className="mx-auto max-w-[30em] text-left text-[19px] leading-[1.7] text-cloud md:text-center md:text-[28px] md:leading-[1.6]"
-    >
-      {words.map((w, i) => {
-        const start = i / words.length;
-        return (
-          <Word key={i} progress={scrollYProgress} range={[start, start + 1 / words.length]}>
-            {w}
-          </Word>
-        );
-      })}
-    </p>
-  );
-}
-
-export function Problem({ facts }: { facts: { sources: number; programs: number } }) {
-  return (
-    <section className="wrap-wide pt-2 md:pt-4">
-      <div className="relative overflow-hidden rounded-[28px] bg-coal px-5 py-20 md:px-16 md:py-32">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-[420px]"
-          style={{
-            background:
-              "radial-gradient(60% 90% at 50% 120%, rgba(144,184,240,0.5), rgba(132,125,255,0.26) 38%, rgba(15,16,17,0) 72%)",
-          }}
-        />
-        <div aria-hidden className="grain pointer-events-none absolute inset-0" />
-        <div className="relative mx-auto max-w-[1040px] text-center">
-          <h2 className="t-display-l text-pure">
-            <LineReveal lines={[br("청약이 어려운 건"), br("정보가 | 흩어져 있어서예요")]} />
+    <section aria-labelledby="problem-title" className="bg-wash py-20 md:py-28">
+      <div className="wrap">
+        <div className="text-center">
+          <p className="eyebrow">청약이 어려운 이유</p>
+          <h2 id="problem-title" className="t-display-l mt-3">
+            <LineReveal lines={[br("이런 적, | 있지 않나요?")]} />
           </h2>
-          <div className="mt-12 md:mt-16">
-            <ScrollLitParagraph />
-          </div>
-
-          <Reveal className="mt-16 grid grid-cols-3 md:mt-24">
-            {[
-              { n: facts.sources, unit: "곳", label: "공고 출처" },
-              { n: facts.programs, unit: "종", label: "판정 유형" },
-              { n: 0, unit: "건", label: "남기는 개인정보" },
-            ].map((f) => (
-              <div key={f.label} className="flex flex-col items-center gap-2 border-l border-line px-2 first:border-l-0">
-                <p className="leading-none text-pure">
-                  <span className="num text-[44px] md:text-[64px]">{f.n}</span>
-                  <span className="ml-1 font-[family-name:var(--font-display)] text-[18px] md:text-[26px]">{f.unit}</span>
-                </p>
-                <p className="t-small whitespace-nowrap text-ash">{f.label}</p>
-              </div>
-            ))}
-          </Reveal>
         </div>
+        <ul className="mt-10 grid gap-3 md:mt-14 md:grid-cols-3 md:gap-4">
+          {PAINS.map((p, i) => (
+            <motion.li
+              key={p.title}
+              initial={{ opacity: 0, y: 32 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.7, delay: i * 0.1, ease: EASE }}
+              className="rounded-[24px] bg-page p-6 shadow-card md:p-8"
+            >
+              <span className={`grid size-12 place-items-center rounded-[14px] ${p.tint}`}>
+                <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+                  {p.icon}
+                </svg>
+              </span>
+              <h3 className="t-title mt-5 text-ink">{p.title}</h3>
+              <p className="t-body mt-2 text-sub">{br(p.body)}</p>
+            </motion.li>
+          ))}
+        </ul>
+        <Reveal className="mt-10 text-center md:mt-14">
+          <p className="t-display-s">
+            {br("청약핏이 | 대신 모으고, 대신 확인해 드려요")}
+          </p>
+          <svg viewBox="0 0 24 24" className="mx-auto mt-4 size-6 animate-bounce text-brand" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+            <path d="M12 5v14M6 13l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </Reveal>
       </div>
     </section>
   );
